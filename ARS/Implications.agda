@@ -186,7 +186,7 @@ RP-→RP RP- f f-inc a aisf-bound with RP- f f-inc a aisf-bound
             ... | yisf-bound with RP- f f-inc y yisf-bound
             ... | j ,, R*yfⱼ = R*yfⱼ ⋆!⋆ (aisf-bound j ⋆!⋆ R*afᵢ)
 
-RP-↔RP : R isRP- ↔ (R isRP)
+RP-↔RP : R isRP- ↔ R isRP
 RP-↔RP  = RP-→RP , RP→RP-
 
 
