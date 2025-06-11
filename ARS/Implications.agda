@@ -91,6 +91,16 @@ module Normalizing-Implications where
     WN∧MF→SN (n ,, R*xn , n∈NF) x∈MF =
         acc (λ y Rxy → ∅ (NF↓⊆NF n∈NF (x∈MF n R*xn) Rxy))
 
+    MF∧SN→NF : ∀ {x} → MF x × SN x → NF x 
+    MF∧SN→NF (x∈MF , acc xacc) Rxy with xacc _ Rxy 
+    ... | acc yacc = {!   !} 
+
+    NF→MF∧SN : ∀ {x} → NF x → MF x × SN x 
+    NF→MF∧SN xinNF = (NF⊆MF xinNF) , NF⊆SN xinNF  
+    
+    MF∧SN↔NF : ∀ {x} → MF x × SN x ↔ NF x 
+    MF∧SN↔NF = {!   !} 
+
     WN∧NP∧SM→SN : ∀ {x} → WN x → NP x → SM x → SN x
     WN∧NP∧SM→SN {x} x∈WN x∈NP (SMrec .x x∈MF) = WN∧MF→SN x∈WN x∈MF
     WN∧NP∧SM→SN {x} (n ,, R*xn , n∈NF) x∈NP (SMacc .x xAcc) = acc f where
@@ -221,3 +231,4 @@ SN∧UN→CRelem : (~R R) isMinDec → ∀ x → SN x → UN x → CR x
 SN∧UN→CRelem decNF x x∈SN x∈UN R*xb R*xc with SNdec→WN decNF x x∈SN
 ... | (z ,, R*xz , z∈NF) = (z ,, decMin∧SNx∧UNx→NP  decNF x x∈SN x∈UN  z∈NF R*xz  R*xb
                                 , decMin∧SNx∧UNx→NP  decNF x x∈SN x∈UN z∈NF R*xz R*xc )
+ 
