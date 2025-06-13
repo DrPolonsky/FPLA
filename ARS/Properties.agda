@@ -89,21 +89,13 @@ module GlobalProperties (R : 𝓡 A) where
     _isUN→ : Set
     _isUN→ = ∀ x → UN x
 
-    is_-_bound_ : (f : ℕ → A) → A → Set
-    is_-_bound_ f x = ∀ n → (R ⋆) (f n) x
-
-    _isBP : Set
-    _isBP = ∀ (f : ℕ → A) → f ∈ R -increasing → Σ[ x ∈ A ] ( is_-_bound_ f x )
-
-    _isBP+ : Set
-    _isBP+ = ∀ (f : ℕ → A) → f ∈ (R ʳ) -increasing → Σ[ a ∈ A ] (is_-_bound_ f a )
 
     _isRP : Set
-    _isRP = ∀ (f : ℕ → A) → f ∈ R -increasing → ∀ a → (is_-_bound_ f a)
+    _isRP = ∀ (f : ℕ → A) → f ∈ R -increasing → ∀ a → (is R - f bound a)
          → Σ[ m ∈ ℕ ] MF (f m)
 
     _isRP- : Set
-    _isRP- = ∀ (f : ℕ → A) → f ∈ R -increasing → ∀ a → (is_-_bound_ f a)
+    _isRP- = ∀ (f : ℕ → A) → f ∈ R -increasing → ∀ a → (is R - f bound a)
           → Σ[ i ∈ ℕ ] ((R ⋆) a (f i))
 
     -- AKA Convergent

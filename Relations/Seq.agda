@@ -12,6 +12,13 @@ _-increasing s = ∀ n → R (s n) (s (succ n)) -- xₙ < xₙ₊₁
 _-decreasing : 𝓟 (ℕ → A)
 _-decreasing s = ∀ n → R (s (succ n)) (s n) -- xₙ > xₙ₊₁
 
+is_-_bound_ : (f : ℕ → A) → A → Set
+is_-_bound_ f x = ∀ n → (R ⋆) (f n) x
+
+_isBP : Set
+_isBP = ∀ (f : ℕ → A) → f ∈ _-increasing → Σ[ x ∈ A ] ( is_-_bound_ f x )
+
+
 seq-lemma : ∀ (f : ℕ → A) → f ∈ _-increasing → ∀ n → (R ⋆) (f zero) (f n)
 seq-lemma f f-inc zero = ε⋆
 seq-lemma f f-inc (succ n) = f-inc zero ,⋆ seq-lemma (f ∘ succ) (λ k → f-inc (succ k)) n
