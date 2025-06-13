@@ -91,15 +91,21 @@ module Normalizing-Implications where
     WN∧MF→SN (n ,, R*xn , n∈NF) x∈MF =
         acc (λ y Rxy → ∅ (NF↓⊆NF n∈NF (x∈MF n R*xn) Rxy))
 
-    MF∧SN→NF : ∀ {x} → MF x × SN x → NF x 
-    MF∧SN→NF (x∈MF , acc xacc) Rxy with xacc _ Rxy 
-    ... | acc yacc = {!   !} 
-
+    MF∧SN→NF : ∀ {x} → MF x → SN x → NF x 
+    MF∧SN→NF x∈MF (acc xacc) {y} Rxy 
+        with MF∧SN→NF (MF↓⊆MF x∈MF (Rxy ,⋆ ε⋆)) (xacc y Rxy) 
+    ... | y∈NF with x∈MF y (Rxy ,⋆ ε⋆)  
+    ... | ε⋆ = y∈NF Rxy
+    ... | Ryy₁ ,⋆ _ = y∈NF Ryy₁    
+    
+    -- xacc _ Rxy
+    -- ... | acc yacc = {!   !} 
+    
     NF→MF∧SN : ∀ {x} → NF x → MF x × SN x 
     NF→MF∧SN xinNF = (NF⊆MF xinNF) , NF⊆SN xinNF  
     
     MF∧SN↔NF : ∀ {x} → MF x × SN x ↔ NF x 
-    MF∧SN↔NF = {!   !} 
+    MF∧SN↔NF = (λ (x∈MF , x∈SN) → MF∧SN→NF x∈MF x∈SN) , NF→MF∧SN 
 
     WN∧NP∧SM→SN : ∀ {x} → WN x → NP x → SM x → SN x
     WN∧NP∧SM→SN {x} x∈WN x∈NP (SMrec .x x∈MF) = WN∧MF→SN x∈WN x∈MF
@@ -231,4 +237,3 @@ SN∧UN→CRelem : (~R R) isMinDec → ∀ x → SN x → UN x → CR x
 SN∧UN→CRelem decNF x x∈SN x∈UN R*xb R*xc with SNdec→WN decNF x x∈SN
 ... | (z ,, R*xz , z∈NF) = (z ,, decMin∧SNx∧UNx→NP  decNF x x∈SN x∈UN  z∈NF R*xz  R*xb
                                 , decMin∧SNx∧UNx→NP  decNF x x∈SN x∈UN z∈NF R*xz R*xc )
- 
