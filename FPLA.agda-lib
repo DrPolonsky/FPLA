@@ -1,0 +1,3 @@
+name: FPLA
+include: .
+depend: standard-library
