@@ -98,9 +98,6 @@ module Normalizing-Implications where
     ... | ε⋆ = y∈NF Rxy
     ... | Ryy₁ ,⋆ _ = y∈NF Ryy₁    
     
-    -- xacc _ Rxy
-    -- ... | acc yacc = {!   !} 
-    
     NF→MF∧SN : ∀ {x} → NF x → MF x × SN x 
     NF→MF∧SN xinNF = (NF⊆MF xinNF) , NF⊆SN xinNF  
     
