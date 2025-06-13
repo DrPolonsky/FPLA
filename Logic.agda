@@ -61,9 +61,11 @@ _↔!↔_ : ∀ {A B C} → A ↔ B → B ↔ C → A ↔ C
 
 -- EQUALITY
 -- ≡ is \== or \equiv
-data _≡_ {l} {A : Set l} (a : A) : A → Set l where
-  refl : a ≡ a
-{-# BUILTIN EQUALITY _≡_ #-}
+-- data _≡_ {l} {A : Set l} (a : A) : A → Set l where
+--   refl : a ≡ a
+-- {-# BUILTIN EQUALITY _≡_ #-}
+
+open import Relation.Binary.PropositionalEquality using (_≡_; refl) public
 
 ~ : ∀ {A : Set} {a b : A} → a ≡ b → b ≡ a
 ~ refl = refl
@@ -128,7 +130,7 @@ f ∘≅ gh = λ a → cong f (gh a)
 infix 10 _↔_
 infix 14 _⊔_
 infix 15 _×_
-infix 18 _≡_
+-- infix 18 _≡_
 infix 18 _≅_
 infixr 22 _!_
 infix 25 _∘_

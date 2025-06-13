@@ -5,10 +5,12 @@ open import Lifting
 
 -- INTEGERS AND FINITE SETS
 -- ℕ is \bN
-data ℕ : Set where
-  zero : ℕ
-  succ : ℕ → ℕ
-{-# BUILTIN NATURAL ℕ #-}
+-- data ℕ : Set where
+--   zero : ℕ
+--   succ : ℕ → ℕ
+-- {-# BUILTIN NATURAL ℕ #-}
+
+open import Data.Nat using (ℕ; zero) renaming (suc to succ) public
 
 add : ℕ → ℕ → ℕ
 add zero y = y
@@ -44,6 +46,8 @@ if_then_else_ : ∀ {A : Set} → 𝔹 → A → A → A
 if true  then x else y = x
 if false then x else y = y
 
+infixr 4 if_then_else_
+
 and : 𝔹 → 𝔹 → 𝔹
 and true true = true
 and _ _ = false
@@ -57,18 +61,21 @@ eqℕ x y = and (le x y) (le y x)
 
 -- Lists
 -- ∷ is \::
-data List (A : Set) : Set where
-  [] : List A
-  _∷_ : A → List A → List A
-{-# BUILTIN LIST List #-}
+-- data List (A : Set) : Set where
+--   [] : List A
+--   _∷_ : A → List A → List A
+-- {-# BUILTIN LIST List #-}
 
-infixr 21 _∷_
+-- infixr 21 _∷_
 
-any : ∀ {A} → (A → 𝔹) → List A → 𝔹
+open import Data.List using (List; []; _∷_) public
+-- open import Data.List.Base using (List; []; _∷_)
+
+any : ∀ {A : Set} → (A → 𝔹) → List A → 𝔹
 any f [] = false
 any f (x ∷ xs) = if f x then true else any f xs
 
-all : ∀ {A} → (A → 𝔹) → List A → 𝔹
+all : ∀ {A : Set} → (A → 𝔹) → List A → 𝔹
 all f [] = true
 all f (x ∷ as) = if not (f x) then false else all f as
 
@@ -87,13 +94,13 @@ foldList : ∀ {A B : Set} → B → (A → B → B) → List A → B
 foldList z f [] = z
 foldList z f (x ∷ xs) = f x (foldList z f xs)
 
-_++_ : ∀ {A} → List A → List A → List A
+_++_ : ∀ {A : Set} → List A → List A → List A
 [] ++ ys = ys
 (x ∷ xs) ++ ys = x ∷ (xs ++ ys)
 
 infixr 21 _++_
 
-merge : ∀ {A} → List A → List A → List A
+merge : ∀ {A : Set} → List A → List A → List A
 merge xs [] = xs
 merge [] ys = ys
 merge (x ∷ xs) (y ∷ ys) = x ∷ y ∷ merge xs ys
@@ -106,18 +113,18 @@ lazyProd (x ∷ xs) (y ∷ ys) = (x , y) ∷ merge (lazyProd xs (y ∷ ys))
 
 filter : ∀ {A} → (A → 𝔹) → List A → List A
 filter f [] = []
-filter f (x ∷ xs) = if f x then (filter f xs) else x ∷ (filter f xs)
+filter f (x ∷ xs) = if f x then (filter f xs) else (x ∷ (filter f xs))
 
-elem : ∀ {A} → (A → A → 𝔹) → A → List A → 𝔹
+elem : ∀ {A : Set} → (A → A → 𝔹) → A → List A → 𝔹
 elem dA a [] = false
 elem dA a (x ∷ xs) = if dA a x then true else elem dA a xs
 
-take : ∀ {A} → ℕ → List A → List A
+take : ∀ {A : Set} → ℕ → List A → List A
 take zero _ = []
 take (succ n) [] = []
 take (succ n) (x ∷ xs) = x ∷ take n xs
 
-length : ∀ {A} → List A → ℕ
+length : ∀ {A : Set} → List A → ℕ
 length [] = 0
 length (_ ∷ xs) = succ (length xs)
 
@@ -129,7 +136,7 @@ drop {A} f a = g where
              g (x ∷ as) = if fa x then as else x ∷ g as
 
 {-# TERMINATING #-}
-isSubset : ∀ {A} → (A → A → 𝔹) → List A → List A → 𝔹
+isSubset : ∀ {A : Set} → (A → A → 𝔹) → List A → List A → 𝔹
 isSubset {A} eq xs ys = check xs ys where
   check : List A → List A → 𝔹
   check []       _    = true

@@ -114,7 +114,7 @@ module GlobalProperties (R : 𝓡 A) where
     -- Cofinality Property
     _isCP : Set
     _isCP = ∀ (a : A) → Σ[ s ∈ (ℕ → A) ] ((s ∈ (R ʳ) -increasing) ×
-                   (s zero ≡ a × (∀ b → (R ⋆) a b → Σ[ n ∈ ℕ ] ((R ⋆) b (s n))) ))
+                   ((s zero ≡ a) × (∀ b → (R ⋆) a b → Σ[ n ∈ ℕ ] ((R ⋆) b (s n))) ))
 
 open GlobalProperties public
 

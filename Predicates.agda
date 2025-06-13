@@ -5,6 +5,8 @@ open import Logic
 open import Lifting
 open import Datatypes
 open import Lambda
+-- open import Data.Nat.Base using (ℕ; zero; succ)
+
 
 -- The type of n-ary predicates on A
 𝓟^ : ℕ → Set → Set₁

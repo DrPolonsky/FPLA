@@ -198,7 +198,7 @@ module FBImplications {A : Set} {R : 𝓡 A} (RisFB : R isFB) where
     RisWFseq- : isWFseq- R
     RisWFseq- = isWFmin-→isWFseq- R (isWFminDNE-→isWFmin- R (isWFminDNE→isWFminDNE- R wfMinDNE))
     P : 𝓟 A
-    P x = Σ[ n ∈ ℕ ] (x ≡ s n × ¬ (s ∘ add n) ∈ R -decreasing)
+    P x = Σ[ n ∈ ℕ ] ((x ≡ s n) × ¬ (s ∘ add n) ∈ R -decreasing)
     ps0 : P (s 0)
     ps0 = 0 ,, (refl , RisWFseq- _ )
     CCP⊆P : ¬¬Closed P
