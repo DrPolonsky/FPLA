@@ -77,11 +77,11 @@ module Confluent-Implications where
     WN∧NP→CR : ∀ {x} → WN x → NP x → CR x
     WN∧NP→CR (n ,, (R*xn , x∈NF)) x∈NP R*xy R*xz = n ,, x∈NP x∈NF R*xn R*xy , x∈NP x∈NF R*xn R*xz
 
-    UN→∧WN→CR : R isUN→ → R isWN → R isCR
-    UN→∧WN→CR RisUN→ RisWN x {y}{z} R*xy R*xz with RisWN y | RisWN z
-    ... | n₀ ,, R*yn₀ , n₀∈NF |  n₁ ,, R*zn₁ , n₁∈NF with
-                RisUN→ x n₀∈NF n₁∈NF (R*xy ⋆!⋆ R*yn₀) (R*xz ⋆!⋆ R*zn₁)
-    ... | n₀≡n₁ = n₀ ,, (R*yn₀ , transp ((R ⋆) z) (~ n₀≡n₁) R*zn₁)
+    -- UN→∧WN→CR : R isUN→ → R isWN → R isCR
+    -- UN→∧WN→CR RisUN→ RisWN x {y}{z} R*xy R*xz with RisWN y | RisWN z
+    -- ... | n₀ ,, R*yn₀ , n₀∈NF |  n₁ ,, R*zn₁ , n₁∈NF with
+    --             RisUN→ x n₀∈NF n₁∈NF (R*xy ⋆!⋆ R*yn₀) (R*xz ⋆!⋆ R*zn₁)
+    -- ... | n₀≡n₁ = n₀ ,, (R*yn₀ , transp ((R ⋆) z) (~ n₀≡n₁) R*zn₁)
 
 module Normalizing-Implications where
     NF⊆SN : ∀ {x} → NF x → SN x
@@ -103,6 +103,11 @@ module Normalizing-Implications where
     
     MF∧SN↔NF : ∀ {x} → MF x × SN x ↔ NF x 
     MF∧SN↔NF = (λ (x∈MF , x∈SN) → MF∧SN→NF x∈MF x∈SN) , NF→MF∧SN 
+
+    MF∧WN↔NF : ∀ {x} → MF x × WN x ↔ NF x 
+    pr1 MF∧WN↔NF (x∈MF , x∈WN)  with WN∧MF→SN x∈WN x∈MF
+    ... | x∈SN = MF∧SN→NF x∈MF x∈SN
+    pr2 MF∧WN↔NF x∈NF = NF⊆MF x∈NF , ((_ ,, ε⋆ , x∈NF)) 
 
     WN∧NP∧SM→SN : ∀ {x} → WN x → NP x → SM x → SN x
     WN∧NP∧SM→SN {x} x∈WN x∈NP (SMrec .x x∈MF) = WN∧MF→SN x∈WN x∈MF

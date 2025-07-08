@@ -31,6 +31,12 @@ module Theorem-1-2-2 where
     ii : R isWN × R isUN → R isCR
     ii (RisWN , RisUN) = Confluent-Implications.UN→∧WN→CR (Terese-Alternative.UN→UN→ RisUN) RisWN
 
+    ii+ : R isWN × R isUN→ → R isCR
+    ii+ (RisWN ,  RisUN→) x {y}{z} R*xy R*xz with RisWN y | RisWN z
+    ... | n₀ ,, R*yn₀ , n₀∈NF |  n₁ ,, R*zn₁ , n₁∈NF with
+                RisUN→ x n₀∈NF n₁∈NF (R*xy ⋆!⋆ R*yn₀) (R*xz ⋆!⋆ R*zn₁)
+    ... | n₀≡n₁ = n₀ ,, (R*yn₀ , transp ((R ⋆) z) (~ n₀≡n₁) R*zn₁)
+
     iii : subcommutative R → R isCR
     iii RisSC x R*xy R*xz = Proposition-1-1-10.v→i (λ { b c (a ,, Rab , R*ac) → f b c a Rab R*ac } ) (x ,, (R*xy , R*xz))  where
       f : (x y z : A) → R z x → (R ⋆) z y → ((R ⋆) ∘R ~R (R ⋆)) x y
