@@ -132,8 +132,8 @@ module Normalizing-Implications where
       with LocalNewmansLemmaRecurrent R RisWCR _ x∈SM
     ... | x∈CR = WN∧NP∧SM→SN x∈WN ((MP→NP ∘ CR→MP) x∈CR ) x∈SM
 
-module Desired-Implications where
-    -- These are implications we still hope to show
+module Terese-Alternative where
+    -- These are implications for using alternative definitions to those given in TeReSe
 
     NP→NP₌ : R isNP → R isNP₌
     NP→NP₌ RisNP y∈NF ε⋆ = ε⋆

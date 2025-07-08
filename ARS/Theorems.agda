@@ -29,7 +29,7 @@ module Theorem-1-2-2 where
 
 
     ii : R isWN × R isUN → R isCR
-    ii (RisWN , RisUN) = Confluent-Implications.UN→∧WN→CR (Desired-Implications.UN→UN→ RisUN) RisWN
+    ii (RisWN , RisUN) = Confluent-Implications.UN→∧WN→CR (Terese-Alternative.UN→UN→ RisUN) RisWN
 
     iii : subcommutative R → R isCR
     iii RisSC x R*xy R*xz = Proposition-1-1-10.v→i (λ { b c (a ,, Rab , R*ac) → f b c a Rab R*ac } ) (x ,, (R*xy , R*xz))  where
