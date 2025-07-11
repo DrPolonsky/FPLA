@@ -5,7 +5,7 @@ open import Relations.ClosureOperators
 
 -- open import Relations.Core
 
-module Relations.WFDefinitions {A : Set} where
+module Relations.WellFounded.WFDefinitions {A : Set} where
 
 module LocalWFDefinitions {R : 𝓡 A} where
 
@@ -28,6 +28,12 @@ module LocalWFDefinitions {R : 𝓡 A} where
   -- contains an index at which it's not decreasing
   WFseq : 𝓟 A
   WFseq a = ∀ (s : ℕ → A) → s 0 ≡ a → Σ[ n ∈ ℕ ] (¬ (R (s (succ n)) (s n)))
+
+  Rmin : 𝓟 A    -- The NF property
+  Rmin x = ∀ {y} → ¬ R y x
+
+  WFseq+ : 𝓟 A 
+  WFseq+ a = ∀ (s : ℕ → A) → s 0 ≡ a → Σ[ n ∈ ℕ ] (s n ∈ Rmin)
 
   -- x is R-φ-minimal if φ(x) is true and φ(y) is false for all y below x
   _-_-minimal : 𝓟 A → 𝓟 A

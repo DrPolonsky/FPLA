@@ -82,7 +82,7 @@ module Confluent-Implications where
     -- ... | n₀ ,, R*yn₀ , n₀∈NF |  n₁ ,, R*zn₁ , n₁∈NF with
     --             RisUN→ x n₀∈NF n₁∈NF (R*xy ⋆!⋆ R*yn₀) (R*xz ⋆!⋆ R*zn₁)
     -- ... | n₀≡n₁ = n₀ ,, (R*yn₀ , transp ((R ⋆) z) (~ n₀≡n₁) R*zn₁)
-
+open Confluent-Implications public
 module Normalizing-Implications where
     NF⊆SN : ∀ {x} → NF x → SN x
     NF⊆SN {x} x∈NF = acc λ y Rxy → ∅ (x∈NF Rxy)

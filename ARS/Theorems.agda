@@ -12,7 +12,7 @@ open import ARS.Implications
 open import ARS.Properties {A}
 open LocalProperties {R}
 open import ARS.Propositions
-open import Relations.WeakWFDefinitions
+open import Relations.WellFounded.WFWeakDefinitions
 {-This file contains formalization of the theorems of TeReSe Chapter 1-}
 
 module Theorem-1-2-2 where
@@ -27,15 +27,15 @@ module Theorem-1-2-2 where
     CP→UN : R isCR → R isUN
     CP→UN RisCR = NP→UN (CR→NP RisCR)
 
-
-    ii : R isWN × R isUN → R isCR
-    ii (RisWN , RisUN) = Confluent-Implications.UN→∧WN→CR (Terese-Alternative.UN→UN→ RisUN) RisWN
-
     ii+ : R isWN × R isUN→ → R isCR
     ii+ (RisWN ,  RisUN→) x {y}{z} R*xy R*xz with RisWN y | RisWN z
     ... | n₀ ,, R*yn₀ , n₀∈NF |  n₁ ,, R*zn₁ , n₁∈NF with
                 RisUN→ x n₀∈NF n₁∈NF (R*xy ⋆!⋆ R*yn₀) (R*xz ⋆!⋆ R*zn₁)
     ... | n₀≡n₁ = n₀ ,, (R*yn₀ , transp ((R ⋆) z) (~ n₀≡n₁) R*zn₁)
+
+    ii : R isWN × R isUN → R isCR
+    ii (RisWN , RisUN) = ii+ (RisWN , (Terese-Alternative.UN→UN→ RisUN))
+
 
     iii : subcommutative R → R isCR
     iii RisSC x R*xy R*xz = Proposition-1-1-10.v→i (λ { b c (a ,, Rab , R*ac) → f b c a Rab R*ac } ) (x ,, (R*xy , R*xz))  where
