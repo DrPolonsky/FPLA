@@ -104,10 +104,11 @@ module WeakImplications {A : Set} (R : 𝓡 A) where
 
 -- Will be tougher. Both should be provable.
   WFseq-→WFseq+- : isWFseq- R → isWFseq+- R
-  WFseq-→WFseq+- = {!   !}
-
+  WFseq-→WFseq+- RisWFseq- s ¬n∈Rmin with RisWFseq- s 
+  ... | 
+  
   WFseq+-→WFseq- : isWFseq+- R → isWFseq- R
-  WFseq+-→WFseq- = {!   !} 
+  WFseq+-→WFseq- RisWFseq+- s s-dec = RisWFseq+- (λ _ → s zero) (λ z → snd z (s-dec zero)) 
 
 
 open WeakImplications public
