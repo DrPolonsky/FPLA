@@ -39,10 +39,10 @@ open import Relations.FinitelyBranching
 -- Implications relying on finite branching of the relation.
 module FBImplications {A : Set} {R : 𝓡 A} (RisFB : R isFB) where
 
-  -- May 2nd note: This must exist somewhere in general form? 
+  -- May 2nd note: This must exist somewhere in general form?
   RisWF→¬¬RisWF : ∀ {a} → (R -accessible) a → ¬ (¬ (R -accessible) a)
-  RisWF→¬¬RisWF RisWF ¬RisWF = ∅ (¬RisWF RisWF) 
-  
+  RisWF→¬¬RisWF RisWF ¬RisWF = ∅ (¬RisWF RisWF)
+
   FB→isWFminDNE-→isWFacc- : isWFminDNE- R → isWFacc- R
   FB→isWFminDNE-→isWFacc- RisWF x₀ x₀∉acc =
     RisWF (∁ (R -accessible)) (λ a nnnac ac → ∅ (nnnac (RisWF→¬¬RisWF ac))) x₀∉acc f
@@ -51,7 +51,7 @@ module FBImplications {A : Set} {R : 𝓡 A} (RisFB : R isFB) where
               FB→DNS R (R -accessible) z (RisFB z)
                      (λ y Ryx y∉acc → z∈min y y∉acc Ryx )
                      λ za → z∉acc (acc za)
-  
+
   -- When FB holds, ¬¬-accessibility is inductive
   FB→ind∁∁acc : R -inductive (∁ ∁ R -accessible)
   FB→ind∁∁acc x H x∉acc = FB→DNS R (R -accessible) x (RisFB x) H (λ f → x∉acc (acc f) )
@@ -79,6 +79,7 @@ module FBImplications {A : Set} {R : 𝓡 A} (RisFB : R isFB) where
 
   -- with wfMin (λ a → Σ[ n ∈ ℕ ] (s n ≡ a)) (s zero) (zero ,, refl)
   -- ... | x ,, (k ,, p) , H = (k ,, λ Ryx → H (s (succ k)) (succ k ,, refl ) (transp (R (s (succ k))) p Ryx ) )
+
 
 
 
@@ -160,6 +161,26 @@ module MinimalComplement {A : Set} (R : 𝓡 A) where
     with (CorSequence P CI (a ,, ¬pa)) | RisWFseq (fst ∘ CorSequence P CI (a ,, ¬pa)) (CorSequence-inc P CI (a ,, ¬pa))
   ... | c | H = ∅ H
 
+  RisFB→accWDec→accCor : R isFB → dec (∁ (R -accessible)) → _-coreductive_ (R -accessible)
+  RisFB→accWDec→accCor RisFB accWDec x x∉acc = {!   !}
+  {- Proof plan.
+  RisFB yields a finite number of y, say, y1..yk, such that x→y.  (Ryx)
+  For each such y, we can decide *weakly* whether y is accessible.
+  That is, for all i, have y∉acc ∨ ¬¬ y∈acc.
+  We can search through these y exhaustively;
+    if, for each i, the second option is taken, namely, ¬¬ y∈acc,
+        then: have (∀ y. R y x → ¬¬ y∈acc)
+              applying FB→DNS with P := (R -accessible) yields ¬¬ (∀ y → R y x → P y)
+              This contradicts that x∉acc !
+    if, on the other hand, there does exist an i, such that the first option is taken,
+        namely y∉acc,
+        then: we are done.  The y is found.
+  -}
+
+  RisFB→decNF→accCor : R isFB → dec (RMin R) → _-coreductive_ (R -accessible)
+  RisFB→decNF→accCor RisFB decNF x x∉acc with FB→DNS R (R -accessible) x (RisFB x)
+  ... | accDNS = {!   !}
+
 module ClassicalImplications {A : Set} (R : 𝓡 A) where
 
   {- We will consider four decidability hypotheses here:
@@ -204,7 +225,7 @@ module ClassicalImplications {A : Set} (R : 𝓡 A) where
           f : ¬¬ (x ∈ R -accessible)
           f x∉acc with wfDNE (∁ (R -accessible)) (λ y nnny ya → nnny (λ z → z ya)) x x∉acc
           ... | (y ,, y∉acc , yIH) = y∉acc (acc λ z Rzy → dne z (λ z∉acc → yIH z z∉acc Rzy ) )
-    
+
   -- Double negation shift for accessibility (global)
   isWFacc-→¬¬isWFacc : AccDNE → isWFacc- R → ¬¬ (R isWFacc)
   isWFacc-→¬¬isWFacc AccDNE RisWFacc- ¬RisWFacc  = ¬RisWFacc λ x → AccDNE x (RisWFacc- x)

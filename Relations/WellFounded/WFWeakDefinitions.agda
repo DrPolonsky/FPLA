@@ -22,7 +22,7 @@ isWFind- = ∀ (φ : 𝓟 A) → R -inductive φ → ∀ x → ¬¬ (φ x)
 isWFseq- : Set
 isWFseq- = ∀ (s : ℕ → A) → ¬ (s ∈ R -decreasing)
 
-isWFseq+- : Set 
+isWFseq+- : Set
 isWFseq+- = ∀ (s : ℕ → A) → ¬¬ (Σ[ n ∈ ℕ ] (s n ∈ Rmin R))
 
 isWFmin- : Set₁
