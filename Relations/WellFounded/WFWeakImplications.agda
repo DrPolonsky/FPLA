@@ -102,13 +102,24 @@ module WeakImplications {A : Set} (R : 𝓡 A) where
   - from WFacc and strong decidability of acc (acc∈cored), prove wf[ind]
   -}
 
--- Will be tougher. Both should be provable.
-  WFseq-→WFseq+- : isWFseq- R → isWFseq+- R
-  WFseq-→WFseq+- RisWFseq- s ¬n∈Rmin with RisWFseq- s 
-  ... | z = {!   !} 
-  
+  isWFseq-₂ : Set
+  isWFseq-₂ = ∀ (s : ℕ → A) → ¬¬ (Σ[ n ∈ ℕ ] (R (s (succ n)) (s n) → ⊥))
+
+  -- Does this require R to be ¬¬ Closed?  ¬¬Rxy → Rxy AKA ∁∁R ⊆ R ??
+  -- isWFseq-₂ ↔ isWFseq- R
+  -- because ¬¬ (∃ x. P(x)) ↔ ¬ (∀ x. ¬ P(x))
+
+
+  -- WFseq-₂→WFseq+- : isWFseq-₂ → isWFseq+- R
+  -- WFseq-₂→WFseq+- isSeq2 s ¬Ex = {! ¬  !}
+  --
+  -- -- Will be tougher. Both should be provable.
+  -- WFseq-→WFseq+- : isWFseq- R → isWFseq+- R
+  -- WFseq-→WFseq+- RisWFseq- s ¬n∈Rmin with RisWFseq- s
+  -- ... | c = ¬n∈Rmin {!   !}
+
   WFseq+-→WFseq- : isWFseq+- R → isWFseq- R
-  WFseq+-→WFseq- RisWFseq+- s s-dec = RisWFseq+- (λ _ → s zero) (λ z → snd z (s-dec zero)) 
+  WFseq+-→WFseq- RisWFseq+- s s-dec = RisWFseq+- (λ _ → s zero) (λ z → snd z (s-dec zero))
 
 
 open WeakImplications public
