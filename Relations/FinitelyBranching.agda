@@ -24,3 +24,14 @@ FB→DNS P a aisFB H1 H2 with aisFB
           g allxs y Ray = All∈List (λ z → R z a → P z) (w y Ray) allxs Ray
 
 -- FBfind :
+
+-- Attempt to improve the above
+open import Data.List.Relation.Unary.All
+
+FB→DNS₂ : ∀ (P : 𝓟 A) → ∀ x → x ∈ FB → (∀ y → R y x → ¬¬ P y) → ¬¬ (∀ y → R y x → P y) -- If x is FB, then the (finite) predecessors of x have the DNS property
+FB→DNS₂ P a a∈FB@(xs ,, Rba→b∈xs) ¬¬Py ¬∀Py = 
+    let 
+        ¬¬Allxs : ¬¬ (All (λ y → R y a → P y ) xs)
+        ¬¬Allxs = {!   !}
+        
+    in {!   !} 
