@@ -91,23 +91,23 @@ module Normalizing-Implications where
     WN∧MF→SN (n ,, R*xn , n∈NF) x∈MF =
         acc (λ y Rxy → ∅ (NF↓⊆NF n∈NF (x∈MF n R*xn) Rxy))
 
-    MF∧SN→NF : ∀ {x} → MF x → SN x → NF x 
-    MF∧SN→NF x∈MF (acc xacc) {y} Rxy 
-        with MF∧SN→NF (MF↓⊆MF x∈MF (Rxy ,⋆ ε⋆)) (xacc y Rxy) 
-    ... | y∈NF with x∈MF y (Rxy ,⋆ ε⋆)  
+    MF∧SN→NF : ∀ {x} → MF x → SN x → NF x
+    MF∧SN→NF x∈MF (acc xacc) {y} Rxy
+        with MF∧SN→NF (MF↓⊆MF x∈MF (Rxy ,⋆ ε⋆)) (xacc y Rxy)
+    ... | y∈NF with x∈MF y (Rxy ,⋆ ε⋆)
     ... | ε⋆ = y∈NF Rxy
-    ... | Ryy₁ ,⋆ _ = y∈NF Ryy₁    
-    
-    NF→MF∧SN : ∀ {x} → NF x → MF x × SN x 
-    NF→MF∧SN xinNF = (NF⊆MF xinNF) , NF⊆SN xinNF  
-    
-    MF∧SN↔NF : ∀ {x} → MF x × SN x ↔ NF x 
-    MF∧SN↔NF = (λ (x∈MF , x∈SN) → MF∧SN→NF x∈MF x∈SN) , NF→MF∧SN 
+    ... | Ryy₁ ,⋆ _ = y∈NF Ryy₁
 
-    MF∧WN↔NF : ∀ {x} → MF x × WN x ↔ NF x 
+    NF→MF∧SN : ∀ {x} → NF x → MF x × SN x
+    NF→MF∧SN xinNF = (NF⊆MF xinNF) , NF⊆SN xinNF
+
+    MF∧SN↔NF : ∀ {x} → MF x × SN x ↔ NF x
+    MF∧SN↔NF = (λ (x∈MF , x∈SN) → MF∧SN→NF x∈MF x∈SN) , NF→MF∧SN
+
+    MF∧WN↔NF : ∀ {x} → MF x × WN x ↔ NF x
     pr1 MF∧WN↔NF (x∈MF , x∈WN)  with WN∧MF→SN x∈WN x∈MF
     ... | x∈SN = MF∧SN→NF x∈MF x∈SN
-    pr2 MF∧WN↔NF x∈NF = NF⊆MF x∈NF , ((_ ,, ε⋆ , x∈NF)) 
+    pr2 MF∧WN↔NF x∈NF = NF⊆MF x∈NF , ((_ ,, ε⋆ , x∈NF))
 
     WN∧NP∧SM→SN : ∀ {x} → WN x → NP x → SM x → SN x
     WN∧NP∧SM→SN {x} x∈WN x∈NP (SMrec .x x∈MF) = WN∧MF→SN x∈WN x∈MF
@@ -177,7 +177,6 @@ module Terese-Alternative where
 
     RisSMseq→RisRP : (∀ {x : A} → SMseq R x) → R isRP
     RisSMseq→RisRP RisSM f f-inc a a-bnd = RisSM f refl f-inc
-
 
     RisSMseq→RisBP : (∀ {x : A} → SMseq R x) → R isBP
     RisSMseq→RisBP RisSM f f-inc with RisSM f refl f-inc

@@ -161,25 +161,22 @@ module MinimalComplement {A : Set} (R : 𝓡 A) where
     with (CorSequence P CI (a ,, ¬pa)) | RisWFseq (fst ∘ CorSequence P CI (a ,, ¬pa)) (CorSequence-inc P CI (a ,, ¬pa))
   ... | c | H = ∅ H
 
-  RisFB→accWDec→accCor : R isFB → dec (∁ (R -accessible)) → _-coreductive_ (R -accessible)
-  RisFB→accWDec→accCor RisFB accWDec x x∉acc = {!   !}
-  {- Proof plan.
-  RisFB yields a finite number of y, say, y1..yk, such that x→y.  (Ryx)
-  For each such y, we can decide *weakly* whether y is accessible.
-  That is, for all i, have y∉acc ∨ ¬¬ y∈acc.
-  We can search through these y exhaustively;
-    if, for each i, the second option is taken, namely, ¬¬ y∈acc,
-        then: have (∀ y. R y x → ¬¬ y∈acc)
-              applying FB→DNS with P := (R -accessible) yields ¬¬ (∀ y → R y x → P y)
-              This contradicts that x∉acc !
-    if, on the other hand, there does exist an i, such that the first option is taken,
-        namely y∉acc,
-        then: we are done.  The y is found.
-  -}
+  open import Lists
 
-  RisFB→decNF→accCor : R isFB → dec (RMin R) → _-coreductive_ (R -accessible)
-  RisFB→decNF→accCor RisFB decNF x x∉acc with FB→DNS R (R -accessible) x (RisFB x)
-  ... | accDNS = {!   !}
+  RisFBRel→accWDec→accCor : R isFBRel → dec (∁ (R -accessible)) → _-coreductive_ (R -accessible)
+  RisFBRel→accWDec→accCor RisFBRel accWDec a a∉acc
+    with decList∃ (∁ (R -accessible)) accWDec (fst (RisFBRel a))
+  ... | in2 no = ∅ (f λ Ra⊆acc → a∉acc (acc Ra⊆acc ) ) where
+    g = FBRel⊆FB R a (RisFBRel a)
+    h = λ y Rya y∉acc → no (List∃intro _ (fst (RisFBRel a)) y (pr1 (snd (RisFBRel a) y) Rya , y∉acc) )
+    f : ¬¬ (∀ y → R y a → y ∈ R -accessible)
+    f = FB→DNS R (R -accessible) a g h
+  ... | in1 yes with List∃elim _ _ yes
+  ... | y ,, y∈Rx , y∉acc = y ,, pr2 (snd (RisFBRel a) y) y∈Rx , y∉acc
+
+  -- RisFB→decNF→accCor : R isFB → dec (RMin R) → _-coreductive_ (R -accessible)
+  -- RisFB→decNF→accCor RisFB decNF x x∉acc with FB→DNS R (R -accessible) x (RisFB x)
+  -- ... | accDNS = {!   !}
 
 module ClassicalImplications {A : Set} (R : 𝓡 A) where
 

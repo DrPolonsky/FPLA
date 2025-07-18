@@ -44,3 +44,14 @@ decList∃ P decP (x ∷ xs) with decP x
 ... | in2 x∉P with decList∃ P decP xs
 ... | in1 ∃Pxs = in1 (in2 ∃Pxs )
 ... | in2 ∄Pxs = in2 (case x∉P ∄Pxs )
+
+filterList : ∀ {A : Set} (P : 𝓟 A) → dec P → ∀ (xs : List A)
+                  → Σ[ ys ∈ List A ] (∀ (a : A) → a ∈List ys ↔ a ∈List xs × P a)
+filterList P decP [] = [] ,, λ a → (λ ()) , pr1
+filterList P decP (x ∷ xs) with filterList P decP xs
+... | ys ,, Y with decP x
+... | in1 yes = (x ∷ ys) ,, λ a → (case (λ a=x → (in1 a=x , transp P (~ a=x) yes ) )
+                            λ a∈ys → (in2 (pr1 (pr1 (Y a) a∈ys)) ) , pr2 (pr1 (Y a) a∈ys ) )
+                          , λ {(in1 a=x , a∈P) → in1 a=x ; (in2 x , a∈P) → in2 (pr2 (Y a) (x , a∈P) ) }
+... | in2 no = ys ,, λ a → (λ a∈ys → (in2 (pr1 (pr1 (Y a) a∈ys)) ) , pr2 (pr1 (Y a) a∈ys) )
+                          , λ { (in1 a=x , a∈P) → pr2 (Y a) (∅ (no (transp P a=x a∈P ) ) , a∈P ) ; (in2 a∈xs , a∈P) → pr2 (Y a) (a∈xs , a∈P) }
