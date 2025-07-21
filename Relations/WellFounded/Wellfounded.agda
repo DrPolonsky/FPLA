@@ -138,6 +138,16 @@ module MinimalComplement {A : Set} (R : 𝓡 A) where
   isWFminDNE→Cor¬¬ RisWFmin = isWFminCor→Cor¬¬
     (isWFminCor+→isWFminCor (isWFminDNE→isWFminCor+  RisWFmin))
 
+  isWFminDNE-→Cor¬¬ : isWFminDNE- R → ∀ P → _-coreductive_ P → ∀ a → ¬¬ P a
+  isWFminDNE-→Cor¬¬ WFR P Pcor a a∉P = WFR (∁ P) (λ x z z₁ → z (λ z₂ → z₂ z₁)) a∉P f
+    where f : _
+          f (m ,, m∉P , mmin) with Pcor m m∉P
+          ... | (n ,, Rnm , n∉P) = mmin n (λ _ → mmin n n∉P Rnm) Rnm
+
+  -- This implication also follows from isWFminDNE-→isWFmin-→isWFseq-→isWFaccc- (with accCor)
+  accCor∧isWFminDNE-→isWFacc- : _-coreductive_ (R -accessible) → isWFminDNE- R → isWFacc- R
+  accCor∧isWFminDNE-→isWFacc- accCor RisWF = isWFminDNE-→Cor¬¬ RisWF (R -accessible) accCor
+
   CorSequence : ∀ P → _-coreductive_ P → Σ[ a ∈ A ] (a ∉ P) → ℕ → Σ[ e ∈ A ] (e ∉ P)
   CorSequence P CI aH zero = aH
   CorSequence P CI (a ,, Ha) (succ n) with CorSequence P CI (a ,, Ha) n
@@ -160,6 +170,17 @@ module MinimalComplement {A : Set} (R : 𝓡 A) where
   isWFseq-→isWFminCor+ RisWFseq P CI {a} ¬pa
     with (CorSequence P CI (a ,, ¬pa)) | RisWFseq (fst ∘ CorSequence P CI (a ,, ¬pa)) (CorSequence-inc P CI (a ,, ¬pa))
   ... | c | H = ∅ H
+  -- The converse is not provable,
+  -- because the complement of the image of a sequence is not coreductive (at least not constructively).
+
+  -- isWFminCor+→isWFseq- : isWFminCor+ → isWFseq- R
+  -- isWFminCor+→isWFseq- WFmc s sinc
+  --   with WFmc (λ x → Σ[ b ∈ ℕ ] (∀ k → k ≤ b → ¬ x ≡ s k) → Σ[ l ∈ ℕ ] → x ≡ s l) ... = {!   !}
+
+  accCorec→isWFminCor+→isWFacc- : _-coreductive_ (R -accessible) → isWFminCor+ → isWFacc- R
+  accCorec→isWFminCor+→isWFacc- acc∈Cor WFmc a a∉acc
+    with WFmc (R -accessible) acc∈Cor a∉acc
+  ... | (m ,, m∉acc , p) = m∉acc (acc p)
 
   open import Lists
 
