@@ -129,6 +129,12 @@ module Normalizing-Implications where
     isWN∧isSM→isSN : R isWN → R isSM → R isSN
     isWN∧isSM→isSN RisWN RisSM x =  isWN∧SM→SN RisWN (RisSM x)
 
+    isWN∧isSMseq→isSNseq : R isWN → (∀ {y} → SMseq R y) → isWFseq- (~R R) 
+    isWN∧isSMseq→isSNseq RisWN RisSMseq f f-inc with RisSMseq f refl f-inc
+    ... | i ,, i∈MF with pr1 MF∧WN↔NF (i∈MF , RisWN (f i)) 
+    ... | fi∈NF = fi∈NF (f-inc i)    
+
+
     open import ARS.NewmansLemma
     open Newmans-Lemma-SM
 
@@ -175,7 +181,7 @@ module Terese-Alternative where
     RP∧BP→SMseq RisRP RisBP f f0≡x f-inc with RisBP f f-inc
     ... | (b ,, b-bnd) = RisRP f f-inc b b-bnd
 
-    RisSMseq→RisRP : (∀ {x : A} → SMseq R x) → R isRP
+    RisSMseq→RisRP : (∀ {x : A} → SMseq R x) → R isRP   
     RisSMseq→RisRP RisSM f f-inc a a-bnd = RisSM f refl f-inc
 
     RisSMseq→RisBP : (∀ {x : A} → SMseq R x) → R isBP
