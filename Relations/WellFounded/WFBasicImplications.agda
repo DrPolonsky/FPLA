@@ -18,9 +18,6 @@ module BasicImplications {A : Set} {R : 𝓡 A} where
   acc⊆ind : ∀ (φ : 𝓟 A) → R -inductive φ → R -accessible ⊆ φ
   acc⊆ind φ φisRind x (acc IH) = φisRind x (λ y Ryx → acc⊆ind φ φisRind y (IH y Ryx) )
 
-  -- acc⊆WFseq : R -accessible ⊆ WFseq R
-  -- acc⊆WFseq a (acc ac) s s0=a = acc⊆WFseq (s 1) {!   !} {!   !} {!   !}
-  --
   ¬acc : ∀ {x : A} → x ∉ R -accessible → ¬ (∀ y → R y x → y ∈ R -accessible)
   ¬acc ¬xisRacc ∀yisRacc = ¬xisRacc (acc ∀yisRacc)
 
@@ -48,6 +45,11 @@ module BasicImplications {A : Set} {R : 𝓡 A} where
   isWFmin→isWFseq : R isWFmin → R isWFseq
   isWFmin→isWFseq wfMin s with wfMin (λ a → Σ[ n ∈ ℕ ] (s n ≡ a)) (s zero) (zero ,, refl)
   ... | x ,, (k ,, p) , H = (k ,, λ Ryx → H (s (succ k)) (succ k ,, refl ) (transp (R (s (succ k))) p Ryx ) )
+
+  -- -- A correct but non-terminating proof.
+  -- {-# TERMINATING #-}
+  -- isWFseq→isWFacc : R isWFseq → R isWFacc
+  -- isWFseq→isWFacc R∈WFs x = acc (λ y Ryx → isWFseq→isWFacc R∈WFs y )
 
   WFseq+⊆WFseq : WFseq+ R ⊆ WFseq R
   WFseq+⊆WFseq x x∈seq+ s s0≡x with x∈seq+ s s0≡x
