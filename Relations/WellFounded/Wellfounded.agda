@@ -35,9 +35,9 @@ module WFMinDecImplications {A : Set} (R : 𝓡 A) (dM : R isMinDec) where
 
 
 open WFMinDecImplications public
-open import Relations.FinitelyBranching
+open import Relations.FinitelyBranching 
 -- Implications relying on finite branching of the relation.
-module FBImplications {A : Set} {R : 𝓡 A} (RisFB : R isFB) where
+module FBImplications {A : Set} {R : 𝓡 A} (RisFB : (~R R) isFB) where
 
   -- May 2nd note: This must exist somewhere in general form?
   RisWF→¬¬RisWF : ∀ {a} → (R -accessible) a → ¬ (¬ (R -accessible) a)
@@ -48,13 +48,13 @@ module FBImplications {A : Set} {R : 𝓡 A} (RisFB : R isFB) where
     RisWF (∁ (R -accessible)) (λ a nnnac ac → ∅ (nnnac (RisWF→¬¬RisWF ac))) x₀∉acc f
       where f : ¬ Σ-syntax A (R - ∁ (R -accessible)-minimal)
             f (z ,, z∉acc , z∈min) =
-              FB→DNS R (R -accessible) z (RisFB z)
+              FB→DNS (~R R) (R -accessible) z (RisFB z)
                      (λ y Ryx y∉acc → z∈min y y∉acc Ryx )
                      λ za → z∉acc (acc za)
 
   -- When FB holds, ¬¬-accessibility is inductive
   FB→ind∁∁acc : R -inductive (∁ ∁ R -accessible)
-  FB→ind∁∁acc x H x∉acc = FB→DNS R (R -accessible) x (RisFB x) H (λ f → x∉acc (acc f) )
+  FB→ind∁∁acc x H x∉acc = FB→DNS (~R R) (R -accessible) x (RisFB x) H (λ f → x∉acc (acc f) )
 
   -- For finitely branching relations, isDec implies MinDec
   open import Lists
@@ -162,7 +162,7 @@ module MinimalComplement {A : Set} (R : 𝓡 A) where
 
   -- A Noteworthy Consequence
   accCorec→isWFseq-→isWFacc- : _-coreductive_ (R -accessible) → isWFseq- R → isWFacc- R
-  accCorec→isWFseq-→isWFacc- AccisCor RisWFseq- a a∉acc = RisWFseq- s s-inc where
+  accCorec→isWFseq-→isWFacc- AccisCor RisWFseq- a a∉acc = RisWFseq- s s-inc  where
     s     = fst ∘ CorSequence     (R -accessible) AccisCor (a ,, a∉acc)
     s-inc = CorSequence-inc (R -accessible) AccisCor (a ,, a∉acc)
 
@@ -184,14 +184,14 @@ module MinimalComplement {A : Set} (R : 𝓡 A) where
 
   open import Lists
 
-  RisFBRel→accWDec→accCor : R isFBRel → dec (∁ (R -accessible)) → _-coreductive_ (R -accessible)
+  RisFBRel→accWDec→accCor : (~R R) isFBRel → dec (∁ (R -accessible)) → _-coreductive_ (R -accessible)
   RisFBRel→accWDec→accCor RisFBRel accWDec a a∉acc
     with decList∃ (∁ (R -accessible)) accWDec (fst (RisFBRel a))
-  ... | in2 no = ∅ (f λ Ra⊆acc → a∉acc (acc Ra⊆acc ) ) where
-    g = FBRel⊆FB R a (RisFBRel a)
+  ... | in2 no = ∅ (f λ Ra⊆acc → a∉acc (acc Ra⊆acc) ) where
+    g = FBRel⊆FB (~R R) a (RisFBRel a)
     h = λ y Rya y∉acc → no (List∃intro _ (fst (RisFBRel a)) y (pr1 (snd (RisFBRel a) y) Rya , y∉acc) )
     f : ¬¬ (∀ y → R y a → y ∈ R -accessible)
-    f = FB→DNS R (R -accessible) a g h
+    f = FB→DNS (~R R) (R -accessible) a g h
   ... | in1 yes with List∃elim _ _ yes
   ... | y ,, y∈Rx , y∉acc = y ,, pr2 (snd (RisFBRel a) y) y∈Rx , y∉acc
 

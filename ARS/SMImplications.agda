@@ -48,9 +48,11 @@ module ARS.SMImplications {A : Set} (R : 𝓡 A) where
     g = FBRel⊆FB R a (RisFBRel a) 
     h = λ y Rya y∉SM → no (List∃intro _ (fst (RisFBRel a)) y (pr1 (snd (RisFBRel a) y) Rya , y∉SM) )
     f : ¬¬ (∀ y → R a y → y ∈ SM)
-    f = {!   !} -- FB→DNS ? SM a g h 
+    f = FB→DNS R SM a g {!   !}
   ... | in1 yes with List∃elim _ _ yes 
-  ... | y ,, y∈Rx , y∉SM  = y ,, pr2 (snd (RisFBRel a) y) y∈Rx , y∉SM
+  ... | y ,, y∈Rx , y∉SM with snd (RisFBRel a) y
+  ... | pr3 , pr4 = y ,, ({! pr4  !} , {!   !})   
+  -- = y ,, pr2 (snd (RisFBRel a) y) y∈Rx , y∉SM
 
 
   SMCor→SMseq-→SM- : _-coreductive_ (SM) → SMseq- ⊆ SM-  
@@ -61,11 +63,11 @@ module ARS.SMImplications {A : Set} (R : 𝓡 A) where
     in a∈SMseq- λ x → {!   !}
 
   
-  FB∧dec→SMseq-⊆SM- : R isFBRel → dec (∁ SM) → SMseq- ⊆ SM-
-  FB∧dec→SMseq-⊆SM- RisFBRel SMwDec a RisSMseq- a∉SM- with FBrel→decCSM→SMcor RisFBRel SMwDec 
-  ... | SMisCor = RisSMseq- {!   !} where 
-    s = {!   !} 
-    s-inc = {!   !} 
+  -- FB∧dec→SMseq-⊆SM- : R isFBRel → dec (∁ SM) → SMseq- ⊆ SM-
+  -- FB∧dec→SMseq-⊆SM- RisFBRel SMwDec a RisSMseq- a∉SM- with FBrel→decCSM→SMcor RisFBRel SMwDec 
+  -- ... | SMisCor = RisSMseq- {!   !} where 
+  --   s = {!   !} 
+  --   s-inc = {!   !} 
 
 
 
