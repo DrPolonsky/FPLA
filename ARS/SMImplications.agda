@@ -21,6 +21,12 @@ module ARS.SMImplications {A : Set} (R : 𝓡 A) where
   SMseq- : 𝓟 A
   SMseq- = ∁ (∁ SMseq )
 
+  isSM- : Set
+  isSM- = ∀ x → x ∈ SM- 
+
+  isSMseq- : Set 
+  isSMseq- = ∀ x → x ∈ SMseq- 
+
   inc∧SMseq→MF : ∀ (f : ℕ → A) → f ∈ R -increasing → f 0 ∈ SM → Σ[ i ∈ ℕ ] ((f i) ∈ MF)
   inc∧SMseq→MF f f-inc (SMrec .(f 0) f0∈MF) = zero ,, f0∈MF
   inc∧SMseq→MF f f-inc (SMacc .(f 0) f0acc) with inc∧SMseq→MF (f ∘ succ) (λ n → f-inc (succ n)) (f0acc (f (succ 0)) (f-inc 0)) 
@@ -36,31 +42,20 @@ module ARS.SMImplications {A : Set} (R : 𝓡 A) where
   -- maybe?
   -- Start with a lemma which mirrors RisFBRel→accWDec→accCor to imply sm is correductive. And then follow accCorec→isWFseq-→isWFacc- to complete the proof. ** July 23rd 
 
-  open import Relations.WellFounded.Wellfounded
+  open import Relations.Coreductive (R)
   open MinimalComplement R
 
-  open import Lists 
-  open import ARS.Closure
-
   FBrel→decCSM→SMcor : R isFBRel → dec (∁ (SM)) → _-coreductive_ (SM)
-  FBrel→decCSM→SMcor RisFBRel SMwDec a a∉SM with decList∃ (∁ (SM)) SMwDec (fst (RisFBRel a))
-  ... | in2 no = ∅ (f λ Ra⊆SM → a∉SM (SMacc a Ra⊆SM)) where 
-    g = FBRel⊆FB R a (RisFBRel a) 
-    h = λ y Rya y∉SM → no (List∃intro _ (fst (RisFBRel a)) y (pr1 (snd (RisFBRel a) y) Rya , y∉SM) )
-    f : ¬¬ (∀ y → R a y → y ∈ SM)
-    f = FB→DNS R SM a g {!   !}
-  ... | in1 yes with List∃elim _ _ yes 
-  ... | y ,, y∈Rx , y∉SM with snd (RisFBRel a) y
-  ... | pr3 , pr4 = y ,, ({! pr4  !} , {!   !})   
-  -- = y ,, pr2 (snd (RisFBRel a) y) y∈Rx , y∉SM
+  FBrel→decCSM→SMcor RisFBRel SMwDec = 
+    FBRel∧WDec→CorP RisFBRel SM (λ z → SMacc _ (λ y → z)) SMwDec  
 
-
-  SMCor→SMseq-→SM- : _-coreductive_ (SM) → SMseq- ⊆ SM-  
-  SMCor→SMseq-→SM- SMisCor a a∈SMseq- a∉SM- = let 
+  -- Define CorSequence in Coreductive file and refactor here and wellfounded. All below needs uncommenting. 
+  SMCor→SMseq-→SM- : _-coreductive_ (SM) → isSMseq- → isSM-    
+  SMCor→SMseq-→SM- SMisCor RisSMseq- a a∉SM- = let 
       s : (x : ℕ) → A 
       s = fst ∘ CorSequence   (SM) SMisCor (a ,, a∉SM-) 
       s-inc = CorSequence-inc (SM) SMisCor (a ,, a∉SM-) 
-    in a∈SMseq- λ x → {!   !}
+    in RisSMseq- {!   !} {!   !}
 
   
   -- FB∧dec→SMseq-⊆SM- : R isFBRel → dec (∁ SM) → SMseq- ⊆ SM-

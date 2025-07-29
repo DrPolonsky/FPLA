@@ -86,8 +86,7 @@ module FBImplications {A : Set} {R : 𝓡 A} (RisFB : (~R R) isFB) where
 open FBImplications public
 
 module MinimalComplement {A : Set} (R : 𝓡 A) where
-  _-coreductive_ : 𝓟 A → Set
-  _-coreductive_ P = ∀ x → x ∉ P → Σ[ y ∈ A ] (R y x × y ∉ P)
+  open import Relations.Coreductive (~R R) 
 
   Cor→ind¬¬ : ∀ (P : 𝓟 A) → _-coreductive_ P → R -inductive (∁ (∁ P))
   Cor→ind¬¬ P Pco x xind ¬Px with Pco x ¬Px
@@ -148,18 +147,6 @@ module MinimalComplement {A : Set} (R : 𝓡 A) where
   accCor∧isWFminDNE-→isWFacc- : _-coreductive_ (R -accessible) → isWFminDNE- R → isWFacc- R
   accCor∧isWFminDNE-→isWFacc- accCor RisWF = isWFminDNE-→Cor¬¬ RisWF (R -accessible) accCor
 
-  CorSequence : ∀ P → _-coreductive_ P → Σ[ a ∈ A ] (a ∉ P) → ℕ → Σ[ e ∈ A ] (e ∉ P)
-  CorSequence P CI aH zero = aH
-  CorSequence P CI (a ,, Ha) (succ n) with CorSequence P CI (a ,, Ha) n
-  ... | (a' ,, Ha') with CI a' Ha'
-  ... | (x ,, Rxa , x∉P) = (x ,, x∉P)
-
-  CorSequence-inc : ∀ P → (PCor : _-coreductive_ P) (init : Σ[ a ∈ A ] (a ∉ P)) →
-                           (R -decreasing) (fst ∘ CorSequence P PCor init)
-  CorSequence-inc P PCor init k with CorSequence P PCor init k
-  ... | (a ,, Ha) with PCor a Ha
-  ... | (x ,, Rxa , x∉P) = Rxa
-
   -- A Noteworthy Consequence
   accCorec→isWFseq-→isWFacc- : _-coreductive_ (R -accessible) → isWFseq- R → isWFacc- R
   accCorec→isWFseq-→isWFacc- AccisCor RisWFseq- a a∉acc = RisWFseq- s s-inc  where
@@ -184,16 +171,13 @@ module MinimalComplement {A : Set} (R : 𝓡 A) where
 
   open import Lists
 
+  acc∈Pacc : Pacc (R -accessible)
+  acc∈Pacc x = acc (λ y Ryx → x Ryx) 
+
   RisFBRel→accWDec→accCor : (~R R) isFBRel → dec (∁ (R -accessible)) → _-coreductive_ (R -accessible)
-  RisFBRel→accWDec→accCor RisFBRel accWDec a a∉acc
-    with decList∃ (∁ (R -accessible)) accWDec (fst (RisFBRel a))
-  ... | in2 no = ∅ (f λ Ra⊆acc → a∉acc (acc Ra⊆acc) ) where
-    g = FBRel⊆FB (~R R) a (RisFBRel a)
-    h = λ y Rya y∉acc → no (List∃intro _ (fst (RisFBRel a)) y (pr1 (snd (RisFBRel a) y) Rya , y∉acc) )
-    f : ¬¬ (∀ y → R y a → y ∈ R -accessible)
-    f = FB→DNS (~R R) (R -accessible) a g h
-  ... | in1 yes with List∃elim _ _ yes
-  ... | y ,, y∈Rx , y∉acc = y ,, pr2 (snd (RisFBRel a) y) y∈Rx , y∉acc
+  RisFBRel→accWDec→accCor RisFBRel accWDec  = 
+      FBRel∧WDec→CorP RisFBRel (R -accessible) acc∈Pacc accWDec 
+
 
   -- RisFB→decNF→accCor : R isFB → dec (RMin R) → _-coreductive_ (R -accessible)
   -- RisFB→decNF→accCor RisFB decNF x x∉acc with FB→DNS R (R -accessible) x (RisFB x)
