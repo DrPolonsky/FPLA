@@ -18,10 +18,10 @@ module Newmans-Lemma where
 
 module Newmans-Lemma-SM where
     LocalNewmansLemmaRecurrent : R isWCR → SM ⊆ CR
-    LocalNewmansLemmaRecurrent RisWCR x (SMrec .x x∈Rec) R*xy R*xz = x ,, x∈Rec _ R*xy , x∈Rec _ R*xz           -- Start by casing on SR. Recurrent case is simple
-    LocalNewmansLemmaRecurrent RisWCR x (SMacc .x x∈Acc) ε⋆ R*xz = _ ,, R*xz , ε⋆                               -- Then case on the reductions, ε⋆ cases are simple
-    LocalNewmansLemmaRecurrent RisWCR x (SMacc .x x∈Acc) (Rxy₁ ,⋆ R*y₁y) ε⋆ = _ ,, ε⋆ , (Rxy₁ ,⋆ R*y₁y)
-    LocalNewmansLemmaRecurrent RisWCR x (SMacc .x x∈Acc) (Rxy₁ ,⋆ R*y₁y) (Rxz₁ ,⋆ R*z₁z)                        -- Now apply WCR to get common reduct w
+    LocalNewmansLemmaRecurrent RisWCR x (MF⊆SM .x x∈Rec) R*xy R*xz = x ,, x∈Rec _ R*xy , x∈Rec _ R*xz           -- Start by casing on SR. Recurrent case is simple
+    LocalNewmansLemmaRecurrent RisWCR x (SMind .x x∈Acc) ε⋆ R*xz = _ ,, R*xz , ε⋆                               -- Then case on the reductions, ε⋆ cases are simple
+    LocalNewmansLemmaRecurrent RisWCR x (SMind .x x∈Acc) (Rxy₁ ,⋆ R*y₁y) ε⋆ = _ ,, ε⋆ , (Rxy₁ ,⋆ R*y₁y)
+    LocalNewmansLemmaRecurrent RisWCR x (SMind .x x∈Acc) (Rxy₁ ,⋆ R*y₁y) (Rxz₁ ,⋆ R*z₁z)                        -- Now apply WCR to get common reduct w
                 with RisWCR x Rxy₁ Rxz₁
     ... | w ,, R*y₁w , R*z₁w  with LocalNewmansLemmaRecurrent RisWCR _ (x∈Acc _ Rxy₁) R*y₁y R*y₁w               -- Recursive twice
     ... | y₂ ,, R*yy₂ , R*wy₂ with LocalNewmansLemmaRecurrent RisWCR _ (x∈Acc _ Rxz₁) R*z₁z (R*z₁w ⋆!⋆ R*wy₂)

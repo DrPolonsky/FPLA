@@ -86,11 +86,7 @@ module FBImplications {A : Set} {R : 𝓡 A} (RisFB : (~R R) isFB) where
 open FBImplications public
 
 module MinimalComplement {A : Set} (R : 𝓡 A) where
-  open import Relations.Coreductive (~R R) 
-
-  Cor→ind¬¬ : ∀ (P : 𝓟 A) → _-coreductive_ P → R -inductive (∁ (∁ P))
-  Cor→ind¬¬ P Pco x xind ¬Px with Pco x ¬Px
-  ... | (y ,, Ryx , ¬Py) = xind y Ryx ¬Py
+  open import Relations.Coreductive R
 
   -- A variation of ``minimal'' with focus on the complement of the given predicate
   isWFmin+ : Set₁
@@ -149,14 +145,14 @@ module MinimalComplement {A : Set} (R : 𝓡 A) where
 
   -- A Noteworthy Consequence
   accCorec→isWFseq-→isWFacc- : _-coreductive_ (R -accessible) → isWFseq- R → isWFacc- R
-  accCorec→isWFseq-→isWFacc- AccisCor RisWFseq- a a∉acc = RisWFseq- s s-inc  where
-    s     = fst ∘ CorSequence     (R -accessible) AccisCor (a ,, a∉acc)
-    s-inc = CorSequence-inc (R -accessible) AccisCor (a ,, a∉acc)
+  accCorec→isWFseq-→isWFacc- AccisCor RisWFseq- a a∉acc = RisWFseq- seq seq-inc  where 
+    open CorSequence (CS {R -accessible} {AccisCor} (a ,, a∉acc)) 
+
 
   isWFseq-→isWFminCor+ : isWFseq- R → isWFminCor+
-  isWFseq-→isWFminCor+ RisWFseq P CI {a} ¬pa
-    with (CorSequence P CI (a ,, ¬pa)) | RisWFseq (fst ∘ CorSequence P CI (a ,, ¬pa)) (CorSequence-inc P CI (a ,, ¬pa))
-  ... | c | H = ∅ H
+  isWFseq-→isWFminCor+ RisWFseq P CI {a} ¬pa =  ∅ (RisWFseq seq seq-inc) where 
+    open CorSequence (CS {P} {CI} (a ,, ¬pa))
+
   -- The converse is not provable,
   -- because the complement of the image of a sequence is not coreductive (at least not constructively).
 
@@ -171,12 +167,10 @@ module MinimalComplement {A : Set} (R : 𝓡 A) where
 
   open import Lists
 
-  acc∈Pacc : Pacc (R -accessible)
-  acc∈Pacc x = acc (λ y Ryx → x Ryx) 
 
   RisFBRel→accWDec→accCor : (~R R) isFBRel → dec (∁ (R -accessible)) → _-coreductive_ (R -accessible)
   RisFBRel→accWDec→accCor RisFBRel accWDec  = 
-      FBRel∧WDec→CorP RisFBRel (R -accessible) acc∈Pacc accWDec 
+      FBRel∧WDec→CorP RisFBRel (R -accessible) accWDec (λ x  → acc)  
 
 
   -- RisFB→decNF→accCor : R isFB → dec (RMin R) → _-coreductive_ (R -accessible)

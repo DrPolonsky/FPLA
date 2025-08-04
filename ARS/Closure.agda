@@ -33,9 +33,9 @@ module DownwardClosure where
     ... | R*zx  = R*zx ⋆!⋆ R*xy
 
     SM↓⊆SM : ∀ {x} → SM x → ∀ {y} → (R ⋆) x y → SM y
-    SM↓⊆SM {x} (SMrec _ x∈rec) ε⋆ = SMrec x x∈rec
-    SM↓⊆SM {y} (SMrec _ x∈rec) (Rxx₀ ,⋆ R*x₀y) = SM↓⊆SM (SMrec _ (MF↓⊆MF x∈rec (Rxx₀ ,⋆ ε⋆))) R*x₀y
-    SM↓⊆SM {x} (SMacc _ x∈acc) ε⋆ = SMacc x x∈acc
-    SM↓⊆SM (SMacc _ x) (Rxx₀ ,⋆ R*x₀y) = SM↓⊆SM (x _ Rxx₀) R*x₀y
+    SM↓⊆SM {x} (MF⊆SM _ x∈rec) ε⋆ = MF⊆SM x x∈rec
+    SM↓⊆SM {y} (MF⊆SM _ x∈rec) (Rxx₀ ,⋆ R*x₀y) = SM↓⊆SM (MF⊆SM _ (MF↓⊆MF x∈rec (Rxx₀ ,⋆ ε⋆))) R*x₀y
+    SM↓⊆SM {x} (SMind _ x∈acc) ε⋆ = SMind x x∈acc
+    SM↓⊆SM (SMind _ x) (Rxx₀ ,⋆ R*x₀y) = SM↓⊆SM (x _ Rxx₀) R*x₀y
 
 open DownwardClosure public

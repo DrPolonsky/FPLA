@@ -48,9 +48,9 @@ module LocalProperties {R : 𝓡 A} where
     WM x = Σ[ r ∈ A ] ((R ⋆) x r × MF r)
 
     -- Strongly minimal form
-    data SM : 𝓟 A where
-      SMrec : ∀ x → MF x → SM x
-      SMacc : ∀ x → (∀ y → R x y → SM y) → SM x
+    data SM : 𝓟 A where 
+      MF⊆SM : ∀ x → MF x → SM x
+      SMind : ∀ x → (∀ y → R x y → SM y) → SM x
 
     -- Weakly minimal form property
     MP : 𝓟 A

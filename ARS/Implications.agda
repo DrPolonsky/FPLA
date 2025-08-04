@@ -37,7 +37,7 @@ module Hierarchy-Implications where
     ... | Rzz₁ ,⋆ R*z₁y = ∅ (z∈NF Rzz₁)
 
     SN→SM : ∀ {x} → SN x → SM x
-    SN→SM (acc xa) = SMacc _ (λ y Rxy → SN→SM (xa y Rxy))
+    SN→SM (acc xa) = SMind _ (λ y Rxy → SN→SM (xa y Rxy))
 
     SN→SMseq : ∀ {x} → SN x → SMseq R x
     SN→SMseq {x} (acc accx) f refl f-inc with
@@ -60,8 +60,8 @@ module Hierarchy-Implications where
     SN→WN∧SM decR {x} x∈SN = SNdec→WN decR x x∈SN , SN→SMseq x∈SN
 
     SM→WM : (~R R) isMinDec → ∀ {x} → SM x → WM x
-    SM→WM decR {x} (SMrec .x x∈rec) = x ,, ε⋆ , x∈rec
-    SM→WM decR {x} (SMacc .x x∈acc) with decR x
+    SM→WM decR {x} (MF⊆SM .x x∈rec) = x ,, ε⋆ , x∈rec
+    SM→WM decR {x} (SMind .x x∈acc) with decR x
     ... | in2 xIsMin = x ,, (ε⋆ , λ { y ε⋆ → ε⋆
                                     ; y (Rxx₁ ,⋆ R*x₁y) → ∅ (xIsMin _ Rxx₁)})
     ... | in1 (y ,, Rxy) with SM→WM decR (x∈acc y Rxy)
@@ -110,8 +110,8 @@ module Normalizing-Implications where
     pr2 MF∧WN↔NF x∈NF = NF⊆MF x∈NF , ((_ ,, ε⋆ , x∈NF))
 
     WN∧NP∧SM→SN : ∀ {x} → WN x → NP x → SM x → SN x
-    WN∧NP∧SM→SN {x} x∈WN x∈NP (SMrec .x x∈MF) = WN∧MF→SN x∈WN x∈MF
-    WN∧NP∧SM→SN {x} (n ,, R*xn , n∈NF) x∈NP (SMacc .x xAcc) = acc f where
+    WN∧NP∧SM→SN {x} x∈WN x∈NP (MF⊆SM .x x∈MF) = WN∧MF→SN x∈WN x∈MF
+    WN∧NP∧SM→SN {x} (n ,, R*xn , n∈NF) x∈NP (SMind .x xAcc) = acc f where
         f : ∀ (y : A) → ~R R y x → y ∈ ~R R -accessible
         f y Rxy = WN∧NP∧SM→SN
                     (n ,, x∈NP n∈NF R*xn (Rxy ,⋆ ε⋆) , n∈NF)
@@ -119,12 +119,12 @@ module Normalizing-Implications where
                     (xAcc y Rxy)
 
     isWN∧SM→SN : R isWN → ∀ {x} → SM x → SN x
-    isWN∧SM→SN RisWN {x} (SMrec .x x∈MF) = WN∧MF→SN (RisWN x) x∈MF
-    isWN∧SM→SN RisWN {x} (SMacc .x x∈SMacc) with RisWN x
+    isWN∧SM→SN RisWN {x} (MF⊆SM .x x∈MF) = WN∧MF→SN (RisWN x) x∈MF
+    isWN∧SM→SN RisWN {x} (SMind .x x∈SMind) with RisWN x
     ... | .x ,, ε⋆ , n∈NF = NF⊆SN n∈NF
     ... | n ,, (Rxy ,⋆ R*xn) , n∈NF = acc f where
         f :  ∀ (y : A) → ~R R y x → y ∈ ~R R -accessible
-        f y Rxy = isWN∧SM→SN RisWN  (x∈SMacc y Rxy)
+        f y Rxy = isWN∧SM→SN RisWN  (x∈SMind y Rxy)
 
     isWN∧isSM→isSN : R isWN → R isSM → R isSN
     isWN∧isSM→isSN RisWN RisSM x =  isWN∧SM→SN RisWN (RisSM x)
