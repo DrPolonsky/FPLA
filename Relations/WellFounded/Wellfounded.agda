@@ -35,7 +35,7 @@ module WFMinDecImplications {A : Set} (R : 𝓡 A) (dM : R isMinDec) where -- RE
 
 
 open WFMinDecImplications public
-open import Relations.FinitelyBranching 
+open import Relations.FinitelyBranching
 -- Implications relying on finite branching of the relation.
 module FBImplications {A : Set} {R : 𝓡 A} (RisFB : (~R R) isFB) where
 
@@ -104,6 +104,28 @@ module MinimalComplement {A : Set} (R : 𝓡 A) where
   isWFminCor : Set₁
   isWFminCor = ∀ (P : 𝓟 A) → _-coreductive_ P → ∀ {a : A} → a ∉ P → Σ[ m ∈ A ] (m ∈ R - ∁ P -minimal)
 
+  isWFminCor→Cor¬¬ : isWFminCor → ∀ P → _-coreductive_ P → ∀ x → ¬¬ P x
+  isWFminCor→Cor¬¬ iwfc P Pco x ¬px with iwfc P Pco ¬px
+  ... | (y ,, ¬py , ymin) with Pco y ¬py
+  ... | (z ,, Rzy , ¬pz) = ymin z ¬pz Rzy
+
+  -- Cor¬¬ is really a variation of isWFind- :
+  -- ∀ P → P is coreductive → ∀ x → x ∈ ∁ (∁ P)
+  -- Should we just call this isWFcor- or something?
+
+  Cor¬¬→isWFminCor : (∀ P → _-coreductive_ P → ∀ x → ¬¬ P x) → isWFminCor
+  Cor¬¬→isWFminCor H P Pcor {a} a∉P = ∅ (H P Pcor a a∉P )
+
+  isWFminCor+→isWFminCor : isWFminCor+ → isWFminCor
+  isWFminCor+→isWFminCor RisWFminCor+ P Pcor a∉P with RisWFminCor+ P Pcor a∉P
+  ... | (x ,, x∉P , H) = x ,, x∉P , λ y y∉P Ryx → y∉P (H y Ryx)
+
+  Cor¬¬→isWFminCor+ : (∀ P → _-coreductive_ P → ∀ x → ¬¬ P x) → isWFminCor+
+  Cor¬¬→isWFminCor+ H P Pcor {a} a∉P = ∅ (H P Pcor a a∉P )
+
+  isWFminCor→isWFminCor+ : isWFminCor → isWFminCor+
+  isWFminCor→isWFminCor+ wfmc = Cor¬¬→isWFminCor+ (isWFminCor→Cor¬¬ wfmc )
+
   -- Implications involving complements/coreductive
   isWFmin+→isWFind- : isWFmin+ → isWFind- R
   isWFmin+→isWFind- RisWF P Pind x ¬px with RisWF P ¬px
@@ -124,15 +146,6 @@ module MinimalComplement {A : Set} (R : 𝓡 A) where
   ... | (y ,, ¬Py , ymin) with Pco y ¬Py
   ... | (z ,, Rzy , ¬Pz) = ∅ (ymin z ¬Pz Rzy)
 
-  isWFminCor+→isWFminCor : isWFminCor+ → isWFminCor
-  isWFminCor+→isWFminCor RisWFminCor+ P Pcor a∉P with RisWFminCor+ P Pcor a∉P
-  ... | (x ,, x∉P , H) = x ,, x∉P , λ y y∉P Ryx → y∉P (H y Ryx)
-
-  isWFminCor→Cor¬¬ : isWFminCor → ∀ P → _-coreductive_ P → ∀ x → ¬¬ P x
-  isWFminCor→Cor¬¬ iwfc P Pco x ¬px with iwfc P Pco ¬px
-  ... | (y ,, ¬py , ymin) with Pco y ¬py
-  ... | (z ,, Rzy , ¬pz) = ymin z ¬pz Rzy
-
   isWFminDNE→Cor¬¬ : R isWFminDNE → ∀ P → _-coreductive_ P → ∀ a → ¬¬ P a
   isWFminDNE→Cor¬¬ RisWFmin = isWFminCor→Cor¬¬
     (isWFminCor+→isWFminCor (isWFminDNE→isWFminCor+  RisWFmin))
@@ -149,12 +162,12 @@ module MinimalComplement {A : Set} (R : 𝓡 A) where
 
   -- A Noteworthy Consequence
   accCorec→isWFseq-→isWFacc- : _-coreductive_ (R -accessible) → isWFseq- R → isWFacc- R
-  accCorec→isWFseq-→isWFacc- AccisCor RisWFseq- a a∉acc = RisWFseq- seq seq-inc  where 
-    open CorSequence (CS {R -accessible} {AccisCor} (a ,, a∉acc)) 
+  accCorec→isWFseq-→isWFacc- AccisCor RisWFseq- a a∉acc = RisWFseq- seq seq-inc  where
+    open CorSequence (CS {R -accessible} {AccisCor} (a ,, a∉acc))
 
 
   isWFseq-→isWFminCor+ : isWFseq- R → isWFminCor+
-  isWFseq-→isWFminCor+ RisWFseq P CI {a} ¬pa =  ∅ (RisWFseq seq seq-inc) where 
+  isWFseq-→isWFminCor+ RisWFseq P CI {a} ¬pa =  ∅ (RisWFseq seq seq-inc) where
     open CorSequence (CS {P} {CI} (a ,, ¬pa))
 
   -- The converse is not provable,
@@ -173,14 +186,19 @@ module MinimalComplement {A : Set} (R : 𝓡 A) where
 
 
   RisFBRel→accWDec→accCor : (~R R) isFBRel → dec (∁ (R -accessible)) → _-coreductive_ (R -accessible)
-  RisFBRel→accWDec→accCor RisFBRel accWDec  = 
-      FBRel∧WDec→CorP RisFBRel (R -accessible) accWDec (λ x  → acc)  
+  RisFBRel→accWDec→accCor RisFBRel accWDec  =
+      FBRel∧WDec→CorP RisFBRel (R -accessible) accWDec (λ x  → acc)
 
 
   -- RisFB→decNF→accCor : R isFB → dec (RMin R) → _-coreductive_ (R -accessible)
   -- RisFB→decNF→accCor RisFB decNF x x∉acc with FB→DNS R (R -accessible) x (RisFB x)
   -- ... | accDNS = {!   !}
 
+  isWFminCor+→isWFseq- : isWFminCor → isWFseq- R
+  isWFminCor+→isWFseq- wfmc s s-inc =
+    isWFminCor→Cor¬¬ wfmc (λ a → ¬ Σ[ k ∈ ℕ ] (s k ≡ a) )
+                    {!   !} (s zero)
+                    λ ¬Ex → ¬Ex ((0 ,, refl ))
 module ClassicalImplications {A : Set} (R : 𝓡 A) where
 
   {- We will consider four decidability hypotheses here:

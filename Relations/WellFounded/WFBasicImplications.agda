@@ -46,7 +46,7 @@ module BasicImplications {A : Set} {R : 𝓡 A} where
   isWFmin→isWFseq wfMin s with wfMin (λ a → Σ[ n ∈ ℕ ] (s n ≡ a)) (s zero) (zero ,, refl)
   ... | x ,, (k ,, p) , H = (k ,, λ Ryx → H (s (succ k)) (succ k ,, refl ) (transp (R (s (succ k))) p Ryx ) )
 
-  -- -- A correct but non-terminating proof.
+  -- -- A correct(?) but non-terminating proof.
   -- {-# TERMINATING #-}
   -- isWFseq→isWFacc : R isWFseq → R isWFacc
   -- isWFseq→isWFacc R∈WFs x = acc (λ y Ryx → isWFseq→isWFacc R∈WFs y )
