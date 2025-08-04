@@ -17,14 +17,14 @@ open import Relations.WellFounded.WFWeakImplications public
 open BasicImplications
 
 -- Implications relying on decidability of minimality.
-module WFMinDecImplications {A : Set} (R : 𝓡 A) (dM : R isMinDec) where
-
+module WFMinDecImplications {A : Set} (R : 𝓡 A) (dM : R isMinDec) where -- REF: This name is no longer appropriate
+  -- REF: Move both of the below functions to Seq?
   dMseq : A → ℕ → A
   dMseq a0 zero = a0
   dMseq a0 (succ n) with dM (dMseq a0 n)
   ... | in1 (b ,, bRsn) = b
   ... | in2 x = dMseq a0 n
-
+  -- REF: The below isn't used. Do we want to keep it?
   ¬¬∃seqDec : ∀ a → ¬¬ (   (Σ[ k ∈ ℕ ] ∀ x → ¬ R x (dMseq a k))
                          ⊔ (∀ k → R (dMseq a (succ k)) (dMseq a k)))
   ¬¬∃seqDec a ¬EM = ¬EM (in2 f) where
@@ -43,6 +43,7 @@ module FBImplications {A : Set} {R : 𝓡 A} (RisFB : (~R R) isFB) where
   RisWF→¬¬RisWF : ∀ {a} → (R -accessible) a → ¬ (¬ (R -accessible) a)
   RisWF→¬¬RisWF RisWF ¬RisWF = ∅ (¬RisWF RisWF)
 
+  -- REF: Move to WFWeakDefinitions?
   FB→isWFminDNE-→isWFacc- : isWFminDNE- R → isWFacc- R
   FB→isWFminDNE-→isWFacc- RisWF x₀ x₀∉acc =
     RisWF (∁ (R -accessible)) (λ a nnnac ac → ∅ (nnnac (RisWF→¬¬RisWF ac))) x₀∉acc f
@@ -53,11 +54,13 @@ module FBImplications {A : Set} {R : 𝓡 A} (RisFB : (~R R) isFB) where
                      λ za → z∉acc (acc za)
 
   -- When FB holds, ¬¬-accessibility is inductive
+  -- REF: The below isn't used, shall we remove it?
   FB→ind∁∁acc : R -inductive (∁ ∁ R -accessible)
   FB→ind∁∁acc x H x∉acc = FB→DNS (~R R) (R -accessible) x (RisFB x) H (λ f → x∉acc (acc f) )
 
   -- For finitely branching relations, isDec implies MinDec
   open import Lists
+  -- REF: Move this to FB?
   FB→isDec→isMinDec : R isDec → R isMinDec
   FB→isDec→isMinDec RisDec x₀ with decList∃ (~R R x₀) (λ _ → RisDec) (fst (RisFB x₀))
   ... | in2 ∄y = in2 (λ y Ryx₀ →
@@ -66,6 +69,7 @@ module FBImplications {A : Set} {R : 𝓡 A} (RisFB : (~R R) isFB) where
   ... | (y ,, _ , Ryx₀) = in1 (y ,, Ryx₀ )
 
   -- May 2nd: Does this want moving to misc?
+  -- REF: Or removing entirely?
   FB→isWFminDNE→isWFseq : R isWFminDNE → R isWFseq
   FB→isWFminDNE→isWFseq wfMinDNE s = {!    !} where
     RisWFseq- : isWFseq- R
@@ -186,7 +190,7 @@ module ClassicalImplications {A : Set} (R : 𝓡 A) where
   4. AccCor   : R -coreductive (R -accessible)
   -- (Recall that, for FB relations, 1 → 2)
   -}
-
+-- REF: Move to WFBasicImplications
   -- 1. For decidable relations, sequential well-foundedness is implied by the standard one
   isDec→isWFacc→isWFseq : R isDec → R isWFacc → R isWFseq
   isDec→isWFacc→isWFseq dR wfAcc s = f s (s zero) (wfAcc (s zero)) refl where
@@ -216,6 +220,7 @@ module ClassicalImplications {A : Set} (R : 𝓡 A) where
   AccDNE = ¬¬Closed (R -accessible)
 
   -- April 28th: Todo fix this
+  -- REF: Move to WFBasicImplications
   DNEacc→isWFminDNE→isWFacc : AccDNE → R isWFminDNE → R isWFacc
   DNEacc→isWFminDNE→isWFacc dne wfDNE x = dne x f where
           f : ¬¬ (x ∈ R -accessible)
@@ -223,6 +228,7 @@ module ClassicalImplications {A : Set} (R : 𝓡 A) where
           ... | (y ,, y∉acc , yIH) = y∉acc (acc λ z Rzy → dne z (λ z∉acc → yIH z z∉acc Rzy ) )
 
   -- Double negation shift for accessibility (global)
+  -- REF: Move to WFWeakDefinitions all three below?
   isWFacc-→¬¬isWFacc : AccDNE → isWFacc- R → ¬¬ (R isWFacc)
   isWFacc-→¬¬isWFacc AccDNE RisWFacc- ¬RisWFacc  = ¬RisWFacc λ x → AccDNE x (RisWFacc- x)
 
