@@ -46,6 +46,20 @@ module BasicImplications {A : Set} {R : 𝓡 A} where
   isWFmin→isWFseq wfMin s with wfMin (λ a → Σ[ n ∈ ℕ ] (s n ≡ a)) (s zero) (zero ,, refl)
   ... | x ,, (k ,, p) , H = (k ,, λ Ryx → H (s (succ k)) (succ k ,, refl ) (transp (R (s (succ k))) p Ryx ) )
 
+  accDNE→isWFminDNE→isWFacc : ¬¬Closed (R -accessible) → R isWFminDNE → R isWFacc
+  accDNE→isWFminDNE→isWFacc accDNE RisWFDNE x = accDNE x f where 
+    f : x ∈ ∁ ∁ (R -accessible) 
+    f x∉acc with RisWFDNE (∁ (R -accessible)) (¬¬Closed∁ (R -accessible)) x x∉acc 
+    ... | y ,, y∉acc , y∈min = y∉acc (acc (λ z Rzy → accDNE z 
+          λ z∉acc → y∈min z z∉acc Rzy)) 
+        
+  MP→isWFminDNE→isWFseq : MP≡ → R isWFminDNE → R isWFseq
+  MP→isWFminDNE→isWFseq mp≡ RisWFminDNE s 
+    with RisWFminDNE (λ x → Σ[ k ∈ ℕ ] (s k ≡ x)) (λ x → mp≡ s x ) (s 0) (0 ,, refl)     
+  ... | y ,, (k ,, sk≡y) , ¬sz→Rzy  = k ,, 
+    λ Rsk+1Rsk → ¬sz→Rzy (s (succ k)) ((succ k) ,, refl) 
+      (transp (R (s (succ k))) sk≡y Rsk+1Rsk) 
+
   -- -- A correct(?) but non-terminating proof.
   -- {-# TERMINATING #-}
   -- isWFseq→isWFacc : R isWFseq → R isWFacc

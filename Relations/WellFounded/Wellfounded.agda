@@ -1,4 +1,4 @@
-{-# OPTIONS --allow-unsolved-metas #-}
+-- {-# OPTIONS --allow-unsolved-metas #-}
 open import Logic
 open import Predicates
 open import Relations.Core
@@ -34,6 +34,7 @@ module FBImplications {A : Set} {R : 𝓡 A} (RisFB : (~R R) isFB) where
               FB→DNS (~R R) (R -accessible) z (RisFB z)
                      (λ y Ryx y∉acc → z∈min y y∉acc Ryx )
                      λ za → z∉acc (acc za)
+  
 
   -- When FB holds, ¬¬-accessibility is inductive
   -- REF: The below isn't used, shall we remove it?
@@ -49,25 +50,6 @@ module FBImplications {A : Set} {R : 𝓡 A} (RisFB : (~R R) isFB) where
    ∄y (List∃intro (~R R x₀) (fst (RisFB x₀)) y (snd (RisFB x₀) y Ryx₀ , Ryx₀)))
   ... | in1 ∃y with List∃elim (~R R x₀) (fst (RisFB x₀)) ∃y
   ... | (y ,, _ , Ryx₀) = in1 (y ,, Ryx₀ )
-
-  -- May 2nd: Does this want moving to misc?
-  -- REF: Or removing entirely?
-  FB→isWFminDNE→isWFseq : R isWFminDNE → R isWFseq
-  FB→isWFminDNE→isWFseq wfMinDNE s = {!    !} where
-    RisWFseq- : isWFseq- R
-    RisWFseq- = isWFmin-→isWFseq- R (isWFminDNE-→isWFmin- R (isWFminDNE→isWFminDNE- R wfMinDNE))
-    P : 𝓟 A
-    P x = Σ[ n ∈ ℕ ] ((x ≡ s n) × ¬ (s ∘ add n) ∈ R -decreasing)
-    ps0 : P (s 0)
-    ps0 = 0 ,, (refl , RisWFseq- _ )
-    CCP⊆P : ¬¬Closed P
-    CCP⊆P x ¬x∉P = {!    !}
-
-  -- with wfMin (λ a → Σ[ n ∈ ℕ ] (s n ≡ a)) (s zero) (zero ,, refl)
-  -- ... | x ,, (k ,, p) , H = (k ,, λ Ryx → H (s (succ k)) (succ k ,, refl ) (transp (R (s (succ k))) p Ryx ) )
-
-
-
 
 open FBImplications public
 
@@ -176,11 +158,19 @@ module MinimalComplement {A : Set} (R : 𝓡 A) where
   -- RisFB→decNF→accCor RisFB decNF x x∉acc with FB→DNS R (R -accessible) x (RisFB x)
   -- ... | accDNS = {!   !}
 
-  isWFminCor+→isWFseq- : isWFminCor → isWFseq- R
-  isWFminCor+→isWFseq- wfmc s s-inc =
+
+  -- If the relation is finitely branching, then the complement of the image of each decreasing sequence is coreductive.
+  cor→seqLemma : MP≡ → (s : ℕ → A) → s ∈ (R -decreasing) → _-coreductive_ (λ a → ¬ Σ-syntax ℕ (λ k → s k ≡ a))
+  cor→seqLemma mp≡ s s-inc x ¬¬x∈s with mp≡ s x ¬¬x∈s
+  ... | k ,, sk≡x = (s (succ k)) ,, transp (R (s (succ k))) sk≡x (s-inc (k)) ,
+     λ ¬∃n → ¬∃n ((succ k) ,, refl)   
+
+  isWFminCor+→isWFseq- : MP≡ → isWFminCor → isWFseq- R
+  isWFminCor+→isWFseq- mp≡ wfmc s s-inc =
     isWFminCor→Cor¬¬ wfmc (λ a → ¬ Σ[ k ∈ ℕ ] (s k ≡ a) )
-                    {!   !} (s zero)
+                    (cor→seqLemma mp≡ s s-inc) (s zero)
                     λ ¬Ex → ¬Ex ((0 ,, refl ))
+
 module ClassicalImplications {A : Set} (R : 𝓡 A) where
 
   {- We will consider four decidability hypotheses here:

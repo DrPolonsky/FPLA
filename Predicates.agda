@@ -145,8 +145,16 @@ module ClassicalProperties {A : Set} where
   dec : 𝓟 A → Set
   dec P = ∀ x → EM (P x)
 
+  -- dec≡ : Set
+  -- dec≡ = ∀ x → dec (_≡_ x)
+  
   ¬¬Closed : 𝓟 A → Set
   ¬¬Closed P = ∁∁ P ⊆ P
+
+  -- The image of every sequence is not not closed
+  MP≡ : Set
+  MP≡ = ∀ (f : ℕ → A) → ¬¬Closed (λ x → ( Σ[ k ∈ ℕ ] (f k ≡ x)))
+  -- MP≡ = ∀ (f : ℕ → A) → ∀ x → ¬¬ ( Σ[ k ∈ ℕ ] (f k ≡ x)) → Σ[ k ∈ ℕ ] (f k ≡ x)
 
   DNS : 𝓟 A → Set
   DNS P = (∀ x → ¬¬ (P x)) → ¬¬ (∀ x → P x)
@@ -154,7 +162,17 @@ module ClassicalProperties {A : Set} where
   dec→¬¬Closed : ∀ (P : 𝓟 A) → dec P → ¬¬Closed P
   dec→¬¬Closed P dp a ¬¬pa = case I (λ ¬pa → ∅ (¬¬pa ¬pa) ) (dp a) 
 
+  ¬¬Closed∁ : ∀ (P : 𝓟 A) → ¬¬Closed (∁ P)
+  ¬¬Closed∁ P x ¬¬¬x∈P Px = ¬¬¬x∈P (λ ¬Px → ¬Px Px)
+
+
+  
+
 open ClassicalProperties public
+
+-- Markov Principle
+MP : Set₁
+MP = ∀ (P : 𝓟 ℕ) → dec P → ¬¬ ( Σ[ k ∈ ℕ ] (P k)) → Σ[ k ∈ ℕ ] (P k)
 
 module BigOps {A : Set} where
 
