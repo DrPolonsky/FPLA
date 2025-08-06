@@ -24,7 +24,7 @@ module BasicImplications {A : Set} {R : 𝓡 A} where
   ¬ind : ∀ (P : 𝓟 A) → R -inductive P → ∀ x → ¬ (P x) → ¬ (∀ y → R y x → P y)
   ¬ind P Pind x ¬Px ∀y = ¬Px (Pind x ∀y )
 
-  wf→irrefl : R isWF → ∀ x → ¬ R x x
+  wf→irrefl : R isWF → ∀ x → ¬ R x x -- REF: This isn't used, should we move to a utilities file?
   wf→irrefl RisWF x = go x (RisWF x) where
     go : ∀ y → y ∈ R -accessible → ¬ R y y
     go y (acc Hy) Ryy = go y (Hy y Ryy) Ryy

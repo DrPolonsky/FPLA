@@ -16,25 +16,7 @@ open import Relations.WellFounded.WFBasicImplications public
 open import Relations.WellFounded.WFWeakImplications public
 open BasicImplications
 
--- Implications relying on decidability of minimality.
-module WFMinDecImplications {A : Set} (R : 𝓡 A) (dM : R isMinDec) where -- REF: This name is no longer appropriate
-  -- REF: Move both of the below functions to Seq?
-  dMseq : A → ℕ → A
-  dMseq a0 zero = a0
-  dMseq a0 (succ n) with dM (dMseq a0 n)
-  ... | in1 (b ,, bRsn) = b
-  ... | in2 x = dMseq a0 n
-  -- REF: The below isn't used. Do we want to keep it?
-  ¬¬∃seqDec : ∀ a → ¬¬ (   (Σ[ k ∈ ℕ ] ∀ x → ¬ R x (dMseq a k))
-                         ⊔ (∀ k → R (dMseq a (succ k)) (dMseq a k)))
-  ¬¬∃seqDec a ¬EM = ¬EM (in2 f) where
-    f : (dMseq a) ∈ R -decreasing
-    f k with dM (dMseq a k) | dMseq a (succ k) in e
-    ... | in1 (c ,, Rcsk) | b = transp (~R R (dMseq a k)) e Rcsk
-    ... | in2 x∈NF | b = ∅ (¬EM (in1 (k ,, x∈NF)))
 
-
-open WFMinDecImplications public
 open import Relations.FinitelyBranching
 -- Implications relying on finite branching of the relation.
 module FBImplications {A : Set} {R : 𝓡 A} (RisFB : (~R R) isFB) where
