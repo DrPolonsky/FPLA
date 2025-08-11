@@ -1,6 +1,8 @@
 open import Relations.Relations
 open import Predicates
 open import Logic
+open import Relations.WellFounded.WFDefinitions
+open import Relations.WellFounded.WFBasicImplications 
 
 module ARS.Util {A : Set } {R : 𝓡 A} where
 
@@ -42,9 +44,8 @@ wCR→conflInd RisWCR x IND (Rxy₀ ,⋆ R*y₀y) (Rxz₀ ,⋆ R*z₀z) with Ris
 ... | u ,, R*zu , R*vu = u ,, ((R*yv ⋆!⋆ R*vu) , R*zu)
 
 wCR→Conf : R isWCR → SN ⊆ CR
-wCR→Conf RisWCR = acc⊆ind (λ x → CR x) (wCR→conflInd RisWCR)
-  where open BasicImplications
-
+wCR→Conf RisWCR = BasicImplications.acc⊆ind (λ x → CR x) (wCR→conflInd RisWCR)
+  
 
 
 open import Relations.Decidable

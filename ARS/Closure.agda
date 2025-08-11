@@ -1,6 +1,7 @@
 open import Relations.Relations
 open import Predicates
 open import Logic
+open import Relations.WellFounded.WFBasicImplications
 
 module ARS.Closure {A : Set } {R : 𝓡 A} where
 

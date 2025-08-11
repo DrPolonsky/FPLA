@@ -5,6 +5,7 @@ open import Predicates
 open import Logic
 open import Datatypes using (ℕ; zero)
 open import Relations.Seq
+open import Relations.WellFounded.WFDefinitions
 
 _↘_↙_ : A → 𝓡 A → A → Set
 _↘_↙_ x R y = (R ∘~ R) x y

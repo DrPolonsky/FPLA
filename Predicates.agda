@@ -170,9 +170,9 @@ module ClassicalProperties {A : Set} where
 
 open ClassicalProperties public
 
--- Markov Principle
-MP : Set₁
-MP = ∀ (P : 𝓟 ℕ) → dec P → ¬¬ ( Σ[ k ∈ ℕ ] (P k)) → Σ[ k ∈ ℕ ] (P k)
+-- Markov Principle -- already defined in Properties
+-- MP : Set₁
+-- MP = ∀ (P : 𝓟 ℕ) → dec P → ¬¬ ( Σ[ k ∈ ℕ ] (P k)) → Σ[ k ∈ ℕ ] (P k)
 
 module BigOps {A : Set} where
 

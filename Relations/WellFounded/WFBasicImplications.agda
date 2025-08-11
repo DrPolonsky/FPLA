@@ -100,3 +100,45 @@ module BasicImplications {A : Set} {R : 𝓡 A} where
 -}
 
 open BasicImplications
+
+module ClassicalImplications {A : Set} (R : 𝓡 A) where
+
+  -- 1. For decidable relations, sequential well-foundedness is implied by the standard one
+  isDec→isWFacc→isWFseq : R isDec → R isWFacc → R isWFseq
+  isDec→isWFacc→isWFseq dR wfAcc s = f s (s zero) (wfAcc (s zero)) refl where
+    f : ∀ (s : ℕ → A) (x : A) (x-acc : x ∈ R -accessible) (x=s0 : x ≡ s zero)
+              → Σ[ k ∈ ℕ ] (¬ R (s (succ k)) (s k))
+    f s x (acc xa) x=s0 with dR {s 1} {x}
+    ... | in2 ¬Ryx = 0 ,, λ Rs1s0 → ¬Ryx (transp (R (s 1)) (~ x=s0) Rs1s0)
+    ... | in1  Ryx with f (s ∘ succ) (s 1) (xa (s 1) Ryx) refl
+    ... | i ,, p = succ i ,, p
+
+  isDec→isWFind→isWFseq : R isDec → R isWFind → R isWFseq
+  isDec→isWFind→isWFseq dR wfInd = isDec→isWFacc→isWFseq dR (isWFind→isWFacc wfInd)
+
+
+module WFDNE {A : Set} (R : 𝓡 A) where
+  -- 3. Implications relying on ¬¬-closure of accessibility
+  AccDNE : Set
+  AccDNE = ¬¬Closed (R -accessible)
+
+  -- April 28th: Todo fix this
+  -- REF: Move to WFBasicImplications
+  DNEacc→isWFminDNE→isWFacc : AccDNE → R isWFminDNE → R isWFacc
+  DNEacc→isWFminDNE→isWFacc dne wfDNE x = dne x f where
+          f : ¬¬ (x ∈ R -accessible)
+          f x∉acc with wfDNE (∁ (R -accessible)) (λ y nnny ya → nnny (λ z → z ya)) x x∉acc
+          ... | (y ,, y∉acc , yIH) = y∉acc (acc λ z Rzy → dne z (λ z∉acc → yIH z z∉acc Rzy ) )
+
+  -- Double negation shift for accessibility (global)
+  -- REF: Move to WFWeakDefinitions all three below?
+  isWFacc-→¬¬isWFacc : AccDNE → isWFacc- R → ¬¬ (R isWFacc)
+  isWFacc-→¬¬isWFacc AccDNE RisWFacc- ¬RisWFacc  = ¬RisWFacc λ x → AccDNE x (RisWFacc- x)
+
+  ¬¬isWFacc→isWFacc : AccDNE → ¬¬ (R isWFacc) → R isWFacc
+  ¬¬isWFacc→isWFacc AccDNE ¬¬isWFaccR = λ x → AccDNE x (λ ¬accx → ¬¬isWFaccR (λ ∀acc → ¬accx (∀acc x ) ))
+
+  ¬¬isWFind→isWFind : AccDNE → ¬¬ (R isWFind) → R isWFind
+  ¬¬isWFind→isWFind AccDNE ¬¬isWFindR = isWFacc→isWFind (¬¬isWFacc→isWFacc (AccDNE) g )
+    where g = λ ¬Racc → ¬¬isWFindR (λ Rind → ¬Racc (isWFind→isWFacc Rind ) )
+

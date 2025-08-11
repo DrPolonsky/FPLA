@@ -4,6 +4,7 @@ open import Predicates
 open import Datatypes
 open import Lists
 open import Relations.Decidable using (_isDec)
+open import Relations.Core
 
 module Relations.FinitelyBranching {A : Set} (R : 𝓡 A) where
 
@@ -37,5 +38,3 @@ FB→DNS P a aisFB H1 H2 with aisFB
           ¬¬Allxs ¬allPxs = ListDNS (λ y → R a y → P y) xs (h xs) ¬allPxs
           g : List∀ (λ y → R a y → P y) xs → (∀ y → R a y → P y)
           g allxs y Ray = All∈List (λ z → R a z → P z) (w y Ray) allxs Ray
-
-

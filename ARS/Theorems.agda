@@ -125,8 +125,9 @@ module Theorem-1-2-3 where
       s∈SN : SN s
 
   -- open WFDefinitions
-  open MinimalComplement
-
+  -- open MinimalComplement
+  open import Relations.Coreductive
+  open import Relations.WellFounded.WFDefinitions
   AccCor : Set
   AccCor = (~R R) -coreductive (~R R -accessible)
 

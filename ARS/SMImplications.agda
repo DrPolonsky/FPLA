@@ -43,7 +43,6 @@ module ARS.SMImplications {A : Set} (R : 𝓡 A) where
   -- Start with a lemma which mirrors RisFBRel→accWDec→accCor to imply sm is correductive. And then follow accCorec→isWFseq-→isWFacc- to complete the proof. ** July 23rd 
 
   open import Relations.Coreductive (~R R)
-  open MinimalComplement R
 
   FBrel→decCSM→SMcor : R isFBRel → dec (∁ (SM)) → _-coreductive_ (SM)
   FBrel→decCSM→SMcor RisFBRel SMwDec = 

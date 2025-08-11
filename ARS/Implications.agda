@@ -3,6 +3,7 @@ open import Predicates
 open import Logic
 open import Datatypes using (ℕ; zero;  succ)
 open import Relations.Seq
+open import Relations.WellFounded.WFBasicImplications
 
 
 module ARS.Implications {A : Set } {R : 𝓡 A} where
