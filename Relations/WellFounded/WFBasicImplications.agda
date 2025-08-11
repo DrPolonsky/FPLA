@@ -12,6 +12,13 @@ module Relations.WellFounded.WFBasicImplications where
 open import Relations.WellFounded.WFDefinitions public
 open import Relations.WellFounded.WFWeakDefinitions public
 
+AccCor : ∀ {A} → 𝓡 A → Set 
+AccCor R = R -coreductive (R -accessible)
+module accCor {A : Set} (R : 𝓡 A) (acc∈Cor : AccCor R) where 
+
+  accCor∧isWFcor→isWFacc : R isWFcor → R isWFacc 
+  accCor∧isWFcor→isWFacc RisWFcor x = RisWFcor x (R -accessible) acc∈Cor 
+
 module BasicImplications {A : Set} {R : 𝓡 A} where
 
   -- Accessibility is the least inductive predicate
@@ -60,6 +67,11 @@ module BasicImplications {A : Set} {R : 𝓡 A} where
     λ Rsk+1Rsk → ¬sz→Rzy (s (succ k)) ((succ k) ,, refl) 
       (transp (R (s (succ k))) sk≡y Rsk+1Rsk) 
 
+-- Work started Aug 8th on below. Can be developed. 
+  MP→isWFcor→isWFseq : MP≡ {A} → R isWFcor → R isWFseq
+  MP→isWFcor→isWFseq mp≡ RisWFcor s with RisWFcor (s 0) (λ x → ((R ⋆) x (s 0) ) → ¬ (Σ[ k ∈ ℕ ] ((R ⋆) (s k) x))) {!   !} ε⋆  
+  ... | z  = ∅ (z (0 ,, ε⋆))
+
   -- -- A correct(?) but non-terminating proof.
   -- {-# TERMINATING #-}
   -- isWFseq→isWFacc : R isWFseq → R isWFacc
@@ -68,6 +80,22 @@ module BasicImplications {A : Set} {R : 𝓡 A} where
   WFseq+⊆WFseq : WFseq+ R ⊆ WFseq R
   WFseq+⊆WFseq x x∈seq+ s s0≡x with x∈seq+ s s0≡x
   ... | k ,, n  = k ,, n
+
+  WFmin→WFcor : R isWFmin → R isWFcor 
+  WFmin→WFcor RisWFmin = {!   !} 
+
+  WFminDNE→WFcor : R isWFminDNE → R isWFcor 
+  WFminDNE→WFcor RisWFminDNE x P P∈Cor with RisWFminDNE (∁ P) (¬¬Closed∁ P) x 
+  ...| z = {!   !} 
+
+  corP : 𝓟 A → 𝓟 A 
+  corP P x = Σ[ y ∈ A ] ((R ⋆) y x)
+
+  WFcor→WFminDNE : R isWFcor → R isWFminDNE 
+  WFcor→WFminDNE RisWFcor P P∈DNE x x∈P = {!   !} 
+
+  WFacc→WFcor : ∀ x → x ∈ WFacc R → WFcor R x
+  WFacc→WFcor x (acc x∈acc) P P∈Cor = {!   !} 
 
   -- WFseq⊆WFseq+ : WFseq R ⊆ WFseq+ R
   -- WFseq⊆WFseq+ x x∈seq s s0≡x with x∈seq s s0≡x
@@ -99,7 +127,7 @@ module BasicImplications {A : Set} {R : 𝓡 A} where
   This n yields an index on which s does not reduce to its successor.
 -}
 
-open BasicImplications
+open BasicImplications 
 
 module ClassicalImplications {A : Set} (R : 𝓡 A) where
 
@@ -117,10 +145,12 @@ module ClassicalImplications {A : Set} (R : 𝓡 A) where
   isDec→isWFind→isWFseq dR wfInd = isDec→isWFacc→isWFseq dR (isWFind→isWFacc wfInd)
 
 
+
 module WFDNE {A : Set} (R : 𝓡 A) where
   -- 3. Implications relying on ¬¬-closure of accessibility
   AccDNE : Set
   AccDNE = ¬¬Closed (R -accessible)
+
 
   -- April 28th: Todo fix this
   -- REF: Move to WFBasicImplications

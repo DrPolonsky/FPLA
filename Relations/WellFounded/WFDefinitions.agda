@@ -21,7 +21,7 @@ module LocalWFDefinitions {R : 𝓡 A} where
   _-inductive_ : 𝓟 A → Set
   _-inductive_ φ = ∀ x → (∀ y → R y x → φ y) → φ x
 
-  WFind : 𝓟₁ A
+  WFind : 𝓟₁ A 
   WFind a = ∀ (φ : 𝓟 A) → _-inductive_ φ → φ a
 
   -- a∈A is sequentially well-founded if every sequence originating from a
@@ -50,6 +50,12 @@ module LocalWFDefinitions {R : 𝓡 A} where
   WFminEM : 𝓟₁ A
   WFminEM a = ∀ (P : 𝓟 A) → ¬¬Closed P → a ∈ P → Σ[ m ∈ A ] ((R ⋆) a m × (_-_-minimal P m))
 
+  _-coreductive_ : 𝓟 A → Set
+  _-coreductive_ P = ∀ x → x ∉ P → Σ[ y ∈ A ] (R y x × y ∉ P) 
+
+  WFcor : 𝓟₁ A 
+  WFcor a = ∀ (φ : 𝓟 A) → _-coreductive_ φ → φ a
+
 module GlobalWFDefinitions (R : 𝓡 A) where
 
   open LocalWFDefinitions {R} public
@@ -76,6 +82,9 @@ module GlobalWFDefinitions (R : 𝓡 A) where
   _isWFminEM : Set₁
   _isWFminEM = ∀ (P : 𝓟 A) → dec P → ∀ a → a ∈ P → Σ[ m ∈ A ] _-_-minimal P m
 
+  _isWFcor : Set₁
+  _isWFcor = ∀ x → WFcor x
+  
   -- When used without qualification, "WF" refers to the first definition.
   _isWF = _isWFacc
 

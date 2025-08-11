@@ -8,14 +8,11 @@ open import Relations.Core
 open import Relations.WellFounded.WFDefinitions
 
 module Relations.Coreductive {A : Set} (R : 𝓡 A) where
-  _-coreductive_ : 𝓟 A → Set
-  _-coreductive_ P = ∀ x → x ∉ P → Σ[ y ∈ A ] (R y x × y ∉ P)
-
-  Cor→ind¬¬ : ∀ (P : 𝓟 A) → _-coreductive_ P → R -inductive (∁ (∁ P))
+  Cor→ind¬¬ : ∀ (P : 𝓟 A) → R -coreductive P → R -inductive (∁ (∁ P))
   Cor→ind¬¬ P Pco x xind ¬Px with Pco x ¬Px
   ... | (y ,, Ryx , ¬Py) = xind y Ryx ¬Py
 
-  FBRel∧WDec→CorP : (~R R) isFBRel → ∀ (P : 𝓟 A) → dec (∁ P) → R -inductive P → _-coreductive_ (P)
+  FBRel∧WDec→CorP : (~R R) isFBRel → ∀ (P : 𝓟 A) → dec (∁ P) → R -inductive P → R -coreductive P
   FBRel∧WDec→CorP RisFBRel P PwDec Rind a a∉P with decList∃ (∁ P) PwDec (fst (RisFBRel a))
   ... | in2 no = ∅ (f λ Ra⊆P → a∉P (Rind a Ra⊆P)) where
       g = FBRel⊆FB (~R R) a (RisFBRel a)
@@ -25,7 +22,7 @@ module Relations.Coreductive {A : Set} (R : 𝓡 A) where
   ... | in1 yes with List∃elim _ _ yes
   ... | y ,, y∈Rx , y∉P = y ,, pr2 (snd (RisFBRel a) y) y∈Rx , y∉P
 
-  record CorSequence (P : 𝓟 A) (Pcor : _-coreductive_ P) : Set where
+  record CorSequence (P : 𝓟 A) (Pcor : R -coreductive P) : Set where
       constructor CS
       field
           init : Σ[ a ∈ A ] (a ∉ P)

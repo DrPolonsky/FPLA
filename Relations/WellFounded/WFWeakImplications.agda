@@ -145,19 +145,22 @@ module FBImplications {A : Set} {R : 𝓡 A} (RisFB : (~R R) isFB) where
 module CoreductiveImplications {A : Set} (R : 𝓡 A) where
   open import Relations.Coreductive R
 
-  isWFminCor→Cor¬¬ : isWFminCor R → ∀ (P : 𝓟 A) → _-coreductive_ P → ∀ x → ¬¬ P x
+  isWFminCor→Cor¬¬ : isWFminCor R → ∀ (P : 𝓟 A) → R -coreductive P → ∀ x → ¬¬ P x
   isWFminCor→Cor¬¬ iwfc P Pco x ¬px with iwfc P Pco ¬px
   ... | (y ,, ¬py , ymin) with Pco y ¬py
   ... | (z ,, Rzy , ¬pz) = ymin z ¬pz Rzy
 
-  Cor¬¬→isWFminCor : (∀ P → _-coreductive_ P → ∀ x → ¬¬ P x) → isWFminCor R
+  Cor¬¬→isWFminCor : (∀ P → R -coreductive P → ∀ x → ¬¬ P x) → isWFminCor R
   Cor¬¬→isWFminCor H P Pcor {a} a∉P = ∅ (H P Pcor a a∉P )
+
+  isWFcor→isWFminCor : R isWFcor  → isWFminCor R
+  isWFcor→isWFminCor RisWFcor = Cor¬¬→isWFminCor (λ P P∈Cor a → λ a∉P → a∉P (RisWFcor a P P∈Cor))  
 
   isWFminCor+→isWFminCor : isWFminCor+ R → isWFminCor R
   isWFminCor+→isWFminCor RisWFminCor+ P Pcor a∉P with RisWFminCor+ P Pcor a∉P
   ... | (x ,, x∉P , H) = x ,, x∉P , λ y y∉P Ryx → y∉P (H y Ryx)
 
-  Cor¬¬→isWFminCor+ : (∀ P → _-coreductive_ P → ∀ x → ¬¬ P x) → isWFminCor+ R
+  Cor¬¬→isWFminCor+ : (∀ P → R -coreductive P → ∀ x → ¬¬ P x) → isWFminCor+ R
   Cor¬¬→isWFminCor+ H P Pcor {a} a∉P = ∅ (H P Pcor a a∉P )
 
   isWFminCor→isWFminCor+ : isWFminCor R → isWFminCor+ R
@@ -170,22 +173,22 @@ module CoreductiveImplications {A : Set} (R : 𝓡 A) where
   ... | (y ,, ¬Py , ymin) with Pco y ¬Py
   ... | (z ,, Rzy , ¬Pz) = ∅ (ymin z ¬Pz Rzy)
 
-  isWFminDNE→Cor¬¬ : R isWFminDNE → ∀ P → _-coreductive_ P → ∀ a → ¬¬ P a
+  isWFminDNE→Cor¬¬ : R isWFminDNE → ∀ P → R -coreductive P → ∀ a → ¬¬ P a
   isWFminDNE→Cor¬¬ RisWFmin = isWFminCor→Cor¬¬
     (isWFminCor+→isWFminCor (isWFminDNE→isWFminCor+  RisWFmin))
 
-  isWFminDNE-→Cor¬¬ : isWFminDNE- R → ∀ P → _-coreductive_ P → ∀ a → ¬¬ P a
+  isWFminDNE-→Cor¬¬ : isWFminDNE- R → ∀ P → R -coreductive P → ∀ a → ¬¬ P a
   isWFminDNE-→Cor¬¬ WFR P Pcor a a∉P = WFR (∁ P) (λ x z z₁ → z (λ z₂ → z₂ z₁)) a∉P f
     where f : _
           f (m ,, m∉P , mmin) with Pcor m m∉P
           ... | (n ,, Rnm , n∉P) = mmin n (λ _ → mmin n n∉P Rnm) Rnm
 
   -- This implication also follows from isWFminDNE-→isWFmin-→isWFseq-→isWFaccc- (with accCor)
-  accCor∧isWFminDNE-→isWFacc- : _-coreductive_ (R -accessible) → isWFminDNE- R → isWFacc- R
+  accCor∧isWFminDNE-→isWFacc- : R -coreductive (R -accessible) → isWFminDNE- R → isWFacc- R
   accCor∧isWFminDNE-→isWFacc- accCor RisWF = isWFminDNE-→Cor¬¬ RisWF (R -accessible) accCor
 
   -- A Noteworthy Consequence
-  accCorec→isWFseq-→isWFacc- : _-coreductive_ (R -accessible) → isWFseq- R → isWFacc- R
+  accCorec→isWFseq-→isWFacc- : R -coreductive (R -accessible) → isWFseq- R → isWFacc- R
   accCorec→isWFseq-→isWFacc- AccisCor RisWFseq- a a∉acc = RisWFseq- seq seq-inc  where
     open CorSequence (CS {R -accessible} {AccisCor} (a ,, a∉acc))
 
@@ -197,18 +200,18 @@ module CoreductiveImplications {A : Set} (R : 𝓡 A) where
   -- The converse is not provable,
   -- because the complement of the image of a sequence is not coreductive (at least not constructively).
 
-  accCorec→isWFminCor+→isWFacc- : _-coreductive_ (R -accessible) → isWFminCor+ R → isWFacc- R
+  accCorec→isWFminCor+→isWFacc- : R -coreductive (R -accessible) → isWFminCor+ R → isWFacc- R
   accCorec→isWFminCor+→isWFacc- acc∈Cor WFmc a a∉acc
     with WFmc (R -accessible) acc∈Cor a∉acc
   ... | (m ,, m∉acc , p) = m∉acc (acc p)
 
-  cor→seqLemma : MP≡ → (s : ℕ → A) → s ∈ (R -decreasing) → _-coreductive_ (λ a → ¬ Σ-syntax ℕ (λ k → s k ≡ a))
+  cor→seqLemma : MP≡ → (s : ℕ → A) → s ∈ (R -decreasing) → R -coreductive (λ a → ¬ Σ-syntax ℕ (λ k → s k ≡ a))
   cor→seqLemma mp≡ s s-inc x ¬¬x∈s with mp≡ s x ¬¬x∈s
   ... | k ,, sk≡x = (s (succ k)) ,, transp (R (s (succ k))) sk≡x (s-inc (k)) ,
      λ ¬∃n → ¬∃n ((succ k) ,, refl)   
 
-  isWFminCor+→isWFseq- : MP≡ → isWFminCor R → isWFseq- R
-  isWFminCor+→isWFseq- mp≡ wfmc s s-inc =
+  isWFminCor→isWFseq- : MP≡ → isWFminCor R → isWFseq- R
+  isWFminCor→isWFseq- mp≡ wfmc s s-inc =
     isWFminCor→Cor¬¬ wfmc (λ a → ¬ Σ[ k ∈ ℕ ] (s k ≡ a) )
                     (cor→seqLemma mp≡ s s-inc) (s zero)
                     λ ¬Ex → ¬Ex ((0 ,, refl ))

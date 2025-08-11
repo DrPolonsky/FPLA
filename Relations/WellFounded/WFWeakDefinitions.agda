@@ -34,15 +34,15 @@ isWFminDNE- = ∀ (P : 𝓟 A) → ¬¬Closed P → ∀ {a} → a ∈ P → ¬¬
 isWFminEM- : Set₁
 isWFminEM- = ∀ (P : 𝓟 A) → dec P → ∀ {a} → a ∈ P → ¬¬ Σ[ m ∈ A ] (m ∈ R - P -minimal)
 
-open import Relations.Coreductive R
+open import Relations.Coreductive 
 
 -- isWFmin+, but restricted to coreductive predicates
 isWFminCor+ : Set₁
-isWFminCor+ = ∀ (P : 𝓟 A) → _-coreductive_ P → ∀ {a : A} → a ∉ P → Σ[ m ∈ A ] (m ∉ P × (∀ x → R x m → P x))
+isWFminCor+ = ∀ (P : 𝓟 A) → R -coreductive P → ∀ {a : A} → a ∉ P → Σ[ m ∈ A ] (m ∉ P × (∀ x → R x m → P x))
 
 -- an equivalent variation
 isWFminCor : Set₁
-isWFminCor = ∀ (P : 𝓟 A) → _-coreductive_ P → ∀ {a : A} → a ∉ P → Σ[ m ∈ A ] (m ∈ R - ∁ P -minimal)
-
+isWFminCor = ∀ (P : 𝓟 A) → R -coreductive P → ∀ {a : A} → a ∉ P → Σ[ m ∈ A ] (m ∈ R - ∁ P -minimal)
+ 
 -- open BasicImplications
 -- open WeakerWF
