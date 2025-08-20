@@ -1,7 +1,7 @@
 -- This file for implications between those definitions which we are not including in our report (e.g. seq+)
 
-isWFmin+→isWFind- : isWFmin+ → isWFind- R
-isWFmin+→isWFind- RisWF P Pind x ¬px with RisWF P ¬px
+isWFmin+→isWFind¬¬ : isWFmin+ → R isWFind¬¬ 
+isWFmin+→isWFind¬¬ RisWF P Pind x ¬px with RisWF P ¬px
 ... | (y ,, ¬py , yind) = ¬py ((Pind y yind))
 
 isWFmin+→isWFmin- : isWFmin+ → isWFmin- R

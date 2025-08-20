@@ -12,17 +12,17 @@ module Relations.WellFounded.WFWeakDefinitions {A : Set} (R : 𝓡 A) where
 
 -- Weaker notions of well-foundedness
 
-isWFacc- : Set
-isWFacc- = ∀ x → ¬¬ (x ∈ R -accessible)
+_isWFacc¬¬ : Set 
+_isWFacc¬¬ = ∀ x → ¬¬ (x ∈ R -accessible)
 
-isWFind- : Set₁
-isWFind- = ∀ (φ : 𝓟 A) → R -inductive φ → ∀ x → ¬¬ (φ x)
+_isWFind¬¬ : Set₁
+_isWFind¬¬ = ∀ (φ : 𝓟 A) → R -inductive φ → ∀ x → ¬¬ (φ x)
 
 -- The classical concept of a well-founded relation [TeReSe]
-isWFseq- : Set
+isWFseq- : Set -- Don't modify this one just yet 20th August
 isWFseq- = ∀ (s : ℕ → A) → ¬ (s ∈ R -decreasing)
 
-isWFseq+- : Set
+isWFseq+- : Set  -- Don't modify this one just yet 20th August
 isWFseq+- = ∀ (s : ℕ → A) → ¬¬ (Σ[ n ∈ ℕ ] (s n ∈ Rmin R))
 
 isWFmin- : Set₁

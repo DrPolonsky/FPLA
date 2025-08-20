@@ -18,12 +18,12 @@ module WeakImplications {A : Set} (R : 𝓡 A) where
   -- Implications between weaker well-foundedness notions
 
   -- Remark.  The converse of this is exactly the DNS for accessibility
-  ¬¬isWFacc→isWFacc- :  ¬¬ (R isWFacc) → isWFacc- R
-  ¬¬isWFacc→isWFacc- ¬¬wfAccR = λ x ¬accx     → ¬¬wfAccR (λ isWFacc → ¬accx (isWFacc x) )
+  ¬¬isWFacc→isWFacc¬¬ :  ¬¬ (R isWFacc) → R isWFacc¬¬
+  ¬¬isWFacc→isWFacc¬¬ ¬¬wfAccR = λ x ¬accx     → ¬¬wfAccR (λ isWFacc → ¬accx (isWFacc x) )
 
   -- The converse of this is exactly the DNS for all inductive φ
-  ¬¬isWFind→isWFind- : ¬¬ (R isWFind) → isWFind- R
-  ¬¬isWFind→isWFind- ¬¬WFiR   = λ φ φind x ¬φx → ¬¬WFiR (λ isWFiR → ¬φx (isWFiR x φ φind))
+  ¬¬isWFind→isWFind¬¬ : ¬¬ (R isWFind) → R isWFind¬¬ 
+  ¬¬isWFind→isWFind¬¬ ¬¬WFiR   = λ φ φind x ¬φx → ¬¬WFiR (λ isWFiR → ¬φx (isWFiR x φ φind))
 
 
   ¬¬isWFseq→isWFseq- : ¬¬ (R isWFseq) → isWFseq- R
@@ -35,25 +35,25 @@ module WeakImplications {A : Set} (R : 𝓡 A) where
   isWFminDNE→isWFminDNE- : R isWFminDNE → isWFminDNE- R
   isWFminDNE→isWFminDNE- a b c d e = e (a b c _ d)
 
-  isWFacc-→isWFind- : isWFacc- R → isWFind- R
-  isWFacc-→isWFind- RisWFacc- P Pind d ¬Pd = RisWFacc- d (λ disRacc → ¬Pd (acc⊆ind P Pind d disRacc) )
+  isWFacc¬¬→isWFind¬¬ : R isWFacc¬¬ → R isWFind¬¬ 
+  isWFacc¬¬→isWFind¬¬ RisWFacc¬¬ P Pind d ¬Pd = RisWFacc¬¬ d (λ disRacc → ¬Pd (acc⊆ind P Pind d disRacc) )
 
-  isWFind-→isWFacc- : isWFind- R → isWFacc- R
-  isWFind-→isWFacc- RisWFind = RisWFind (λ y → y ∈ R -accessible) (λ x → acc)
+  isWFind¬¬→isWFacc¬¬ : R isWFind¬¬  → R isWFacc¬¬
+  isWFind¬¬→isWFacc¬¬ RisWFind = RisWFind (λ y → y ∈ R -accessible) (λ x → acc)
 
-  isWFacc-→isWFmin- : isWFacc- R → isWFmin- R
-  isWFacc-→isWFmin- RisWFacc- P {d} d∈P ¬Σ₀ = RisWFacc- d (λ dRacc → f d d∈P dRacc ¬Σ₀)
+  isWFacc¬¬→isWFmin- : R isWFacc¬¬ → isWFmin- R
+  isWFacc¬¬→isWFmin- RisWFacc¬¬ P {d} d∈P ¬Σ₀ = RisWFacc¬¬ d (λ dRacc → f d d∈P dRacc ¬Σ₀)
     where f : ∀ x → x ∈ P → x ∈ R -accessible → ¬¬ Σ[ y ∈ A ] (y ∈ R - P -minimal)
           f x x∈P (acc xac) ¬Σ = ¬Σ (x ,, x∈P , (λ y y∈P Ryx → f y y∈P (xac y Ryx) ¬Σ))
 
   -- redundant [AP]
-  isWFind-→isWFmin- : isWFind- R → isWFmin- R
-  isWFind-→isWFmin- RisWFind- P {d} d∈P =
+  isWFind¬¬→isWFmin- : R isWFind¬¬  → isWFmin- R
+  isWFind¬¬→isWFmin- RisWFind¬¬ P {d} d∈P =
     let φ : 𝓟 A
         φ x = x ∈ P → ¬¬ Σ[ y ∈ A ] (y ∈ R - P -minimal)
         φ-ind : R -inductive φ
         φ-ind x IH x∈P ¬Σ = ¬Σ (x ,, x∈P , λ y y∈P Ryx → IH y Ryx y∈P ¬Σ )
-      in λ ¬Σ → RisWFind- φ φ-ind d (λ H → H d∈P ¬Σ )
+      in λ ¬Σ → RisWFind¬¬ φ φ-ind d (λ H → H d∈P ¬Σ )
 
   isWFmin-→isWFseq- : isWFmin- R → isWFseq- R
   isWFmin-→isWFseq- RisWFmin- s s-dec = RisWFmin- B (zero ,, refl) f
@@ -64,9 +64,9 @@ module WeakImplications {A : Set} (R : 𝓡 A) where
                                 (transp (R (s (succ n))) sn≡d (s-dec n))
 
   -- redundant [AP]
-  isWFacc-→isWFseq- : isWFacc- R → isWFseq- R
-  isWFacc-→isWFseq- RisWFacc- s0 s0-inc =
-    RisWFacc- (s0 0) (λ s00∈acc → f (s0 0) s00∈acc s0 s0-inc refl ) where
+  isWFacc¬¬→isWFseq- : R isWFacc¬¬ → isWFseq- R
+  isWFacc¬¬→isWFseq- RisWFacc¬¬ s0 s0-inc =
+    RisWFacc¬¬ (s0 0) (λ s00∈acc → f (s0 0) s00∈acc s0 s0-inc refl ) where
       f : ∀ x → x ∈ R -accessible → ∀ s → s ∈ R -decreasing → ¬ (s 0 ≡ x)
       f x (acc xacc) s s-inc s0=x =
         f (s 1) (xacc (s 1) (transp (R (s 1)) s0=x (s-inc 0) ) )
@@ -132,8 +132,8 @@ module FBImplications {A : Set} {R : 𝓡 A} (RisFB : (~R R) isFB) where
   RisWF→¬¬RisWF RisWF ¬RisWF = ∅ (¬RisWF RisWF)
 
   -- REF: Move to WFWeakDefinitions?
-  FB→isWFminDNE-→isWFacc- : isWFminDNE- R → isWFacc- R
-  FB→isWFminDNE-→isWFacc- RisWF x₀ x₀∉acc =
+  FB→isWFminDNE-→isWFacc¬¬ : isWFminDNE- R → R isWFacc¬¬
+  FB→isWFminDNE-→isWFacc¬¬ RisWF x₀ x₀∉acc =
     RisWF (∁ (R -accessible)) (λ a nnnac ac → ∅ (nnnac (RisWF→¬¬RisWF ac))) x₀∉acc f
       where f : ¬ Σ-syntax A (R - ∁ (R -accessible)-minimal)
             f (z ,, z∉acc , z∈min) =
@@ -184,12 +184,12 @@ module CoreductiveImplications {A : Set} (R : 𝓡 A) where
           ... | (n ,, Rnm , n∉P) = mmin n (λ _ → mmin n n∉P Rnm) Rnm
 
   -- This implication also follows from isWFminDNE-→isWFmin-→isWFseq-→isWFaccc- (with accCor)
-  accCor∧isWFminDNE-→isWFacc- : R -coreductive (R -accessible) → isWFminDNE- R → isWFacc- R
-  accCor∧isWFminDNE-→isWFacc- accCor RisWF = isWFminDNE-→Cor¬¬ RisWF (R -accessible) accCor
+  accCor∧isWFminDNE-→isWFacc¬¬ : R -coreductive (R -accessible) → isWFminDNE- R → R isWFacc¬¬
+  accCor∧isWFminDNE-→isWFacc¬¬ accCor RisWF = isWFminDNE-→Cor¬¬ RisWF (R -accessible) accCor
 
   -- A Noteworthy Consequence
-  accCorec→isWFseq-→isWFacc- : R -coreductive (R -accessible) → isWFseq- R → isWFacc- R
-  accCorec→isWFseq-→isWFacc- AccisCor RisWFseq- a a∉acc = RisWFseq- seq seq-inc  where
+  accCorec→isWFseq-→isWFacc¬¬ : R -coreductive (R -accessible) → isWFseq- R → R isWFacc¬¬
+  accCorec→isWFseq-→isWFacc¬¬ AccisCor RisWFseq- a a∉acc = RisWFseq- seq seq-inc  where
     open CorSequence (CS {R -accessible} {AccisCor} (a ,, a∉acc))
 
 
@@ -200,8 +200,8 @@ module CoreductiveImplications {A : Set} (R : 𝓡 A) where
   -- The converse is not provable,
   -- because the complement of the image of a sequence is not coreductive (at least not constructively).
 
-  accCorec→isWFminCor+→isWFacc- : R -coreductive (R -accessible) → isWFminCor+ R → isWFacc- R
-  accCorec→isWFminCor+→isWFacc- acc∈Cor WFmc a a∉acc
+  accCorec→isWFminCor+→isWFacc¬¬ : R -coreductive (R -accessible) → isWFminCor+ R → R isWFacc¬¬
+  accCorec→isWFminCor+→isWFacc¬¬ acc∈Cor WFmc a a∉acc
     with WFmc (R -accessible) acc∈Cor a∉acc
   ... | (m ,, m∉acc , p) = m∉acc (acc p)
 

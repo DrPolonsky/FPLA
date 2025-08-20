@@ -20,7 +20,7 @@ module Relations.WellFounded.Wellfounded where
 
 -- module MinimalComplement {A : Set} (R : 𝓡 A) where
 
---   -- Cor¬¬ is really a variation of isWFind- :
+--   -- Cor¬¬ is really a variation of isWFind¬¬ :
 --   -- ∀ P → P is coreductive → ∀ x → x ∈ ∁ (∁ P)
 --   -- Should we just call this isWFcor- or something?
 

@@ -1,3 +1,4 @@
+{-# OPTIONS --allow-unsolved-metas #-}
 open import Logic
 open import Predicates
 open import Relations.Core
@@ -162,8 +163,8 @@ module WFDNE {A : Set} (R : 𝓡 A) where
 
   -- Double negation shift for accessibility (global)
   -- REF: Move to WFWeakDefinitions all three below?
-  isWFacc-→¬¬isWFacc : AccDNE → isWFacc- R → ¬¬ (R isWFacc)
-  isWFacc-→¬¬isWFacc AccDNE RisWFacc- ¬RisWFacc  = ¬RisWFacc λ x → AccDNE x (RisWFacc- x)
+  isWFacc¬¬→¬¬isWFacc : AccDNE → R isWFacc¬¬ → ¬¬ (R isWFacc)
+  isWFacc¬¬→¬¬isWFacc AccDNE RisWFacc¬¬ ¬RisWFacc  = ¬RisWFacc λ x → AccDNE x (RisWFacc¬¬ x)
 
   ¬¬isWFacc→isWFacc : AccDNE → ¬¬ (R isWFacc) → R isWFacc
   ¬¬isWFacc→isWFacc AccDNE ¬¬isWFaccR = λ x → AccDNE x (λ ¬accx → ¬¬isWFaccR (λ ∀acc → ¬accx (∀acc x ) ))
