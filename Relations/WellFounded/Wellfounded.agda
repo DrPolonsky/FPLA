@@ -27,7 +27,7 @@ module Relations.WellFounded.Wellfounded where
 
   
 
---   -- isWFminCor+→isWFseq- : isWFminCor+ → isWFseq- R
+--   -- isWFminCor+→isWFseq- : isWFminCor+ → R isWFseq
 --   -- isWFminCor+→isWFseq- WFmc s sinc
 --   --   with WFmc (λ x → Σ[ b ∈ ℕ ] (∀ k → k ≤ b → ¬ x ≡ s k) → Σ[ l ∈ ℕ ] → x ≡ s l) ... = {!   !}
 

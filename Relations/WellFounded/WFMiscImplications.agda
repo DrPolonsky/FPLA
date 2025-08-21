@@ -4,8 +4,8 @@ isWFmin+→isWFind¬¬ : isWFmin+ → R isWFind¬¬
 isWFmin+→isWFind¬¬ RisWF P Pind x ¬px with RisWF P ¬px
 ... | (y ,, ¬py , yind) = ¬py ((Pind y yind))
 
-isWFmin+→isWFmin- : isWFmin+ → isWFmin- R
-isWFmin+→isWFmin- Rmin+ P {d} p ¬∃minP with Rmin+ (∁ P ) (λ x → x p)
+isWFmin+→isWFmin¬¬ : isWFmin+ → R isWFmin¬¬
+isWFmin+→isWFmin¬¬ Rmin+ P {d} p ¬∃minP with Rmin+ (∁ P ) (λ x → x p)
 ... | (a ,, ¬¬Pa , aMin) = ¬¬Pa (λ pa → ¬∃minP ((a ,, pa , λ y Py Rya → aMin y Rya Py )) )
 
 isWFmin+→isWFminDNE : isWFmin+ → R isWFminDNE
