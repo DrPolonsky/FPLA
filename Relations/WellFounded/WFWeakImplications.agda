@@ -14,9 +14,8 @@ open import Relations.WellFounded.WFWeakDefinitions public
 open import Relations.WellFounded.WFBasicImplications public
 open BasicImplications
 
-module WeakImplications {A : Set} (R : 𝓡 A) where
   -- Implications between weaker well-foundedness notions
-
+module ¬¬WFx→WFx¬¬Implications {A : Set} (R : 𝓡 A) where
   -- Remark.  The converse of this is exactly the DNS for accessibility
   ¬¬isWFacc→isWFacc¬¬ :  ¬¬ (R isWFacc) → R isWFacc¬¬
   ¬¬isWFacc→isWFacc¬¬ ¬¬wfAccR = λ x ¬accx     → ¬¬wfAccR (λ isWFacc → ¬accx (isWFacc x) )
@@ -32,6 +31,7 @@ module WeakImplications {A : Set} (R : 𝓡 A) where
   ¬¬isWFmin→isWFmin¬¬ : ¬¬ (R isWFmin) → R isWFmin¬¬
   ¬¬isWFmin→isWFmin¬¬ ¬¬WFmR   = λ P p ¬Σ → ¬¬WFmR (λ WFmR → ¬Σ (WFmR P _ p ) )
 
+module WeakImplications {A : Set} (R : 𝓡 A) where
   isWFminDNE→isWFminDNE¬¬ : R isWFminDNE → R isWFminDNE¬¬
   isWFminDNE→isWFminDNE¬¬ a b c d e = e (a b c _ d)
 
@@ -75,24 +75,10 @@ module WeakImplications {A : Set} (R : 𝓡 A) where
   isWFmin¬¬→isWFminDNE¬¬ : R isWFmin¬¬ → R isWFminDNE¬¬
   isWFmin¬¬→isWFminDNE¬¬ RisWFmin¬¬ P  = λ _ → RisWFmin¬¬ P
 
-  --  Double check this solution as it went from being long to simple.
   isWFminDNE¬¬→isWFmin¬¬ : R isWFminDNE¬¬ → R isWFmin¬¬
   isWFminDNE¬¬→isWFmin¬¬ RisWFminDNE¬¬ P {d} d∈P ¬∃minP with RisWFminDNE¬¬ (∁ (∁ P)) (λ x y z → y λ w → w z ) (λ z → z d∈P)
   ... | c = c λ { (x ,, ¬x∉P , H) → ¬x∉P (λ x∈P →
                    ¬∃minP (x ,, x∈P , λ y y∈P Ryx → H y (λ z → z y∈P) Ryx ) )  }
-
-  ¬¬lemma : ∀ (X : Set) (Q : 𝓡 X) (P : 𝓟 X) (a : X) → ¬¬ (Σ[ b ∈ X ] (Q b a × P b) ⊔ (∀ b → Q b a → ¬ P b))
-  ¬¬lemma X Q P a ¬⊔ = ¬⊔ (in2 λ b Qba b∈P → ¬⊔ (in1 (b ,, Qba , b∈P) ) )
-
-  ¬¬lemmaA : ∀ (P : 𝓟 A) (a : A) → ¬¬ (Σ[ b ∈ A ] (R b a × P b) ⊔ (∀ b → R b a → ¬ P b))
-  ¬¬lemmaA P a ¬⊔ = ¬⊔ (in2 λ b Rba b∈P → ¬⊔ (in1 (b ,, Rba , b∈P) ) )
-
-  ¬¬lemmaC : ∀ (P : 𝓟 A) → (∁ (∁ P) ⊆ P) → (a : A) →
-        ¬¬ (    (Σ[ bRba ∈ (Σ[ b ∈ A ] R b a) ] (¬ P (fst bRba)))
-             ⊔  (∀ (bRba :  Σ[ b ∈ A ] R b a)    → P (fst bRba)))
-  ¬¬lemmaC P CCP⊆P a ¬⊔ = ¬⊔ (in2 λ { (b ,, Rba) → CCP⊆P b (λ b∉P → ¬⊔ (in1 ((b ,, Rba) ,, b∉P ) ) )  } )
-
-
   -- April 28th: Are these ToDos still something we want or shall we delete them?
   {-
   To do:
@@ -101,14 +87,6 @@ module WeakImplications {A : Set} (R : 𝓡 A) where
   - replace implications WFseq- -> WFacc- and WFDNE- -> WFacc- to use CCaccInd
   - from WFacc and strong decidability of acc (acc∈cored), prove wf[ind]
   -}
-
-  isWFseq-₂ : Set
-  isWFseq-₂ = ∀ (s : ℕ → A) → ¬¬ (Σ[ n ∈ ℕ ] (R (s (succ n)) (s n) → ⊥))
-
-  -- Does this require R to be ¬¬ Closed?  ¬¬Rxy → Rxy AKA ∁∁R ⊆ R ??
-  -- isWFseq-₂ ↔ R isWFseq-
-  -- because ¬¬ (∃ x. P(x)) ↔ ¬ (∀ x. ¬ P(x))
-
 
   -- WFseq-₂→WFseq+- : isWFseq-₂ → R isWFseq+-
   -- WFseq-₂→WFseq+- isSeq2 s ¬Ex = {! ¬  !}
@@ -125,13 +103,7 @@ module WeakImplications {A : Set} (R : 𝓡 A) where
 open WeakImplications public
 
 open import Relations.FinitelyBranching
-module FBImplications {A : Set} {R : 𝓡 A} (RisFB : (~R R) isFB) where
-
-  -- May 2nd note: This must exist somewhere in general form?
-  RisWF→¬¬RisWF : ∀ {a} → (R -accessible) a → ¬ (¬ (R -accessible) a)
-  RisWF→¬¬RisWF RisWF ¬RisWF = ∅ (¬RisWF RisWF)
-
-  -- REF: Move to WFWeakDefinitions?
+module FBWeakImplications {A : Set} {R : 𝓡 A} (RisFB : (~R R) isFB) where
   FB→isWFminDNE¬¬→isWFacc¬¬ : R isWFminDNE¬¬ → R isWFacc¬¬
   FB→isWFminDNE¬¬→isWFacc¬¬ RisWF x₀ x₀∉acc =
     RisWF (∁ (R -accessible)) (λ a nnnac ac → ∅ (nnnac (RisWF→¬¬RisWF ac))) x₀∉acc f
@@ -141,8 +113,7 @@ module FBImplications {A : Set} {R : 𝓡 A} (RisFB : (~R R) isFB) where
                      (λ y Ryx y∉acc → z∈min y y∉acc Ryx )
                      λ za → z∉acc (acc za)
 
--- Should this be a seperate module, if so what name?
-module CoreductiveImplications {A : Set} (R : 𝓡 A) where
+module CoreductiveWeakImplications {A : Set} (R : 𝓡 A) where
   open import Relations.Coreductive R
 
   isWFminCor→Cor¬¬ : R isWFminCor → ∀ (P : 𝓟 A) → R -coreductive P → ∀ x → ¬¬ P x
@@ -215,3 +186,16 @@ module CoreductiveImplications {A : Set} (R : 𝓡 A) where
     isWFminCor→Cor¬¬ wfmc (λ a → ¬ Σ[ k ∈ ℕ ] (s k ≡ a) )
                     (cor→seqLemma mp≡ s s-inc) (s zero)
                     λ ¬Ex → ¬Ex ((0 ,, refl ))
+
+module AccDNEWeakImplications {A : Set} (R : 𝓡 A) (acc∈DNE : AccDNE R) where
+  -- 3. Implications relying on ¬¬-closure of accessibility
+  isWFacc¬¬→¬¬isWFacc : R isWFacc¬¬ → ¬¬ (R isWFacc)
+  isWFacc¬¬→¬¬isWFacc RisWFacc¬¬ ¬RisWFacc  = ¬RisWFacc λ x → acc∈DNE x (RisWFacc¬¬ x)
+
+  ¬¬isWFacc→isWFacc : ¬¬ (R isWFacc) → R isWFacc
+  ¬¬isWFacc→isWFacc ¬¬isWFaccR = λ x → acc∈DNE x (λ ¬accx → ¬¬isWFaccR (λ ∀acc → ¬accx (∀acc x ) ))
+
+  ¬¬isWFind→isWFind : ¬¬ (R isWFind) → R isWFind
+  ¬¬isWFind→isWFind ¬¬isWFindR = isWFacc→isWFind (¬¬isWFacc→isWFacc g) 
+    where   g : ¬¬ (R isWFacc)
+            g = λ ¬Racc → ¬¬isWFindR (λ Rind → ¬Racc (isWFind→isWFacc Rind ) )

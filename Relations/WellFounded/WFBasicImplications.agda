@@ -12,16 +12,9 @@ module Relations.WellFounded.WFBasicImplications where
 
 open import Relations.WellFounded.WFDefinitions public
 open import Relations.WellFounded.WFWeakDefinitions public
+open import Relations.WellFounded.ClassicalProperties public
 
-AccCor : ∀ {A} → 𝓡 A → Set 
-AccCor R = R -coreductive (R -accessible)
-module accCor {A : Set} (R : 𝓡 A) (acc∈Cor : AccCor R) where 
-
-  accCor∧isWFcor→isWFacc : R isWFcor → R isWFacc 
-  accCor∧isWFcor→isWFacc RisWFcor x = RisWFcor x (R -accessible) acc∈Cor 
-
-module BasicImplications {A : Set} {R : 𝓡 A} where
-
+module PropertyImplications {A : Set} {R : 𝓡 A} where 
   -- Accessibility is the least inductive predicate
   acc⊆ind : ∀ (φ : 𝓟 A) → R -inductive φ → R -accessible ⊆ φ
   acc⊆ind φ φisRind x (acc IH) = φisRind x (λ y Ryx → acc⊆ind φ φisRind y (IH y Ryx) )
@@ -29,14 +22,16 @@ module BasicImplications {A : Set} {R : 𝓡 A} where
   ¬acc : ∀ {x : A} → x ∉ R -accessible → ¬ (∀ y → R y x → y ∈ R -accessible)
   ¬acc ¬xisRacc ∀yisRacc = ¬xisRacc (acc ∀yisRacc)
 
+  -- May 2nd note: This must exist somewhere in general form?
+  RisWF→¬¬RisWF : ∀ {a} → (R -accessible) a → ¬ (¬ (R -accessible) a)
+  RisWF→¬¬RisWF RisWF ¬RisWF = ∅ (¬RisWF RisWF)
+
   ¬ind : ∀ (P : 𝓟 A) → R -inductive P → ∀ x → ¬ (P x) → ¬ (∀ y → R y x → P y)
   ¬ind P Pind x ¬Px ∀y = ¬Px (Pind x ∀y )
 
-  wf→irrefl : R isWF → ∀ x → ¬ R x x -- REF: This isn't used, should we move to a utilities file?
-  wf→irrefl RisWF x = go x (RisWF x) where
-    go : ∀ y → y ∈ R -accessible → ¬ R y y
-    go y (acc Hy) Ryy = go y (Hy y Ryy) Ryy
+open PropertyImplications public
 
+module BasicImplications {A : Set} {R : 𝓡 A} where
   -- implications between the base definitions
   isWFacc→isWFind : R isWFacc → R isWFind
   isWFacc→isWFind wfAcc x φ φ-ind = acc⊆ind φ φ-ind x (wfAcc x)
@@ -53,25 +48,6 @@ module BasicImplications {A : Set} {R : 𝓡 A} where
   isWFmin→isWFseq : R isWFmin → R isWFseq
   isWFmin→isWFseq wfMin s with wfMin (λ a → Σ[ n ∈ ℕ ] (s n ≡ a)) (s zero) (zero ,, refl)
   ... | x ,, (k ,, p) , H = (k ,, λ Ryx → H (s (succ k)) (succ k ,, refl ) (transp (R (s (succ k))) p Ryx ) )
-
-  accDNE→isWFminDNE→isWFacc : ¬¬Closed (R -accessible) → R isWFminDNE → R isWFacc
-  accDNE→isWFminDNE→isWFacc accDNE RisWFDNE x = accDNE x f where 
-    f : x ∈ ∁ ∁ (R -accessible) 
-    f x∉acc with RisWFDNE (∁ (R -accessible)) (¬¬Closed∁ (R -accessible)) x x∉acc 
-    ... | y ,, y∉acc , y∈min = y∉acc (acc (λ z Rzy → accDNE z 
-          λ z∉acc → y∈min z z∉acc Rzy)) 
-        
-  MP→isWFminDNE→isWFseq : MP≡ → R isWFminDNE → R isWFseq
-  MP→isWFminDNE→isWFseq mp≡ RisWFminDNE s 
-    with RisWFminDNE (λ x → Σ[ k ∈ ℕ ] (s k ≡ x)) (λ x → mp≡ s x ) (s 0) (0 ,, refl)     
-  ... | y ,, (k ,, sk≡y) , ¬sz→Rzy  = k ,, 
-    λ Rsk+1Rsk → ¬sz→Rzy (s (succ k)) ((succ k) ,, refl) 
-      (transp (R (s (succ k))) sk≡y Rsk+1Rsk) 
-
--- Work started Aug 8th on below. Can be developed. 
-  MP→isWFcor→isWFseq : MP≡ {A} → R isWFcor → R isWFseq
-  MP→isWFcor→isWFseq mp≡ RisWFcor s with RisWFcor (s 0) (λ x → ((R ⋆) x (s 0) ) → ¬ (Σ[ k ∈ ℕ ] ((R ⋆) (s k) x))) {!   !} ε⋆  
-  ... | z  = ∅ (z (0 ,, ε⋆))
 
   -- -- A correct(?) but non-terminating proof.
   -- {-# TERMINATING #-}
@@ -130,8 +106,7 @@ module BasicImplications {A : Set} {R : 𝓡 A} where
 
 open BasicImplications 
 
-module ClassicalImplications {A : Set} (R : 𝓡 A) where
-
+module DecdabilityImplications {A : Set} (R : 𝓡 A) where -- Using R isDec
   -- 1. For decidable relations, sequential well-foundedness is implied by the standard one
   isDec→isWFacc→isWFseq : R isDec → R isWFacc → R isWFseq
   isDec→isWFacc→isWFseq dR wfAcc s = f s (s zero) (wfAcc (s zero)) refl where
@@ -145,31 +120,26 @@ module ClassicalImplications {A : Set} (R : 𝓡 A) where
   isDec→isWFind→isWFseq : R isDec → R isWFind → R isWFseq
   isDec→isWFind→isWFseq dR wfInd = isDec→isWFacc→isWFseq dR (isWFind→isWFacc wfInd)
 
-
-
-module WFDNE {A : Set} (R : 𝓡 A) where
+module AccDNEImplications {A : Set} (R : 𝓡 A) (acc∈DNE : AccDNE R) where
   -- 3. Implications relying on ¬¬-closure of accessibility
-  AccDNE : Set
-  AccDNE = ¬¬Closed (R -accessible)
-
-
-  -- April 28th: Todo fix this
-  -- REF: Move to WFBasicImplications
-  DNEacc→isWFminDNE→isWFacc : AccDNE → R isWFminDNE → R isWFacc
-  DNEacc→isWFminDNE→isWFacc dne wfDNE x = dne x f where
+  DNEacc→isWFminDNE→isWFacc : R isWFminDNE → R isWFacc
+  DNEacc→isWFminDNE→isWFacc wfDNE x = acc∈DNE x f where
           f : ¬¬ (x ∈ R -accessible)
           f x∉acc with wfDNE (∁ (R -accessible)) (λ y nnny ya → nnny (λ z → z ya)) x x∉acc
-          ... | (y ,, y∉acc , yIH) = y∉acc (acc λ z Rzy → dne z (λ z∉acc → yIH z z∉acc Rzy ) )
+          ... | (y ,, y∉acc , yIH) = y∉acc (acc λ z Rzy → acc∈DNE z (λ z∉acc → yIH z z∉acc Rzy ) )
 
-  -- Double negation shift for accessibility (global)
-  -- REF: Move to WFWeakDefinitions all three below?
-  isWFacc¬¬→¬¬isWFacc : AccDNE → R isWFacc¬¬ → ¬¬ (R isWFacc)
-  isWFacc¬¬→¬¬isWFacc AccDNE RisWFacc¬¬ ¬RisWFacc  = ¬RisWFacc λ x → AccDNE x (RisWFacc¬¬ x)
+module accCorImplications {A : Set} (R : 𝓡 A) (acc∈Cor : AccCor R) where 
+  accCor∧isWFcor→isWFacc : R isWFcor → R isWFacc 
+  accCor∧isWFcor→isWFacc RisWFcor x = RisWFcor x (R -accessible) acc∈Cor 
 
-  ¬¬isWFacc→isWFacc : AccDNE → ¬¬ (R isWFacc) → R isWFacc
-  ¬¬isWFacc→isWFacc AccDNE ¬¬isWFaccR = λ x → AccDNE x (λ ¬accx → ¬¬isWFaccR (λ ∀acc → ¬accx (∀acc x ) ))
+module MP≡Implications {A : Set} (R : 𝓡 A) (mp≡ : MP≡) where 
+  MP→isWFminDNE→isWFseq : R isWFminDNE → R isWFseq
+  MP→isWFminDNE→isWFseq RisWFminDNE s 
+    with RisWFminDNE (λ x → Σ[ k ∈ ℕ ] (s k ≡ x)) (λ x → mp≡ s x ) (s 0) (0 ,, refl)     
+  ... | y ,, (k ,, sk≡y) , ¬sz→Rzy  = k ,, 
+    λ Rsk+1Rsk → ¬sz→Rzy (s (succ k)) ((succ k) ,, refl) 
+      (transp (R (s (succ k))) sk≡y Rsk+1Rsk) 
 
-  ¬¬isWFind→isWFind : AccDNE → ¬¬ (R isWFind) → R isWFind
-  ¬¬isWFind→isWFind AccDNE ¬¬isWFindR = isWFacc→isWFind (¬¬isWFacc→isWFacc (AccDNE) g )
-    where g = λ ¬Racc → ¬¬isWFindR (λ Rind → ¬Racc (isWFind→isWFacc Rind ) )
-
+  MP→isWFcor→isWFseq : R isWFcor → R isWFseq
+  MP→isWFcor→isWFseq RisWFcor s with RisWFcor (s 0) (λ x → ((R ⋆) x (s 0) ) → ¬ (Σ[ k ∈ ℕ ] ((R ⋆) (s k) x))) {!   !} ε⋆  
+  ... | z  = ∅ (z (0 ,, ε⋆))
