@@ -12,7 +12,14 @@ module Relations.WellFounded.WFWeakImplications where
 open import Relations.WellFounded.WFDefinitions public
 open import Relations.WellFounded.WFWeakDefinitions public
 open import Relations.WellFounded.WFBasicImplications public
-open BasicImplications
+open ConstructiveImplications
+
+module WFx→¬¬WFxImplications {A : Set} (R : 𝓡 A) where 
+  doubleNegIntro : ∀ {A : Set} → A → ¬¬ A 
+  doubleNegIntro x nx = nx x
+
+  isWFacc→¬¬isWFacc : R isWF → ¬¬ (R isWF)
+  isWFacc→¬¬isWFacc RisWF  = doubleNegIntro RisWF  
 
   -- Implications between weaker well-foundedness notions
 module ¬¬WFx→WFx¬¬Implications {A : Set} (R : 𝓡 A) where
@@ -24,14 +31,13 @@ module ¬¬WFx→WFx¬¬Implications {A : Set} (R : 𝓡 A) where
   ¬¬isWFind→isWFind¬¬ : ¬¬ (R isWFind) → R isWFind¬¬ 
   ¬¬isWFind→isWFind¬¬ ¬¬WFiR   = λ φ φind x ¬φx → ¬¬WFiR (λ isWFiR → ¬φx (isWFiR x φ φind))
 
-
   ¬¬isWFseq→isWFseq- : ¬¬ (R isWFseq) → R isWFseq-
   ¬¬isWFseq→isWFseq- ¬¬WFs = λ s sdec  → ¬¬WFs (λ WFs → snd (WFs s) (sdec (fst (WFs s)) ) )
 
   ¬¬isWFmin→isWFmin¬¬ : ¬¬ (R isWFmin) → R isWFmin¬¬
   ¬¬isWFmin→isWFmin¬¬ ¬¬WFmR   = λ P p ¬Σ → ¬¬WFmR (λ WFmR → ¬Σ (WFmR P _ p ) )
 
-module WeakImplications {A : Set} (R : 𝓡 A) where
+module WeakConstructiveImplications {A : Set} (R : 𝓡 A) where
   isWFminDNE→isWFminDNE¬¬ : R isWFminDNE → R isWFminDNE¬¬
   isWFminDNE→isWFminDNE¬¬ a b c d e = e (a b c _ d)
 
@@ -100,7 +106,7 @@ module WeakImplications {A : Set} (R : 𝓡 A) where
   WFseq+-→WFseq- RisWFseq+- s s-dec = RisWFseq+- (λ _ → s zero) (λ z → snd z (s-dec zero))
 
 
-open WeakImplications public
+open WeakConstructiveImplications public
 
 open import Relations.FinitelyBranching
 module FBWeakImplications {A : Set} {R : 𝓡 A} (RisFB : (~R R) isFB) where

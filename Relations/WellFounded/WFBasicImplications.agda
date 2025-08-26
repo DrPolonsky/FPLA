@@ -1,13 +1,9 @@
 {-# OPTIONS --allow-unsolved-metas #-}
 open import Logic
 open import Predicates
-open import Relations.Core
 open import Datatypes
-open import Classical
 open import Relations.Decidable
 open import Relations.ClosureOperators
-open import Relations.Seq
--- TODO: Remove unused imports
 module Relations.WellFounded.WFBasicImplications where
 
 open import Relations.WellFounded.WFDefinitions public
@@ -31,7 +27,7 @@ module PropertyImplications {A : Set} {R : 𝓡 A} where
 
 open PropertyImplications public
 
-module BasicImplications {A : Set} {R : 𝓡 A} where
+module ConstructiveImplications {A : Set} {R : 𝓡 A} where
   -- implications between the base definitions
   isWFacc→isWFind : R isWFacc → R isWFind
   isWFacc→isWFind wfAcc x φ φ-ind = acc⊆ind φ φ-ind x (wfAcc x)
@@ -58,21 +54,24 @@ module BasicImplications {A : Set} {R : 𝓡 A} where
   WFseq+⊆WFseq x x∈seq+ s s0≡x with x∈seq+ s s0≡x
   ... | k ,, n  = k ,, n
 
-  WFmin→WFcor : R isWFmin → R isWFcor 
-  WFmin→WFcor RisWFmin = {!   !} 
-
-  WFminDNE→WFcor : R isWFminDNE → R isWFcor 
-  WFminDNE→WFcor RisWFminDNE x P P∈Cor with RisWFminDNE (∁ P) (¬¬Closed∁ P) x 
-  ...| z = {!   !} 
+  WFminDNE→WFcor : R isWFminDNE → R isWFcor
+  WFminDNE→WFcor RisWFminDNE x P Pcor = {!   !} 
+  
+  -- WFminDNE→WFcor : ¬¬Closed R isWFminDNE → R isWFcor
+  -- WFminDNE→WFcor RisWFminDNE x P Pcor =
+  --   let nn : ¬¬ (P x) 
+  --   nn = WFmin→WFcor¬¬ (?) x P Pcor
+  --   in ?  -- DNE-on-P (nn) dec→¬¬Closed -- use your available double-negation elimination instance
+  
+  -- WFminDNE→WFcor : R isWFminDNE → R isWFcor 
+  -- WFminDNE→WFcor RisWFminDNE x P P∈Cor with RisWFminDNE (∁ P) (¬¬Closed∁ P) x 
+  -- ... | z = {!   !}
 
   corP : 𝓟 A → 𝓟 A 
   corP P x = Σ[ y ∈ A ] ((R ⋆) y x)
 
   WFcor→WFminDNE : R isWFcor → R isWFminDNE 
   WFcor→WFminDNE RisWFcor P P∈DNE x x∈P = {!   !} 
-
-  WFacc→WFcor : ∀ x → x ∈ WFacc R → WFcor R x
-  WFacc→WFcor x (acc x∈acc) P P∈Cor = {!   !} 
 
   -- WFseq⊆WFseq+ : WFseq R ⊆ WFseq+ R
   -- WFseq⊆WFseq+ x x∈seq s s0≡x with x∈seq s s0≡x
@@ -104,12 +103,12 @@ module BasicImplications {A : Set} {R : 𝓡 A} where
   This n yields an index on which s does not reduce to its successor.
 -}
 
-open BasicImplications 
+open ConstructiveImplications 
 
-module DecdabilityImplications {A : Set} (R : 𝓡 A) where -- Using R isDec
+module DecdabilityImplications {A : Set} (R : 𝓡 A) (dR : R isDec) where -- Using R isDec
   -- 1. For decidable relations, sequential well-foundedness is implied by the standard one
-  isDec→isWFacc→isWFseq : R isDec → R isWFacc → R isWFseq
-  isDec→isWFacc→isWFseq dR wfAcc s = f s (s zero) (wfAcc (s zero)) refl where
+  isDec→isWFacc→isWFseq : R isWFacc → R isWFseq
+  isDec→isWFacc→isWFseq wfAcc s = f s (s zero) (wfAcc (s zero)) refl where
     f : ∀ (s : ℕ → A) (x : A) (x-acc : x ∈ R -accessible) (x=s0 : x ≡ s zero)
               → Σ[ k ∈ ℕ ] (¬ R (s (succ k)) (s k))
     f s x (acc xa) x=s0 with dR {s 1} {x}
@@ -117,8 +116,8 @@ module DecdabilityImplications {A : Set} (R : 𝓡 A) where -- Using R isDec
     ... | in1  Ryx with f (s ∘ succ) (s 1) (xa (s 1) Ryx) refl
     ... | i ,, p = succ i ,, p
 
-  isDec→isWFind→isWFseq : R isDec → R isWFind → R isWFseq
-  isDec→isWFind→isWFseq dR wfInd = isDec→isWFacc→isWFseq dR (isWFind→isWFacc wfInd)
+  isDec→isWFind→isWFseq : R isWFind → R isWFseq
+  isDec→isWFind→isWFseq wfInd = isDec→isWFacc→isWFseq (isWFind→isWFacc wfInd)
 
 module AccDNEImplications {A : Set} (R : 𝓡 A) (acc∈DNE : AccDNE R) where
   -- 3. Implications relying on ¬¬-closure of accessibility
@@ -143,3 +142,55 @@ module MP≡Implications {A : Set} (R : 𝓡 A) (mp≡ : MP≡) where
   MP→isWFcor→isWFseq : R isWFcor → R isWFseq
   MP→isWFcor→isWFseq RisWFcor s with RisWFcor (s 0) (λ x → ((R ⋆) x (s 0) ) → ¬ (Σ[ k ∈ ℕ ] ((R ⋆) (s k) x))) {!   !} ε⋆  
   ... | z  = ∅ (z (0 ,, ε⋆))
+
+module DNEcorImplications {A : Set} (R : 𝓡 A) (cor∈DNE : (P : 𝓟 A) → corDNE R P) where 
+  WFmin→WFcor¬¬ : R isWFmin → ∀ (x : A) → (P : 𝓟 A) → R -coreductive P → ¬¬ (P x)
+  WFmin→WFcor¬¬ RisWFmin x P Pcor x∉P with RisWFmin (∁ P) x x∉P   
+  ... | m ,, m∉P , m∈min with Pcor m m∉P 
+  ... | (z ,, (Rzm , z∉P)) = m∈min z z∉P Rzm 
+    
+  WFmin→WFcor : R isWFmin → R isWFcor
+  WFmin→WFcor RisWFmin x P P∈cor with WFmin→WFcor¬¬ RisWFmin x P P∈cor 
+  ...| nnPx = cor∈DNE P P∈cor x nnPx 
+
+  acc→WFcorLocal :
+    ∀ x → x ∈ R -accessible → WFcor R x
+  acc→WFcorLocal x (acc IH) P Pcor =
+    cor∈DNE P Pcor x (rec (acc IH))
+    where
+      rec : ∀ {z} → z ∈ R -accessible → ¬ (P z) → ⊥
+      rec {z} (acc IHz) nz with Pcor z nz
+      ... | (y ,, (Ryz , nPy)) = rec (IHz y Ryz) nPy
+
+  WFacc→WFcor : R isWFacc → R isWFcor
+  WFacc→WFcor RisWFacc x = acc→WFcorLocal x (RisWFacc x)
+
+module WFseqImplications {A : Set} (R : 𝓡 A) where
+-- Classical “negated universal → existential counterexample” on predecessors of z
+  postulate
+    ExistsBadPred :
+      ∀ z → z ∈ ∁ (WFacc R) →
+      Σ[ y ∈ A ] (R y z × y ∈ ∁ (WFacc R))
+
+  -- Dependent choice along predecessors inside X = ∁ WFacc
+  postulate
+    DC-pre :
+      (x : A) → x ∈ ∁ (WFacc R) →
+      Σ[ f ∈ (ℕ → A) ]
+        ( (f 0 ≡ x)
+        × ((∀ (n : ℕ) → R (f (succ n)) (f n))
+        × (∀ (n : ℕ) → f n ∈ ∁ (WFacc R))) )
+
+  -- From WFseq, build a contradiction with any infinite descending chain
+  WFseq→¬¬WFacc : R isWFseq → ∀ x → ¬¬ (x ∈ WFacc R)
+  WFseq→¬¬WFacc WFs x notAcc
+    with DC-pre x notAcc
+  ... | (f ,, (refl , (dec , _)))
+    with WFs f
+  ... | (k ,, notStep) = ∅ (notStep (dec k))
+
+  -- Close the double negation using AccDNE
+  WFseq→WFacc :
+    AccDNE R → R isWFseq → R isWFacc
+  WFseq→WFacc acc∈DNE WFs x =
+    acc∈DNE x (WFseq→¬¬WFacc WFs x)

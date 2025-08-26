@@ -16,3 +16,6 @@ module Relations.WellFounded.ClassicalProperties {A : Set} (R : 𝓡 A) where
 
     AccDNE : Set
     AccDNE = ¬¬Closed (R -accessible)
+
+    corDNE : ∀ (P : 𝓟 A) → Set 
+    corDNE P = R -coreductive P → ¬¬Closed P
