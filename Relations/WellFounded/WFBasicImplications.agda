@@ -139,10 +139,27 @@ module MP≡Implications {A : Set} (R : 𝓡 A) (mp≡ : MP≡) where
     λ Rsk+1Rsk → ¬sz→Rzy (s (succ k)) ((succ k) ,, refl) 
       (transp (R (s (succ k))) sk≡y Rsk+1Rsk) 
 
-  MP→isWFcor→isWFseq : R isWFcor → R isWFseq
-  MP→isWFcor→isWFseq RisWFcor s with RisWFcor (s 0) (λ x → ((R ⋆) x (s 0) ) → ¬ (Σ[ k ∈ ℕ ] ((R ⋆) (s k) x))) {!   !} ε⋆  
-  ... | z  = ∅ (z (0 ,, ε⋆))
+  -- MP→isWFcor→isWFseq : R isWFcor → R isWFseq
+  -- MP→isWFcor→isWFseq RisWFcor s with RisWFcor (s 0) (λ x → ((R ⋆) x (s 0) ) → ¬ (Σ[ k ∈ ℕ ] ((R ⋆) (s k) x))) f ε⋆  
+  --   where 
+  --     f : _ 
+  --     f x H = ?
+  -- ... | z  = ∅ (z (0 ,, ε⋆))
   -- try and build on this implication. Will probably need to apply MP≡ twice. 
+  -- What correductive property associated with the sequence which if assumed to always be true would give a counterexample to the sequence?
+  -- predicate cand: if you're in the image of s then none of your successors should be in the image of s
+  -- Pred: Given x, the xomplement of sigma k 
+  MP→isWFcor→isWFseq : R isWFcor → R isWFseq
+  MP→isWFcor→isWFseq RisWFcor s = {! lr  !} -- ∅ (g (fst lr) snd lr) 
+    where 
+      g : ∀ (k : ℕ) → ( ¬ (R ⋆) (s k) (s 0))
+      g = {!   !} 
+      f : R -coreductive (λ x → Σ[ k ∈ ℕ ] ((s k) ≡ x) → (Σ[ k ∈ ℕ ] ( ¬ (R ⋆) (s k) x))) 
+      f x x∉P with mp≡ s x (λ x∉s → x∉P (λ x∈s → ∅ (x∉s x∈s)))
+      ... | k ,, sk≡x rewrite ~ sk≡x = (s (succ k)) ,, ({!   !} , λ H → x∉P λ x₁ → fst (H (succ k ,, refl)) ,, λ R*ssucksk → snd (H (succ k ,, refl)) {! ε⋆  !}) 
+      -- ... | k ,, sk≡x = (s (succ k)) ,, (? , ?) 
+
+      lr = RisWFcor (s 0) (λ x → Σ[ k ∈ ℕ ] ((s k) ≡ x) → (Σ[ k ∈ ℕ ] ( ¬ (R ⋆) (s k) x))) f (0 ,, refl)
 
 module DNEcorImplications {A : Set} (R : 𝓡 A) (cor∈DNE : (P : 𝓟 A) → corDNE R P) where 
   WFmin→WFcor¬¬ : R isWFmin → ∀ (x : A) → (P : 𝓟 A) → R -coreductive P → ¬¬ (P x)
