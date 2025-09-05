@@ -142,6 +142,7 @@ module MP≡Implications {A : Set} (R : 𝓡 A) (mp≡ : MP≡) where
   MP→isWFcor→isWFseq : R isWFcor → R isWFseq
   MP→isWFcor→isWFseq RisWFcor s with RisWFcor (s 0) (λ x → ((R ⋆) x (s 0) ) → ¬ (Σ[ k ∈ ℕ ] ((R ⋆) (s k) x))) {!   !} ε⋆  
   ... | z  = ∅ (z (0 ,, ε⋆))
+  -- try and build on this implication. Will probably need to apply MP≡ twice. 
 
 module DNEcorImplications {A : Set} (R : 𝓡 A) (cor∈DNE : (P : 𝓟 A) → corDNE R P) where 
   WFmin→WFcor¬¬ : R isWFmin → ∀ (x : A) → (P : 𝓟 A) → R -coreductive P → ¬¬ (P x)

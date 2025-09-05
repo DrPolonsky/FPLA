@@ -187,8 +187,8 @@ module CoreductiveWeakImplications {A : Set} (R : 𝓡 A) where
   ... | k ,, sk≡x = (s (succ k)) ,, transp (R (s (succ k))) sk≡x (s-inc (k)) ,
      λ ¬∃n → ¬∃n ((succ k) ,, refl)   
 
-  isWFminCor→isWFseq- : MP≡ → R isWFminCor → R isWFseq-
-  isWFminCor→isWFseq- mp≡ wfmc s s-inc =
+  MP≡→isWFminCor→isWFseq- : MP≡ → R isWFminCor → R isWFseq-
+  MP≡→isWFminCor→isWFseq- mp≡ wfmc s s-inc =
     isWFminCor→Cor¬¬ wfmc (λ a → ¬ Σ[ k ∈ ℕ ] (s k ≡ a) )
                     (cor→seqLemma mp≡ s s-inc) (s zero)
                     λ ¬Ex → ¬Ex ((0 ,, refl ))

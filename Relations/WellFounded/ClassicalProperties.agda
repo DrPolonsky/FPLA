@@ -10,7 +10,6 @@ open import Relations.Seq
 open import Relations.WellFounded.WFDefinitions
 -- TODO: Remove unused imports
 module Relations.WellFounded.ClassicalProperties {A : Set} (R : 𝓡 A) where
-
     AccCor : Set 
     AccCor = R -coreductive (R -accessible)
 

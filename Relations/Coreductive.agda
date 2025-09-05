@@ -6,12 +6,17 @@ open import Datatypes
 open import Relations.Seq
 open import Relations.Core
 open import Relations.WellFounded.WFDefinitions
+open import Classical
 
 module Relations.Coreductive {A : Set} (R : 𝓡 A) where
   Cor→ind¬¬ : ∀ (P : 𝓟 A) → R -coreductive P → R -inductive (∁ (∁ P))
   Cor→ind¬¬ P Pco x xind ¬Px with Pco x ¬Px
   ... | (y ,, Ryx , ¬Py) = xind y Ryx ¬Py
 
+-- We think that below we can claim with (~R R) isFBRel → ∀ (P : 𝓟 A) → dec (∁ P) 
+-- We can decide for all x, EM (exists y st Ryx and not Py)
+-- Can we show anything stronger than this too? Or can we use this to imply the following:
+-- If inductive P. Then we can show FBRel and WDec to CorP using FB to DNS and this proof above. 
   FBRel∧WDec→CorP : (~R R) isFBRel → ∀ (P : 𝓟 A) → dec (∁ P) → R -inductive P → R -coreductive P
   FBRel∧WDec→CorP RisFBRel P PwDec Rind a a∉P with decList∃ (∁ P) PwDec (fst (RisFBRel a))
   ... | in2 no = ∅ (f λ Ra⊆P → a∉P (Rind a Ra⊆P)) where
@@ -21,6 +26,21 @@ module Relations.Coreductive {A : Set} (R : 𝓡 A) where
       f = FB→DNS (~R R) P a g h
   ... | in1 yes with List∃elim _ _ yes
   ... | y ,, y∈Rx , y∉P = y ,, pr2 (snd (RisFBRel a) y) y∈Rx , y∉P
+
+  FBRel∧WDec→EMRyx : (~R R) isFBRel → ∀ (P : 𝓟 A) → dec (∁ P) → ∀ {x} → EM (Σ[ y ∈ A ] (R y x × ¬ (P y)))
+  FBRel∧WDec→EMRyx RisFBRel P PwDec {x} with RisFBRel x 
+  ...| ys ,, Rys 
+    with decList∃ (∁ P) PwDec ys
+  ... | in2 no = in2 (λ ∃y → no (List∃intro (∁ P) ys (fst ∃y) (pr1 (Rys (fst ∃y)) (pr1 (snd ∃y)) , pr2 (snd ∃y)))) 
+  ... | in1 yes with List∃elim (∁ P) ys yes 
+  ... | y ,, y∈ys , ¬Py = in1 (y ,, (pr2 (Rys y) y∈ys) , ¬Py)
+
+  indP→CorP : (~R R) isFBRel → ∀ (P : 𝓟 A) → dec (∁ P) → R -inductive P → R -coreductive P
+  indP→CorP RisFBRel P PwDec Rind a a∉P with FBRel∧WDec→EMRyx RisFBRel P PwDec {a} 
+  ... | in1 yes = yes
+  ... | in2 no = ∅ (FB→DNS (~R R) P a (FBRel⊆FB ((~R R)) a (RisFBRel a)) (λ y Rya y∉P → no (y ,, Rya , y∉P)) λ H → a∉P (Rind a H)) 
+  -- Can we weaken this to FB from FBRel?
+  
 
   record CorSequence (P : 𝓟 A) (Pcor : R -coreductive P) : Set where
       constructor CS
