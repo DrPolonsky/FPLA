@@ -1,4 +1,4 @@
-{-# OPTIONS --allow-unsolved-metas #-}
+-- {-# OPTIONS --allow-unsolved-metas #-}
 open import Logic
 open import Predicates
 open import Datatypes
@@ -54,8 +54,7 @@ module ConstructiveImplications {A : Set} {R : 𝓡 A} where
   WFseq+⊆WFseq x x∈seq+ s s0≡x with x∈seq+ s s0≡x
   ... | k ,, n  = k ,, n
 
-  WFminDNE→WFcor : R isWFminDNE → R isWFcor
-  WFminDNE→WFcor RisWFminDNE x P Pcor = {!   !} 
+
   
   -- WFminDNE→WFcor : ¬¬Closed R isWFminDNE → R isWFcor
   -- WFminDNE→WFcor RisWFminDNE x P Pcor =
@@ -149,17 +148,18 @@ module MP≡Implications {A : Set} (R : 𝓡 A) (mp≡ : MP≡) where
   -- What correductive property associated with the sequence which if assumed to always be true would give a counterexample to the sequence?
   -- predicate cand: if you're in the image of s then none of your successors should be in the image of s
   -- Pred: Given x, the xomplement of sigma k 
+{- 
   MP→isWFcor→isWFseq : R isWFcor → R isWFseq
-  MP→isWFcor→isWFseq RisWFcor s = {! lr  !} -- ∅ (g (fst lr) snd lr) 
+  MP→isWFcor→isWFseq RisWFcor s = {!   !} -- ∅ (g (fst lr) snd lr) 
     where 
-      g : ∀ (k : ℕ) → ( ¬ (R ⋆) (s k) (s 0))
+      g : ∀ (k : ℕ) → (¬(R ⋆) (s k) (s 0))
       g = {!   !} 
       f : R -coreductive (λ x → Σ[ k ∈ ℕ ] ((s k) ≡ x) → (Σ[ k ∈ ℕ ] ( ¬ (R ⋆) (s k) x))) 
       f x x∉P with mp≡ s x (λ x∉s → x∉P (λ x∈s → ∅ (x∉s x∈s)))
-      ... | k ,, sk≡x rewrite ~ sk≡x = (s (succ k)) ,, ({!   !} , λ H → x∉P λ x₁ → fst (H (succ k ,, refl)) ,, λ R*ssucksk → snd (H (succ k ,, refl)) {! ε⋆  !}) 
-      -- ... | k ,, sk≡x = (s (succ k)) ,, (? , ?) 
+      ... | k ,, sk≡x rewrite ~ sk≡x = (s (succ k)) ,, ( ?  , λ H → x∉P λ x₁ → fst (H (succ k ,, refl)) ,, λ R*ssucksk → snd (H (succ k ,, refl)) ? )           
 
       lr = RisWFcor (s 0) (λ x → Σ[ k ∈ ℕ ] ((s k) ≡ x) → (Σ[ k ∈ ℕ ] ( ¬ (R ⋆) (s k) x))) f (0 ,, refl)
+-}
 
 module DNEcorImplications {A : Set} (R : 𝓡 A) (cor∈DNE : (P : 𝓟 A) → corDNE R P) where 
   WFmin→WFcor¬¬ : R isWFmin → ∀ (x : A) → (P : 𝓟 A) → R -coreductive P → ¬¬ (P x)
@@ -183,6 +183,25 @@ module DNEcorImplications {A : Set} (R : 𝓡 A) (cor∈DNE : (P : 𝓟 A) → c
   WFacc→WFcor : R isWFacc → R isWFcor
   WFacc→WFcor RisWFacc x = acc→WFcorLocal x (RisWFacc x)
 
+  WFminDNE→WFcor : R isWFminDNE → R isWFcor
+  WFminDNE→WFcor RisWFminDNE x P Pcor = cor∈DNE P Pcor x ¬¬Px
+    where 
+      ¬¬Px : ¬¬ P x
+      ¬¬Px ¬Px with RisWFminDNE (∁ P) (¬¬Closed∁ P) x ¬Px 
+      ... | y ,, ¬Py , Ry⊆∁∁P with Pcor y ¬Py 
+      ... | z ,, Rzy , ¬Pz = Ry⊆∁∁P z ¬Pz Rzy 
+
+  open import Relations.Coreductive R
+  open CorSequence
+
+  WFseq→WFcor : R isWFseq → R isWFcor 
+  WFseq→WFcor RisWFseq x P Pcor = cor∈DNE P Pcor x ¬¬Px 
+    where 
+      ¬¬Px : ¬¬ P x
+      ¬¬Px ¬Px with (CS {Pcor = Pcor} (x ,, ¬Px)) 
+      ...| cs with RisWFseq (seq cs)
+      ...| k ,, ¬Rsk+1sk = ¬Rsk+1sk (seq-inc {Pcor = Pcor} cs k)  
+      
 module WFseqImplications {A : Set} (R : 𝓡 A) where
 -- Classical “negated universal → existential counterexample” on predecessors of z
   postulate
@@ -212,3 +231,20 @@ module WFseqImplications {A : Set} (R : 𝓡 A) where
     AccDNE R → R isWFseq → R isWFacc
   WFseq→WFacc acc∈DNE WFs x =
     acc∈DNE x (WFseq→¬¬WFacc WFs x)
+
+module MP→isWFcor→isWFseq {A : Set} {R : 𝓡 A} (RisWFcor : R isWFcor) (s : ℕ → A) (mp≡ : MP≡) where 
+  g : ∀ (k : ℕ) → (¬(R ⋆) (s k) (s 0))
+  g = {!   !} 
+  
+  f : R -coreductive (λ x → Σ[ k ∈ ℕ ] ((s k) ≡ x) → (Σ[ k ∈ ℕ ] ( ¬ (R ⋆) (s k) x))) 
+  f x x∉P with mp≡ s x (λ x∉s → x∉P (λ x∈s → ∅ (x∉s x∈s)))
+  ... | k ,, sk≡x rewrite ~ sk≡x 
+    = (s (succ k)) ,,
+      ( {!   !}  , λ H → x∉P λ x₁ → fst (H (succ k ,, refl)) ,,  
+      λ R*ssucksk → snd (H (succ k ,, refl)) {!   !} )   
+
+  ims∈cor : R -coreductive (λ x → ¬ Σ[ k ∈ ℕ ] ((s k) ≡ x))
+  ims∈cor x x∉s with mp≡ s x x∉s 
+  ... | k ,, sk≡x = s (succ k) ,, {!   !}           
+
+  lr = RisWFcor (s 0) (λ x → Σ[ k ∈ ℕ ] ((s k) ≡ x) → (Σ[ k ∈ ℕ ] ( ¬ (R ⋆) (s k) x))) f (0 ,, refl)
