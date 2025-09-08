@@ -32,8 +32,7 @@ module LocalWFDefinitions {R : 𝓡 A} where
   Rmin : 𝓟 A    -- The NF property
   Rmin x = ∀ {y} → ¬ R y x
 
-  WFseq+ : 𝓟 A 
-  WFseq+ a = ∀ (s : ℕ → A) → s 0 ≡ a → Σ[ n ∈ ℕ ] (s n ∈ Rmin)
+
 
   -- x is R-φ-minimal if φ(x) is true and φ(y) is false for all y below x
   _-_-minimal : 𝓟 A → 𝓟 A
