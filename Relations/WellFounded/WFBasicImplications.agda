@@ -1,4 +1,4 @@
--- {-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --allow-unsolved-metas #-}
 open import Logic
 open import Predicates
 open import Datatypes
@@ -49,11 +49,6 @@ module ConstructiveImplications {A : Set} {R : 𝓡 A} where
   -- {-# TERMINATING #-}
   -- isWFseq→isWFacc : R isWFseq → R isWFacc
   -- isWFseq→isWFacc R∈WFs x = acc (λ y Ryx → isWFseq→isWFacc R∈WFs y )
-
-  WFseq+⊆WFseq : WFseq+ R ⊆ WFseq R
-  WFseq+⊆WFseq x x∈seq+ s s0≡x with x∈seq+ s s0≡x
-  ... | k ,, n  = k ,, n
-
 
   
   -- WFminDNE→WFcor : ¬¬Closed R isWFminDNE → R isWFcor

@@ -40,6 +40,9 @@ _isWFminCor+ = ∀ (P : 𝓟 A) → R -coreductive P → ∀ {a : A} → a ∉ P
 -- an equivalent variation
 _isWFminCor : Set₁
 _isWFminCor = ∀ (P : 𝓟 A) → R -coreductive P → ∀ {a : A} → a ∉ P → Σ[ m ∈ A ] (m ∈ R - ∁ P -minimal)
+
+_isWFcor¬¬ : Set₁
+_isWFcor¬¬ = ∀ P → R -coreductive P → ∀ x → ¬¬ P x
  
 -- open BasicImplications
 -- open WeakerWF

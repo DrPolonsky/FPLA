@@ -102,10 +102,6 @@ module WeakConstructiveImplications {A : Set} (R : 𝓡 A) where
   -- WFseq-→WFseq+- RisWFseq- s ¬n∈Rmin with RisWFseq- s
   -- ... | c = ¬n∈Rmin {!   !}
 
-  WFseq+-→WFseq- : R isWFseq+- → R isWFseq-
-  WFseq+-→WFseq- RisWFseq+- s s-dec = RisWFseq+- (λ _ → s zero) (λ z → snd z (s-dec zero))
-
-
 open WeakConstructiveImplications public
 
 open import Relations.FinitelyBranching
@@ -187,11 +183,15 @@ module CoreductiveWeakImplications {A : Set} (R : 𝓡 A) where
   ... | k ,, sk≡x = (s (succ k)) ,, transp (R (s (succ k))) sk≡x (s-inc (k)) ,
      λ ¬∃n → ¬∃n ((succ k) ,, refl)   
 
+
   MP≡→isWFminCor→isWFseq- : MP≡ → R isWFminCor → R isWFseq-
   MP≡→isWFminCor→isWFseq- mp≡ wfmc s s-inc =
     isWFminCor→Cor¬¬ wfmc (λ a → ¬ Σ[ k ∈ ℕ ] (s k ≡ a) )
                     (cor→seqLemma mp≡ s s-inc) (s zero)
                     λ ¬Ex → ¬Ex ((0 ,, refl ))
+
+  corDNE→isWFcor¬¬→isWFcor : (∀ P → corDNE R P) → R isWFcor¬¬ → R isWFcor
+  corDNE→isWFcor¬¬→isWFcor corDNE-all RisWFcor¬¬ x φ φ∈Cor = corDNE-all φ φ∈Cor x (RisWFcor¬¬ φ φ∈Cor x)
 
 module AccDNEWeakImplications {A : Set} (R : 𝓡 A) (acc∈DNE : AccDNE R) where
   -- 3. Implications relying on ¬¬-closure of accessibility
