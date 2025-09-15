@@ -6,7 +6,7 @@ open import Classical
 open import Relations.Decidable
 open import Relations.ClosureOperators
 open import Relations.Seq
--- TODO: Remove unused imports
+
 module Relations.WellFounded.WFWeakImplications where
 
 open import Relations.WellFounded.WFDefinitions public
@@ -21,7 +21,6 @@ module WFx→¬¬WFxImplications {A : Set} (R : 𝓡 A) where
   isWFacc→¬¬isWFacc : R isWF → ¬¬ (R isWF)
   isWFacc→¬¬isWFacc RisWF  = doubleNegIntro RisWF  
 
-  -- Implications between weaker well-foundedness notions
 module ¬¬WFx→WFx¬¬Implications {A : Set} (R : 𝓡 A) where
   -- Remark.  The converse of this is exactly the DNS for accessibility
   ¬¬isWFacc→isWFacc¬¬ :  ¬¬ (R isWFacc) → R isWFacc¬¬
@@ -85,23 +84,6 @@ module WeakConstructiveImplications {A : Set} (R : 𝓡 A) where
   isWFminDNE¬¬→isWFmin¬¬ RisWFminDNE¬¬ P {d} d∈P ¬∃minP with RisWFminDNE¬¬ (∁ (∁ P)) (λ x y z → y λ w → w z ) (λ z → z d∈P)
   ... | c = c λ { (x ,, ¬x∉P , H) → ¬x∉P (λ x∈P →
                    ¬∃minP (x ,, x∈P , λ y y∈P Ryx → H y (λ z → z y∈P) Ryx ) )  }
-  -- April 28th: Are these ToDos still something we want or shall we delete them?
-  {-
-  To do:
-  - WFmin[ind]
-  - WFmin[CCind]
-  - replace implications WFseq- -> WFacc- and WFDNE- -> WFacc- to use CCaccInd
-  - from WFacc and strong decidability of acc (acc∈cored), prove wf[ind]
-  -}
-
-  -- WFseq-₂→WFseq+- : isWFseq-₂ → R isWFseq+-
-  -- WFseq-₂→WFseq+- isSeq2 s ¬Ex = {! ¬  !}
-  --
-  -- -- Will be tougher. Both should be provable.
-  -- WFseq-→WFseq+- : R isWFseq- → R isWFseq+-
-  -- WFseq-→WFseq+- RisWFseq- s ¬n∈Rmin with RisWFseq- s
-  -- ... | c = ¬n∈Rmin {!   !}
-
 open WeakConstructiveImplications public
 
 open import Relations.FinitelyBranching
@@ -117,7 +99,6 @@ module FBWeakImplications {A : Set} {R : 𝓡 A} (RisFB : (~R R) isFB) where
 
 module CoreductiveWeakImplications {A : Set} (R : 𝓡 A) where
   open import Relations.Coreductive R
-
   isWFminCor→Cor¬¬ : R isWFminCor → ∀ (P : 𝓟 A) → R -coreductive P → ∀ x → ¬¬ P x
   isWFminCor→Cor¬¬ iwfc P Pco x ¬px with iwfc P Pco ¬px
   ... | (y ,, ¬py , ymin) with Pco y ¬py
@@ -146,11 +127,11 @@ module CoreductiveWeakImplications {A : Set} (R : 𝓡 A) where
   ... | (y ,, ¬Py , ymin) with Pco y ¬Py
   ... | (z ,, Rzy , ¬Pz) = ∅ (ymin z ¬Pz Rzy)
 
-  isWFminDNE→Cor¬¬ : R isWFminDNE → ∀ P → R -coreductive P → ∀ a → ¬¬ P a
+  isWFminDNE→Cor¬¬ : R isWFminDNE → R isWFcor¬¬
   isWFminDNE→Cor¬¬ RisWFmin = isWFminCor→Cor¬¬
     (isWFminCor+→isWFminCor (isWFminDNE→isWFminCor+  RisWFmin))
 
-  isWFminDNE¬¬→Cor¬¬ : R isWFminDNE¬¬ → ∀ P → R -coreductive P → ∀ a → ¬¬ P a
+  isWFminDNE¬¬→Cor¬¬ : R isWFminDNE¬¬ → R isWFcor¬¬
   isWFminDNE¬¬→Cor¬¬ WFR P Pcor a a∉P = WFR (∁ P) (λ x z z₁ → z (λ z₂ → z₂ z₁)) a∉P f
     where f : _
           f (m ,, m∉P , mmin) with Pcor m m∉P
@@ -192,7 +173,7 @@ module CoreductiveWeakImplications {A : Set} (R : 𝓡 A) where
 
   corDNE→isWFcor¬¬→isWFcor : (∀ P → corDNE R P) → R isWFcor¬¬ → R isWFcor
   corDNE→isWFcor¬¬→isWFcor corDNE-all RisWFcor¬¬ x φ φ∈Cor = corDNE-all φ φ∈Cor x (RisWFcor¬¬ φ φ∈Cor x)
-
+-- SA: Sep 15th Do we want to split up the above module into different classical properties or keep it grouped as a general corecurive module?
 module AccDNEWeakImplications {A : Set} (R : 𝓡 A) (acc∈DNE : AccDNE R) where
   -- 3. Implications relying on ¬¬-closure of accessibility
   isWFacc¬¬→¬¬isWFacc : R isWFacc¬¬ → ¬¬ (R isWFacc)

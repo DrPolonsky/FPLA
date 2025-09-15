@@ -3,12 +3,9 @@ open import Predicates
 open import Datatypes
 open import Relations.ClosureOperators
 
--- open import Relations.Core
-
 module Relations.WellFounded.WFDefinitions {A : Set} where
 
 module LocalWFDefinitions {R : 𝓡 A} where
-
   -- An element is R-accessible if all elements R-below it are R-accessible
   data _-accessible : 𝓟 A where
     acc : ∀ {x : A} → (∀ y → R y x → _-accessible y) → _-accessible x
@@ -31,8 +28,6 @@ module LocalWFDefinitions {R : 𝓡 A} where
 
   Rmin : 𝓟 A    -- The NF property
   Rmin x = ∀ {y} → ¬ R y x
-
-
 
   -- x is R-φ-minimal if φ(x) is true and φ(y) is false for all y below x
   _-_-minimal : 𝓟 A → 𝓟 A

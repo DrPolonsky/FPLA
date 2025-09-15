@@ -3,15 +3,10 @@ open import Predicates
 open import Datatypes
 open import Relations.ClosureOperators
 open import Relations.WellFounded.WFDefinitions
--- open import Relations.Core
 open import Relations.Seq
 
 module Relations.WellFounded.WFWeakDefinitions {A : Set} (R : 𝓡 A) where
-
--- open LocalWFDefinitions
-
 -- Weaker notions of well-foundedness
-
 _isWFacc¬¬ : Set 
 _isWFacc¬¬ = ∀ x → ¬¬ (x ∈ R -accessible)
 
@@ -33,6 +28,9 @@ _isWFminEM¬¬ = ∀ (P : 𝓟 A) → dec P → ∀ {a} → a ∈ P → ¬¬ Σ[
 
 open import Relations.Coreductive 
 
+_isWFcor¬¬ : Set₁
+_isWFcor¬¬ = ∀ P → R -coreductive P → ∀ x → ¬¬ P x
+ 
 -- isWFmin+, but restricted to coreductive predicates
 _isWFminCor+ : Set₁
 _isWFminCor+ = ∀ (P : 𝓟 A) → R -coreductive P → ∀ {a : A} → a ∉ P → Σ[ m ∈ A ] (m ∉ P × (∀ x → R x m → P x))
@@ -40,9 +38,3 @@ _isWFminCor+ = ∀ (P : 𝓟 A) → R -coreductive P → ∀ {a : A} → a ∉ P
 -- an equivalent variation
 _isWFminCor : Set₁
 _isWFminCor = ∀ (P : 𝓟 A) → R -coreductive P → ∀ {a : A} → a ∉ P → Σ[ m ∈ A ] (m ∈ R - ∁ P -minimal)
-
-_isWFcor¬¬ : Set₁
-_isWFcor¬¬ = ∀ P → R -coreductive P → ∀ x → ¬¬ P x
- 
--- open BasicImplications
--- open WeakerWF

@@ -4,6 +4,7 @@ open import Predicates
 open import Datatypes
 open import Relations.Decidable
 open import Relations.ClosureOperators
+
 module Relations.WellFounded.WFBasicImplications where
 
 open import Relations.WellFounded.WFDefinitions public
@@ -45,62 +46,13 @@ module ConstructiveImplications {A : Set} {R : 𝓡 A} where
   isWFmin→isWFseq wfMin s with wfMin (λ a → Σ[ n ∈ ℕ ] (s n ≡ a)) (s zero) (zero ,, refl)
   ... | x ,, (k ,, p) , H = (k ,, λ Ryx → H (s (succ k)) (succ k ,, refl ) (transp (R (s (succ k))) p Ryx ) )
 
-  -- -- A correct(?) but non-terminating proof.
-  -- {-# TERMINATING #-}
-  -- isWFseq→isWFacc : R isWFseq → R isWFacc
-  -- isWFseq→isWFacc R∈WFs x = acc (λ y Ryx → isWFseq→isWFacc R∈WFs y )
-
-  
-  -- WFminDNE→WFcor : ¬¬Closed R isWFminDNE → R isWFcor
-  -- WFminDNE→WFcor RisWFminDNE x P Pcor =
-  --   let nn : ¬¬ (P x) 
-  --   nn = WFmin→WFcor¬¬ (?) x P Pcor
-  --   in ?  -- DNE-on-P (nn) dec→¬¬Closed -- use your available double-negation elimination instance
-  
-  -- WFminDNE→WFcor : R isWFminDNE → R isWFcor 
-  -- WFminDNE→WFcor RisWFminDNE x P P∈Cor with RisWFminDNE (∁ P) (¬¬Closed∁ P) x 
-  -- ... | z = {!   !}
-
+-- SA: Can we remove corP? Sep 15
   corP : 𝓟 A → 𝓟 A 
   corP P x = Σ[ y ∈ A ] ((R ⋆) y x)
 
-  WFcor→WFminDNE : R isWFcor → R isWFminDNE 
-  WFcor→WFminDNE RisWFcor P P∈DNE x x∈P = {!   !} 
-
-  -- WFseq⊆WFseq+ : WFseq R ⊆ WFseq+ R
-  -- WFseq⊆WFseq+ x x∈seq s s0≡x with x∈seq s s0≡x
-  -- ... | k ,, n = k ,, {!   !}
-
-  {- This formulation of WFseq+ is wrong:
-  Consider ARS a -> b.
-  Consider the sequence s(k) = a.
-  Then s(k) is not a normal form, and the sequence s does not contain a normal form.
-  Yet every sequence in this ARS does contain an element not reducing to its successor.
-
-  Say that s : ℕ → A is *almost increasing* if for all n,
-  either s(n) -> s(n+1) or s(n) is a normal form.
-
-  WFseq+ could be something like: "every almost increasing sequence ends in a normal form".
-  (IE, ∀ s : ℕ → A, AlmostIncreasing(s) → Σ[ n ∈ ℕ ] (s n ∈ NF ).)
-
-  Let's check that such WFseq+ would indeed be equivalent to WFseq.
-  1. WFseq⊆WFseq+. Assume WFseq.  Let s be given, suppose s is almost increasing.
-  By assumption, exists k s.t. s(k) does not reduce to s(k+1).
-  Since s is almost increasing, s(k) must be a normal form.
-  2. WFseq+⊆WFseq.
-  (That is, if every almost increasing sequence contains/ends in a normal form,
-  then every sequence contains an element not reducing to its successor.)
-  Classical argument.  Assume WFseq+.
-  Let s be a sequence.
-  By excluded middle, either s is almost increasing, or
-  there exists an n, such that s(n) is neither a normal form, nor s(n) -> s(n+1).
-  This n yields an index on which s does not reduce to its successor.
--}
-
 open ConstructiveImplications 
 
-module DecdabilityImplications {A : Set} (R : 𝓡 A) (dR : R isDec) where -- Using R isDec
-  -- 1. For decidable relations, sequential well-foundedness is implied by the standard one
+module DecdabilityImplications {A : Set} (R : 𝓡 A) (dR : R isDec) where
   isDec→isWFacc→isWFseq : R isWFacc → R isWFseq
   isDec→isWFacc→isWFseq wfAcc s = f s (s zero) (wfAcc (s zero)) refl where
     f : ∀ (s : ℕ → A) (x : A) (x-acc : x ∈ R -accessible) (x=s0 : x ≡ s zero)
@@ -114,7 +66,6 @@ module DecdabilityImplications {A : Set} (R : 𝓡 A) (dR : R isDec) where -- Us
   isDec→isWFind→isWFseq wfInd = isDec→isWFacc→isWFseq (isWFind→isWFacc wfInd)
 
 module AccDNEImplications {A : Set} (R : 𝓡 A) (acc∈DNE : AccDNE R) where
-  -- 3. Implications relying on ¬¬-closure of accessibility
   DNEacc→isWFminDNE→isWFacc : R isWFminDNE → R isWFacc
   DNEacc→isWFminDNE→isWFacc wfDNE x = acc∈DNE x f where
           f : ¬¬ (x ∈ R -accessible)
@@ -133,6 +84,7 @@ module MP≡Implications {A : Set} (R : 𝓡 A) (mp≡ : MP≡) where
     λ Rsk+1Rsk → ¬sz→Rzy (s (succ k)) ((succ k) ,, refl) 
       (transp (R (s (succ k))) sk≡y Rsk+1Rsk) 
 
+-- SA: Sep 15th Do we want to keep this or scrap at this point?
   -- MP→isWFcor→isWFseq : R isWFcor → R isWFseq
   -- MP→isWFcor→isWFseq RisWFcor s with RisWFcor (s 0) (λ x → ((R ⋆) x (s 0) ) → ¬ (Σ[ k ∈ ℕ ] ((R ⋆) (s k) x))) f ε⋆  
   --   where 
@@ -162,8 +114,8 @@ module DNEcorImplications {A : Set} (R : 𝓡 A) (cor∈DNE : (P : 𝓟 A) → c
   ... | m ,, m∉P , m∈min with Pcor m m∉P 
   ... | (z ,, (Rzm , z∉P)) = m∈min z z∉P Rzm 
     
-  WFmin→WFcor : R isWFmin → R isWFcor
-  WFmin→WFcor RisWFmin x P P∈cor with WFmin→WFcor¬¬ RisWFmin x P P∈cor 
+  corDNE→WFmin→WFcor : R isWFmin → R isWFcor
+  corDNE→WFmin→WFcor RisWFmin x P P∈cor with WFmin→WFcor¬¬ RisWFmin x P P∈cor 
   ...| nnPx = cor∈DNE P P∈cor x nnPx 
 
   acc→WFcorLocal :
@@ -175,11 +127,11 @@ module DNEcorImplications {A : Set} (R : 𝓡 A) (cor∈DNE : (P : 𝓟 A) → c
       rec {z} (acc IHz) nz with Pcor z nz
       ... | (y ,, (Ryz , nPy)) = rec (IHz y Ryz) nPy
 
-  WFacc→WFcor : R isWFacc → R isWFcor
-  WFacc→WFcor RisWFacc x = acc→WFcorLocal x (RisWFacc x)
+  corDNE→WFacc→WFcor : R isWFacc → R isWFcor
+  corDNE→WFacc→WFcor RisWFacc x = acc→WFcorLocal x (RisWFacc x)
 
-  WFminDNE→WFcor : R isWFminDNE → R isWFcor
-  WFminDNE→WFcor RisWFminDNE x P Pcor = cor∈DNE P Pcor x ¬¬Px
+  corDNE→WFminDNE→WFcor : R isWFminDNE → R isWFcor
+  corDNE→WFminDNE→WFcor RisWFminDNE x P Pcor = cor∈DNE P Pcor x ¬¬Px
     where 
       ¬¬Px : ¬¬ P x
       ¬¬Px ¬Px with RisWFminDNE (∁ P) (¬¬Closed∁ P) x ¬Px 
@@ -189,14 +141,15 @@ module DNEcorImplications {A : Set} (R : 𝓡 A) (cor∈DNE : (P : 𝓟 A) → c
   open import Relations.Coreductive R
   open CorSequence
 
-  WFseq→WFcor : R isWFseq → R isWFcor 
-  WFseq→WFcor RisWFseq x P Pcor = cor∈DNE P Pcor x ¬¬Px 
+  corDNE→WFseq→WFcor : R isWFseq → R isWFcor 
+  corDNE→WFseq→WFcor RisWFseq x P Pcor = cor∈DNE P Pcor x ¬¬Px 
     where 
       ¬¬Px : ¬¬ P x
       ¬¬Px ¬Px with (CS {Pcor = Pcor} (x ,, ¬Px)) 
       ...| cs with RisWFseq (seq cs)
       ...| k ,, ¬Rsk+1sk = ¬Rsk+1sk (seq-inc {Pcor = Pcor} cs k)  
       
+-- SA: Sep 15th do we want to keep either of the remaining two proofs below?       
 module WFseqImplications {A : Set} (R : 𝓡 A) where
 -- Classical “negated universal → existential counterexample” on predecessors of z
   postulate
