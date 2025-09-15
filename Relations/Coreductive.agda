@@ -17,8 +17,8 @@ module Relations.Coreductive {A : Set} (R : 𝓡 A) where
 -- We can decide for all x, EM (exists y st Ryx and not Py)
 -- Can we show anything stronger than this too? Or can we use this to imply the following:
 -- If inductive P. Then we can show FBRel and WDec to CorP using FB to DNS and this proof above. 
-  FBRel∧WDec→CorP : (~R R) isFBRel → ∀ (P : 𝓟 A) → dec (∁ P) → R -inductive P → R -coreductive P
-  FBRel∧WDec→CorP RisFBRel P PwDec Rind a a∉P with decList∃ (∁ P) PwDec (fst (RisFBRel a))
+  FBRel∧WDec→ind⊆cor : (~R R) isFBRel → ∀ (P : 𝓟 A) → dec (∁ P) → R -inductive P → R -coreductive P
+  FBRel∧WDec→ind⊆cor RisFBRel P PwDec Rind a a∉P with decList∃ (∁ P) PwDec (fst (RisFBRel a))
   ... | in2 no = ∅ (f λ Ra⊆P → a∉P (Rind a Ra⊆P)) where
       g = FBRel⊆FB (~R R) a (RisFBRel a)
       h = λ y Rya y∉P → no (List∃intro _ (fst (RisFBRel a)) y (pr1 (snd (RisFBRel a) y) Rya , y∉P) )
@@ -27,6 +27,7 @@ module Relations.Coreductive {A : Set} (R : 𝓡 A) where
   ... | in1 yes with List∃elim _ _ yes
   ... | y ,, y∈Rx , y∉P = y ,, pr2 (snd (RisFBRel a) y) y∈Rx , y∉P
 
+  -- TODO: move this function below to finitely branching as it doesn't directly deal with coreductive
   FBRel∧WDec→EMRyx : (~R R) isFBRel → ∀ (P : 𝓟 A) → dec (∁ P) → ∀ {x} → EM (Σ[ y ∈ A ] (R y x × ¬ (P y)))
   FBRel∧WDec→EMRyx RisFBRel P PwDec {x} with RisFBRel x 
   ...| ys ,, Rys 
@@ -35,6 +36,7 @@ module Relations.Coreductive {A : Set} (R : 𝓡 A) where
   ... | in1 yes with List∃elim (∁ P) ys yes 
   ... | y ,, y∈ys , ¬Py = in1 (y ,, (pr2 (Rys y) y∈ys) , ¬Py)
 
+  -- Rename below to make explicit classical properties. Then rename the function two above with the same type to make clear it is an alternative way of proving the same thing. We prefer the below function to the one 2 above. 
   indP→CorP : (~R R) isFBRel → ∀ (P : 𝓟 A) → dec (∁ P) → R -inductive P → R -coreductive P
   indP→CorP RisFBRel P PwDec Rind a a∉P with FBRel∧WDec→EMRyx RisFBRel P PwDec {a} 
   ... | in1 yes = yes

@@ -44,7 +44,7 @@ wCR→conflInd RisWCR x IND (Rxy₀ ,⋆ R*y₀y) (Rxz₀ ,⋆ R*z₀z) with Ris
 ... | u ,, R*zu , R*vu = u ,, ((R*yv ⋆!⋆ R*vu) , R*zu)
 
 wCR→Conf : R isWCR → SN ⊆ CR
-wCR→Conf RisWCR = BasicImplications.acc⊆ind (λ x → CR x) (wCR→conflInd RisWCR)
+wCR→Conf RisWCR = PropertyImplications.acc⊆ind (λ x → CR x) (wCR→conflInd RisWCR)
   
 
 

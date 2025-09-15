@@ -130,7 +130,7 @@ module Normalizing-Implications where
     isWN∧isSM→isSN : R isWN → R isSM → R isSN
     isWN∧isSM→isSN RisWN RisSM x =  isWN∧SM→SN RisWN (RisSM x)
 
-    isWN∧isSMseq→isSNseq : R isWN → (∀ {y} → SMseq R y) → isWFseq- (~R R) 
+    isWN∧isSMseq→isSNseq : R isWN → (∀ {y} → SMseq R y) → (~R R) isWFseq- 
     isWN∧isSMseq→isSNseq RisWN RisSMseq f f-inc with RisSMseq f refl f-inc
     ... | i ,, i∈MF with pr1 MF∧WN↔NF (i∈MF , RisWN (f i)) 
     ... | fi∈NF = fi∈NF (f-inc i)    

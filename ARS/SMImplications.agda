@@ -47,7 +47,7 @@ module ARS.SMImplications {A : Set} (R : 𝓡 A) where
 
   FBrel→decCSM→SMcor : R isFBRel → dec (∁ (SM)) → (~R R) -coreductive (SM)
   FBrel→decCSM→SMcor RisFBRel SMwDec = 
-    FBRel∧WDec→CorP RisFBRel SM SMwDec SMind 
+    indP→CorP RisFBRel SM SMwDec SMind 
 
   -- -- Define CorSequence in Coreductive file and refactor here and wellfounded. All below needs uncommenting. 
   SMCor→SMseq-→SM- : (~R R) -coreductive (SM) → isSMseq- → isSM-    
