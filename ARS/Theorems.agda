@@ -27,13 +27,13 @@ module Theorem-1-2-2 where
     CP→UN : R isCR → R isUN
     CP→UN RisCR = NP→UN (CR→NP RisCR)
 
-    ii+ : R isWN × R isUN→ → R isCR
-    ii+ (RisWN ,  RisUN→) x {y}{z} R*xy R*xz with RisWN y | RisWN z
+    ii+ : R isWN × R isUN → R isCR
+    ii+ (RisWN ,  RisUN) x {y}{z} R*xy R*xz with RisWN y | RisWN z
     ... | n₀ ,, R*yn₀ , n₀∈NF |  n₁ ,, R*zn₁ , n₁∈NF with
-                RisUN→ x n₀∈NF n₁∈NF (R*xy ⋆!⋆ R*yn₀) (R*xz ⋆!⋆ R*zn₁)
+                RisUN x n₀∈NF n₁∈NF (R*xy ⋆!⋆ R*yn₀) (R*xz ⋆!⋆ R*zn₁)
     ... | n₀≡n₁ = n₀ ,, (R*yn₀ , transp ((R ⋆) z) (~ n₀≡n₁) R*zn₁)
 
-    ii : R isWN × R isUN → R isCR
+    ii : R isWN × R isUN₌ → R isCR
     ii (RisWN , RisUN) = ii+ (RisWN , (Terese-Alternative.UN→UN→ RisUN))
 
 
@@ -68,8 +68,8 @@ module Theorem-1-2-3 where
   wseq-lemma2 f f-winc (succ n) zero = in2 (wseq-lemma f f-winc (succ n))
   wseq-lemma2 f f-winc (succ n) (succ m) = wseq-lemma2 (f ∘ succ) (λ k → f-winc (succ k) ) n m
 
-  i : R isWN → R isUN → R isBP
-  i RisWN RisUN f f-inc with RisWN (f zero)
+  i : R isWN → R isUN₌ → R isBP
+  i RisWN RisUN₌ f f-inc with RisWN (f zero)
   ... | (n ,, R*f0n , n∈NF) = n ,, g where
     g : ∀ k → (R ⋆) (f k) n
     g k with Theorem-1-2-2.ii (RisWN , RisUN)  (f 0) R*f0n (seq-lemma R f f-inc k)
@@ -77,17 +77,17 @@ module Theorem-1-2-3 where
     ... | n' ,, (Rnn₀ ,⋆ R*n₀n') , R*fkn = ∅ (n∈NF Rnn₀ )
 
   -- Using UN→ rather than UN
-  i→ : R isWN → R isUN→ → R isBP
-  i→ RisWN RisUN→ f f-inc  with RisWN (f zero)
+  i→ : R isWN → R isUN → R isBP
+  i→ RisWN RisUN f f-inc  with RisWN (f zero)
   ... | (a ,, R*f0a , a∈NF) = a ,, g where
     g : ∀ k → (R ⋆) (f k) a
     g k with RisWN (f k)
-    ... | b ,, R*fkb , b∈NF with RisUN→ (f zero) a∈NF b∈NF R*f0a ((seq-lemma R f f-inc k) ⋆!⋆ R*fkb)
+    ... | b ,, R*fkb , b∈NF with RisUN (f zero) a∈NF b∈NF R*f0a ((seq-lemma R f f-inc k) ⋆!⋆ R*fkb)
     ... | refl = R*fkb
 
 
   -- A variant on theorem 1-2-3 ii)
-  iiSeq : R isWN → R isUN → R isRP → isWFseq- (~R R)
+  iiSeq : R isWN → R isUN₌ → R isRP → isWFseq- (~R R)
   iiSeq wnR unR rp s sIsRdec with i wnR unR
   ... | bdR with wnR (s 0)
   ... | a ,, R*s₀a , a∈NF with bdR s sIsRdec

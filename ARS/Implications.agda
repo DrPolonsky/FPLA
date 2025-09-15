@@ -78,10 +78,10 @@ module Confluent-Implications where
     WN∧NP→CR : ∀ {x} → WN x → NP x → CR x
     WN∧NP→CR (n ,, (R*xn , x∈NF)) x∈NP R*xy R*xz = n ,, x∈NP x∈NF R*xn R*xy , x∈NP x∈NF R*xn R*xz
 
-    -- UN→∧WN→CR : R isUN→ → R isWN → R isCR
-    -- UN→∧WN→CR RisUN→ RisWN x {y}{z} R*xy R*xz with RisWN y | RisWN z
+    -- UN→∧WN→CR : R isUN → R isWN → R isCR
+    -- UN→∧WN→CR RisUN RisWN x {y}{z} R*xy R*xz with RisWN y | RisWN z
     -- ... | n₀ ,, R*yn₀ , n₀∈NF |  n₁ ,, R*zn₁ , n₁∈NF with
-    --             RisUN→ x n₀∈NF n₁∈NF (R*xy ⋆!⋆ R*yn₀) (R*xz ⋆!⋆ R*zn₁)
+    --             RisUN x n₀∈NF n₁∈NF (R*xy ⋆!⋆ R*yn₀) (R*xz ⋆!⋆ R*zn₁)
     -- ... | n₀≡n₁ = n₀ ,, (R*yn₀ , transp ((R ⋆) z) (~ n₀≡n₁) R*zn₁)
 open Confluent-Implications public
 module Normalizing-Implications where
@@ -163,19 +163,19 @@ module Terese-Alternative where
     NP₌↔NP = NP₌→NP , NP→NP₌
 
     -- Counterexample: (n <- a -> b <-> c <- d -> m)
-    -- n,m ∈ NF, R isUN→, n R⁼ m, but n ≢ m.
+    -- n,m ∈ NF, R isUN, n R⁼ m, but n ≢ m.
     -- Possible fix: Provably with WN, via (WN∧UN→)→CR→WNFP→NP→UN (??)
     -- Add a note to the report noting the distinction between these.
-    -- UN→→UN : R isUN→ → R isUN
-    -- UN→→UN RisUN→ {x} {.x} x∈NF y∈NF ε⋆ = refl
-    -- UN→→UN RisUN→ {x} {y} x∈NF y∈NF (_,⋆_ {y = w} (axˢ+ Rxw) R=wy) = ∅ (x∈NF Rxw)
-    -- UN→→UN RisUN→ {x} {y} x∈NF y∈NF (_,⋆_ {y = w} (axˢ- Rwx) R=wy) = {!   !}
-    --   with UN→→UN RisUN→ ({!   !}) y∈NF R=x₁y
+    -- UN→→UN : R isUN → R isUN
+    -- UN→→UN RisUN {x} {.x} x∈NF y∈NF ε⋆ = refl
+    -- UN→→UN RisUN {x} {y} x∈NF y∈NF (_,⋆_ {y = w} (axˢ+ Rxw) R=wy) = ∅ (x∈NF Rxw)
+    -- UN→→UN RisUN {x} {y} x∈NF y∈NF (_,⋆_ {y = w} (axˢ- Rwx) R=wy) = {!   !}
+    --   with UN→→UN RisUN ({!   !}) y∈NF R=x₁y
     -- ... | refl = {!   !}
 
-    UN→UN→ : R isUN → R isUN→
-    UN→UN→ RisUN x {n} {m} n∈NF m∈NF R*xn R*xm
-      = RisUN n∈NF m∈NF ((~⁼ (⋆⊆⁼ R R*xn) ) ⁼!⁼ ⋆⊆⁼ R R*xm )
+    UN→UN→ : R isUN₌ → R isUN
+    UN→UN→ RisUN₌ x {n} {m} n∈NF m∈NF R*xn R*xm
+      = RisUN₌ n∈NF m∈NF ((~⁼ (⋆⊆⁼ R R*xn) ) ⁼!⁼ ⋆⊆⁼ R R*xm )
 
     -- if we show this for SMseq we can investigate whether it holds for SM
     RP∧BP→SMseq : R isRP → R isBP → ∀ {x : A} → SMseq R x

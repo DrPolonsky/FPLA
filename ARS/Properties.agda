@@ -83,12 +83,12 @@ module GlobalProperties (R : 𝓡 A) where
     _isNP₌ = ∀ {x y} → NF y → (R ⁼) x y → (R ⋆) x y
 
     -- [AP.  What's the problem with getting this from local UN?]
-    _isUN : Set
-    _isUN = ∀ {x y : A} → x ∈ NF → y ∈ NF → (R ⁼) x y → x ≡ y
+    _isUN₌ : Set
+    _isUN₌ = ∀ {x y : A} → x ∈ NF → y ∈ NF → (R ⁼) x y → x ≡ y
     -- NB. This is stronger than global UN, which is UN→ below
 
-    _isUN→ : Set
-    _isUN→ = ∀ x → UN x
+    _isUN : Set
+    _isUN = ∀ x → UN x
 
 
     _isRP : Set
@@ -104,7 +104,7 @@ module GlobalProperties (R : 𝓡 A) where
     _isComplete = _isCR × _isSN
 
     _isSemicomplete : Set
-    _isSemicomplete = _isUN × _isWN
+    _isSemicomplete = _isUN₌ × _isWN
 
     _isDominatedByWF : 𝓡 A → Set
     _isDominatedByWF Q = Q isWF × (R ⊆ Q)
