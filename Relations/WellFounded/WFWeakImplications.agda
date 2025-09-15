@@ -98,6 +98,8 @@ module FBWeakImplications {A : Set} {R : 𝓡 A} (RisFB : (~R R) isFB) where
                      λ za → z∉acc (acc za)
 
 module CoreductiveWeakImplications {A : Set} (R : 𝓡 A) where
+  -- TODO: Pull out the implications between different versions of wfcor to a seperate file. 
+  -- Then seperate into different classical properties per module, rather than general coreductive section. 
   open import Relations.Coreductive R
   isWFminCor→Cor¬¬ : R isWFminCor → ∀ (P : 𝓟 A) → R -coreductive P → ∀ x → ¬¬ P x
   isWFminCor→Cor¬¬ iwfc P Pco x ¬px with iwfc P Pco ¬px
@@ -114,11 +116,11 @@ module CoreductiveWeakImplications {A : Set} (R : 𝓡 A) where
   isWFminCor+→isWFminCor RisWFminCor+ P Pcor a∉P with RisWFminCor+ P Pcor a∉P
   ... | (x ,, x∉P , H) = x ,, x∉P , λ y y∉P Ryx → y∉P (H y Ryx)
 
-  Cor¬¬→isWFminCor+ : (∀ P → R -coreductive P → ∀ x → ¬¬ P x) → R isWFminCor+
-  Cor¬¬→isWFminCor+ H P Pcor {a} a∉P = ∅ (H P Pcor a a∉P )
+  isWFcor¬¬→isWFminCor+ : R isWFcor¬¬ → R isWFminCor+
+  isWFcor¬¬→isWFminCor+ H P Pcor {a} a∉P = ∅ (H P Pcor a a∉P )
 
   isWFminCor→isWFminCor+ : R isWFminCor → R isWFminCor+
-  isWFminCor→isWFminCor+ wfmc = Cor¬¬→isWFminCor+ (isWFminCor→Cor¬¬ wfmc )
+  isWFminCor→isWFminCor+ wfmc = isWFcor¬¬→isWFminCor+ (isWFminCor→Cor¬¬ wfmc )
 
   isWFminDNE→isWFminCor+ : R isWFminDNE → R isWFminCor+
   isWFminDNE→isWFminCor+ RisWFminDNE P Pco {a} a∉P

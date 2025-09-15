@@ -46,10 +46,6 @@ module ConstructiveImplications {A : Set} {R : 𝓡 A} where
   isWFmin→isWFseq wfMin s with wfMin (λ a → Σ[ n ∈ ℕ ] (s n ≡ a)) (s zero) (zero ,, refl)
   ... | x ,, (k ,, p) , H = (k ,, λ Ryx → H (s (succ k)) (succ k ,, refl ) (transp (R (s (succ k))) p Ryx ) )
 
--- SA: Can we remove corP? Sep 15
-  corP : 𝓟 A → 𝓟 A 
-  corP P x = Σ[ y ∈ A ] ((R ⋆) y x)
-
 open ConstructiveImplications 
 
 module DecdabilityImplications {A : Set} (R : 𝓡 A) (dR : R isDec) where
@@ -83,30 +79,6 @@ module MP≡Implications {A : Set} (R : 𝓡 A) (mp≡ : MP≡) where
   ... | y ,, (k ,, sk≡y) , ¬sz→Rzy  = k ,, 
     λ Rsk+1Rsk → ¬sz→Rzy (s (succ k)) ((succ k) ,, refl) 
       (transp (R (s (succ k))) sk≡y Rsk+1Rsk) 
-
--- SA: Sep 15th Do we want to keep this or scrap at this point?
-  -- MP→isWFcor→isWFseq : R isWFcor → R isWFseq
-  -- MP→isWFcor→isWFseq RisWFcor s with RisWFcor (s 0) (λ x → ((R ⋆) x (s 0) ) → ¬ (Σ[ k ∈ ℕ ] ((R ⋆) (s k) x))) f ε⋆  
-  --   where 
-  --     f : _ 
-  --     f x H = ?
-  -- ... | z  = ∅ (z (0 ,, ε⋆))
-  -- try and build on this implication. Will probably need to apply MP≡ twice. 
-  -- What correductive property associated with the sequence which if assumed to always be true would give a counterexample to the sequence?
-  -- predicate cand: if you're in the image of s then none of your successors should be in the image of s
-  -- Pred: Given x, the xomplement of sigma k 
-{- 
-  MP→isWFcor→isWFseq : R isWFcor → R isWFseq
-  MP→isWFcor→isWFseq RisWFcor s = {!   !} -- ∅ (g (fst lr) snd lr) 
-    where 
-      g : ∀ (k : ℕ) → (¬(R ⋆) (s k) (s 0))
-      g = {!   !} 
-      f : R -coreductive (λ x → Σ[ k ∈ ℕ ] ((s k) ≡ x) → (Σ[ k ∈ ℕ ] ( ¬ (R ⋆) (s k) x))) 
-      f x x∉P with mp≡ s x (λ x∉s → x∉P (λ x∈s → ∅ (x∉s x∈s)))
-      ... | k ,, sk≡x rewrite ~ sk≡x = (s (succ k)) ,, ( ?  , λ H → x∉P λ x₁ → fst (H (succ k ,, refl)) ,, λ R*ssucksk → snd (H (succ k ,, refl)) ? )           
-
-      lr = RisWFcor (s 0) (λ x → Σ[ k ∈ ℕ ] ((s k) ≡ x) → (Σ[ k ∈ ℕ ] ( ¬ (R ⋆) (s k) x))) f (0 ,, refl)
--}
 
 module DNEcorImplications {A : Set} (R : 𝓡 A) (cor∈DNE : (P : 𝓟 A) → corDNE R P) where 
   WFmin→WFcor¬¬ : R isWFmin → ∀ (x : A) → (P : 𝓟 A) → R -coreductive P → ¬¬ (P x)
@@ -148,51 +120,3 @@ module DNEcorImplications {A : Set} (R : 𝓡 A) (cor∈DNE : (P : 𝓟 A) → c
       ¬¬Px ¬Px with (CS {Pcor = Pcor} (x ,, ¬Px)) 
       ...| cs with RisWFseq (seq cs)
       ...| k ,, ¬Rsk+1sk = ¬Rsk+1sk (seq-inc {Pcor = Pcor} cs k)  
-      
--- SA: Sep 15th do we want to keep either of the remaining two proofs below?       
-module WFseqImplications {A : Set} (R : 𝓡 A) where
--- Classical “negated universal → existential counterexample” on predecessors of z
-  postulate
-    ExistsBadPred :
-      ∀ z → z ∈ ∁ (WFacc R) →
-      Σ[ y ∈ A ] (R y z × y ∈ ∁ (WFacc R))
-
-  -- Dependent choice along predecessors inside X = ∁ WFacc
-  postulate
-    DC-pre :
-      (x : A) → x ∈ ∁ (WFacc R) →
-      Σ[ f ∈ (ℕ → A) ]
-        ( (f 0 ≡ x)
-        × ((∀ (n : ℕ) → R (f (succ n)) (f n))
-        × (∀ (n : ℕ) → f n ∈ ∁ (WFacc R))) )
-
-  -- From WFseq, build a contradiction with any infinite descending chain
-  WFseq→¬¬WFacc : R isWFseq → ∀ x → ¬¬ (x ∈ WFacc R)
-  WFseq→¬¬WFacc WFs x notAcc
-    with DC-pre x notAcc
-  ... | (f ,, (refl , (dec , _)))
-    with WFs f
-  ... | (k ,, notStep) = ∅ (notStep (dec k))
-
-  -- Close the double negation using AccDNE
-  WFseq→WFacc :
-    AccDNE R → R isWFseq → R isWFacc
-  WFseq→WFacc acc∈DNE WFs x =
-    acc∈DNE x (WFseq→¬¬WFacc WFs x)
-
-module MP→isWFcor→isWFseq {A : Set} {R : 𝓡 A} (RisWFcor : R isWFcor) (s : ℕ → A) (mp≡ : MP≡) where 
-  g : ∀ (k : ℕ) → (¬(R ⋆) (s k) (s 0))
-  g = {!   !} 
-  
-  f : R -coreductive (λ x → Σ[ k ∈ ℕ ] ((s k) ≡ x) → (Σ[ k ∈ ℕ ] ( ¬ (R ⋆) (s k) x))) 
-  f x x∉P with mp≡ s x (λ x∉s → x∉P (λ x∈s → ∅ (x∉s x∈s)))
-  ... | k ,, sk≡x rewrite ~ sk≡x 
-    = (s (succ k)) ,,
-      ( {!   !}  , λ H → x∉P λ x₁ → fst (H (succ k ,, refl)) ,,  
-      λ R*ssucksk → snd (H (succ k ,, refl)) {!   !} )   
-
-  ims∈cor : R -coreductive (λ x → ¬ Σ[ k ∈ ℕ ] ((s k) ≡ x))
-  ims∈cor x x∉s with mp≡ s x x∉s 
-  ... | k ,, sk≡x = s (succ k) ,, {!   !}           
-
-  lr = RisWFcor (s 0) (λ x → Σ[ k ∈ ℕ ] ((s k) ≡ x) → (Σ[ k ∈ ℕ ] ( ¬ (R ⋆) (s k) x))) f (0 ,, refl)
