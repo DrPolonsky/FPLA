@@ -17,6 +17,9 @@ _isWFind¬¬ = ∀ (φ : 𝓟 A) → R -inductive φ → ∀ x → ¬¬ (φ x)
 _isWFseq- : Set -- Don't modify this one just yet 20th August
 _isWFseq- = ∀ (s : ℕ → A) → ¬ (s ∈ R -decreasing)
 
+_isWFseq¬¬ : Set
+_isWFseq¬¬ = ∀ (s : ℕ → A) → ¬¬ Σ[ n ∈ ℕ ] (¬ (R (s (succ n)) (s n)))
+
 _isWFmin¬¬ : Set₁
 _isWFmin¬¬ = ∀ (P : 𝓟 A) → ∀ {d} → d ∈ P → ¬¬ Σ[ y ∈ A ] (y ∈ R - P -minimal)
 

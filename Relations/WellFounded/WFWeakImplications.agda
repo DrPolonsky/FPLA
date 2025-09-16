@@ -83,7 +83,18 @@ module WeakConstructiveImplications {A : Set} (R : 𝓡 A) where
   isWFminDNE¬¬→isWFmin¬¬ : R isWFminDNE¬¬ → R isWFmin¬¬
   isWFminDNE¬¬→isWFmin¬¬ RisWFminDNE¬¬ P {d} d∈P ¬∃minP with RisWFminDNE¬¬ (∁ (∁ P)) (λ x y z → y λ w → w z ) (λ z → z d∈P)
   ... | c = c λ { (x ,, ¬x∉P , H) → ¬x∉P (λ x∈P →
-                   ¬∃minP (x ,, x∈P , λ y y∈P Ryx → H y (λ z → z y∈P) Ryx ) )  }
+                   ¬∃minP (x ,, x∈P , λ y y∈P Ryx → H y (λ z → z y∈P) Ryx ) )}
+
+  isWFseq-→isWFseq¬¬ : R isWFseq- → R isWFseq¬¬ -- Think we need R to be not not closed. We don't have this. But we might be able to get away with R not being not not closed 
+  isWFseq-→isWFseq¬¬ RisWFseq- s H = RisWFseq- s (λ k → {!   !})
+  
+  -- g where 
+  --   g : Σ ℕ (λ z → (x : R (s (succ z)) (s z)) → ⊥) 
+  --   g = {!   !}  
+
+  isWFseq¬¬→isWFseq- : R isWFseq¬¬ → R isWFseq-
+  isWFseq¬¬→isWFseq- = {!   !}
+  
 open WeakConstructiveImplications public
 
 open import Relations.FinitelyBranching
