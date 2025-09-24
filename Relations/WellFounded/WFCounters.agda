@@ -3,9 +3,8 @@ open import Datatypes
 open import Predicates
 open import Classical
 open import Relations.Core
-open import Relations.Wellfounded
-
-module Relations.WFCounters where
+open import Relations.WellFounded.WFDefinitions
+module Relations.WellFounded.WFCounters where
 
 data _<_ : ℕ → ℕ → Set where
   base< : ∀ {n} → n < succ n

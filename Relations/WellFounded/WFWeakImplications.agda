@@ -7,21 +7,22 @@ open import Relations.Decidable
 open import Relations.ClosureOperators
 open import Relations.Seq
 
-module Relations.WellFounded.WFWeakImplications where
+module Relations.WellFounded.WFWeakImplications {A : Set} (R : 𝓡 A) where
 
 open import Relations.WellFounded.WFDefinitions public
 open import Relations.WellFounded.WFWeakDefinitions public
 open import Relations.WellFounded.WFBasicImplications public
 open ConstructiveImplications
+open import Relations.Coreductive R
 
-module WFx→¬¬WFxImplications {A : Set} (R : 𝓡 A) where
+module WFx→¬¬WFxImplications where
   doubleNegIntro : ∀ {A : Set} → A → ¬¬ A
   doubleNegIntro x nx = nx x
 
   isWFacc→¬¬isWFacc : R isWF → ¬¬ (R isWF)
   isWFacc→¬¬isWFacc RisWF  = doubleNegIntro RisWF
 
-module ¬¬WFx→WFx¬¬Implications {A : Set} (R : 𝓡 A) where
+module ¬¬WFx→WFx¬¬Implications where
   -- Remark.  The converse of this is exactly the DNS for accessibility
   ¬¬isWFacc→isWFacc¬¬ :  ¬¬ (R isWFacc) → R isWFacc¬¬
   ¬¬isWFacc→isWFacc¬¬ ¬¬wfAccR = λ x ¬accx     → ¬¬wfAccR (λ isWFacc → ¬accx (isWFacc x) )
@@ -36,7 +37,7 @@ module ¬¬WFx→WFx¬¬Implications {A : Set} (R : 𝓡 A) where
   ¬¬isWFmin→isWFmin¬¬ : ¬¬ (R isWFmin) → R isWFmin¬¬
   ¬¬isWFmin→isWFmin¬¬ ¬¬WFmR   = λ P p ¬Σ → ¬¬WFmR (λ WFmR → ¬Σ (WFmR P _ p ) )
 
-module WeakConstructiveImplications {A : Set} (R : 𝓡 A) where
+module WeakConstructiveImplications where
   isWFminDNE→isWFminDNE¬¬ : R isWFminDNE → R isWFminDNE¬¬
   isWFminDNE→isWFminDNE¬¬ a b c d e = e (a b c _ d)
 
@@ -84,6 +85,16 @@ module WeakConstructiveImplications {A : Set} (R : 𝓡 A) where
   isWFminDNE¬¬→isWFmin¬¬ RisWFminDNE¬¬ P {d} d∈P ¬∃minP with RisWFminDNE¬¬ (∁ (∁ P)) (λ x y z → y λ w → w z ) (λ z → z d∈P)
   ... | c = c λ { (x ,, ¬x∉P , H) → ¬x∉P (λ x∈P →
                    ¬∃minP (x ,, x∈P , λ y y∈P Ryx → H y (λ z → z y∈P) Ryx ) )}
+
+  isWFminDNE¬¬→isWFCor¬¬ : R isWFminDNE¬¬ → R isWFcor¬¬
+  isWFminDNE¬¬→isWFCor¬¬ WFR P Pcor a a∉P = WFR (∁ P) (λ x z z₁ → z (λ z₂ → z₂ z₁)) a∉P f
+    where f : _
+          f (m ,, m∉P , mmin) with Pcor m m∉P
+          ... | (n ,, Rnm , n∉P) = mmin n (λ _ → mmin n n∉P Rnm) Rnm
+
+  isWFseq-→isWFminCor+ : R isWFseq- → R isWFminCor+
+  isWFseq-→isWFminCor+ RisWFseq P CI {a} ¬pa =  ∅ (RisWFseq seq seq-inc) where
+    open CorSequence (CS {P} {CI} (a ,, ¬pa))
 
   module ReductionSequence (wfSeq- : R isWFseq-) (s : ℕ → A) (H : ¬ Σ-syntax ℕ (λ n → ¬ R (s (succ n)) (s n))) where
 
@@ -141,7 +152,7 @@ module WeakConstructiveImplications {A : Set} (R : 𝓡 A) where
 open WeakConstructiveImplications public
 
 open import Relations.FinitelyBranching
-module FBWeakImplications {A : Set} {R : 𝓡 A} (RisFB : (~R R) isFB) where
+module FBWeakImplications (RisFB : (~R R) isFB) where
   FB→isWFminDNE¬¬→isWFacc¬¬ : R isWFminDNE¬¬ → R isWFacc¬¬
   FB→isWFminDNE¬¬→isWFacc¬¬ RisWF x₀ x₀∉acc =
     RisWF (∁ (R -accessible)) (λ a nnnac ac → ∅ (nnnac (RisWF→¬¬RisWF ac))) x₀∉acc f
@@ -150,87 +161,39 @@ module FBWeakImplications {A : Set} {R : 𝓡 A} (RisFB : (~R R) isFB) where
               FB→DNS (~R R) (R -accessible) z (RisFB z)
                      (λ y Ryx y∉acc → z∈min y y∉acc Ryx )
                      λ za → z∉acc (acc za)
-
-module CoreductiveWeakImplications {A : Set} (R : 𝓡 A) where
-  -- TODO: Pull out the implications between different versions of wfcor to a seperate file.
-  -- Then seperate into different classical properties per module, rather than general coreductive section.
-  open import Relations.Coreductive R
-  isWFminCor→Cor¬¬ : R isWFminCor → ∀ (P : 𝓟 A) → R -coreductive P → ∀ x → ¬¬ P x
-  isWFminCor→Cor¬¬ iwfc P Pco x ¬px with iwfc P Pco ¬px
-  ... | (y ,, ¬py , ymin) with Pco y ¬py
-  ... | (z ,, Rzy , ¬pz) = ymin z ¬pz Rzy
-
-  Cor¬¬→isWFminCor : (∀ P → R -coreductive P → ∀ x → ¬¬ P x) → R isWFminCor
-  Cor¬¬→isWFminCor H P Pcor {a} a∉P = ∅ (H P Pcor a a∉P )
-
-  isWFcor→isWFminCor : R isWFcor  → R isWFminCor
-  isWFcor→isWFminCor RisWFcor = Cor¬¬→isWFminCor (λ P P∈Cor a → λ a∉P → a∉P (RisWFcor a P P∈Cor))
-
-  isWFminCor+→isWFminCor : R isWFminCor+ → R isWFminCor
-  isWFminCor+→isWFminCor RisWFminCor+ P Pcor a∉P with RisWFminCor+ P Pcor a∉P
-  ... | (x ,, x∉P , H) = x ,, x∉P , λ y y∉P Ryx → y∉P (H y Ryx)
-
-  isWFcor¬¬→isWFminCor+ : R isWFcor¬¬ → R isWFminCor+
-  isWFcor¬¬→isWFminCor+ H P Pcor {a} a∉P = ∅ (H P Pcor a a∉P )
-
-  isWFminCor→isWFminCor+ : R isWFminCor → R isWFminCor+
-  isWFminCor→isWFminCor+ wfmc = isWFcor¬¬→isWFminCor+ (isWFminCor→Cor¬¬ wfmc )
-
-  isWFminDNE→isWFminCor+ : R isWFminDNE → R isWFminCor+
-  isWFminDNE→isWFminCor+ RisWFminDNE P Pco {a} a∉P
-    with  RisWFminDNE (∁ P) DNS¬ a a∉P
-    where DNS¬ = λ x ¬Px ¬¬Px → ¬Px (λ z → z ¬¬Px)
-  ... | (y ,, ¬Py , ymin) with Pco y ¬Py
-  ... | (z ,, Rzy , ¬Pz) = ∅ (ymin z ¬Pz Rzy)
-
-  isWFminDNE→Cor¬¬ : R isWFminDNE → R isWFcor¬¬
-  isWFminDNE→Cor¬¬ RisWFmin = isWFminCor→Cor¬¬
-    (isWFminCor+→isWFminCor (isWFminDNE→isWFminCor+  RisWFmin))
-
-  isWFminDNE¬¬→Cor¬¬ : R isWFminDNE¬¬ → R isWFcor¬¬
-  isWFminDNE¬¬→Cor¬¬ WFR P Pcor a a∉P = WFR (∁ P) (λ x z z₁ → z (λ z₂ → z₂ z₁)) a∉P f
-    where f : _
-          f (m ,, m∉P , mmin) with Pcor m m∉P
-          ... | (n ,, Rnm , n∉P) = mmin n (λ _ → mmin n n∉P Rnm) Rnm
-
-  -- This implication also follows from isWFminDNE¬¬→isWFmin¬¬→isWFseq-→isWFaccc- (with accCor)
-  accCor∧isWFminDNE¬¬→isWFacc¬¬ : R -coreductive (R -accessible) → R isWFminDNE¬¬ → R isWFacc¬¬
-  accCor∧isWFminDNE¬¬→isWFacc¬¬ accCor RisWF = isWFminDNE¬¬→Cor¬¬ RisWF (R -accessible) accCor
+module accCorWeakImplications (acc∈Cor : AccCor R) where
+-- This implication also follows from isWFminDNE¬¬→isWFmin¬¬→isWFseq-→isWFaccc- (with accCor)
+  accCor∧isWFminDNE¬¬→isWFacc¬¬ : R isWFminDNE¬¬ → R isWFacc¬¬
+  accCor∧isWFminDNE¬¬→isWFacc¬¬ RisWF = isWFminDNE¬¬→isWFCor¬¬ RisWF (R -accessible) acc∈Cor
 
   -- A Noteworthy Consequence
-  accCorec→isWFseq-→isWFacc¬¬ : R -coreductive (R -accessible) → R isWFseq- → R isWFacc¬¬
-  accCorec→isWFseq-→isWFacc¬¬ AccisCor RisWFseq- a a∉acc = RisWFseq- seq seq-inc  where
-    open CorSequence (CS {R -accessible} {AccisCor} (a ,, a∉acc))
+  accCorec→isWFseq-→isWFacc¬¬ : R isWFseq- → R isWFacc¬¬
+  accCorec→isWFseq-→isWFacc¬¬ RisWFseq- a a∉acc = RisWFseq- seq seq-inc  where
+    open CorSequence (CS {R -accessible} {acc∈Cor} (a ,, a∉acc))
 
-
-  isWFseq-→isWFminCor+ : R isWFseq- → R isWFminCor+
-  isWFseq-→isWFminCor+ RisWFseq P CI {a} ¬pa =  ∅ (RisWFseq seq seq-inc) where
-    open CorSequence (CS {P} {CI} (a ,, ¬pa))
-
-  -- The converse is not provable,
-  -- because the complement of the image of a sequence is not coreductive (at least not constructively).
-
-  accCorec→isWFminCor+→isWFacc¬¬ : R -coreductive (R -accessible) → R isWFminCor+ → R isWFacc¬¬
-  accCorec→isWFminCor+→isWFacc¬¬ acc∈Cor WFmc a a∉acc
+  accCorec→isWFminCor+→isWFacc¬¬ : R isWFminCor+ → R isWFacc¬¬
+  accCorec→isWFminCor+→isWFacc¬¬ WFmc a a∉acc
     with WFmc (R -accessible) acc∈Cor a∉acc
   ... | (m ,, m∉acc , p) = m∉acc (acc p)
 
-  cor→seqLemma : MP≡ → (s : ℕ → A) → s ∈ (R -decreasing) → R -coreductive (λ a → ¬ Σ-syntax ℕ (λ k → s k ≡ a))
-  cor→seqLemma mp≡ s s-inc x ¬¬x∈s with mp≡ s x ¬¬x∈s
+module MP≡WeakImplication (mp≡ : MP≡) where 
+  cor→seqLemma : (s : ℕ → A) → s ∈ (R -decreasing) → R -coreductive (λ a → ¬ Σ-syntax ℕ (λ k → s k ≡ a))
+  cor→seqLemma s s-inc x ¬¬x∈s with mp≡ s x ¬¬x∈s
   ... | k ,, sk≡x = (s (succ k)) ,, transp (R (s (succ k))) sk≡x (s-inc (k)) ,
-     λ ¬∃n → ¬∃n ((succ k) ,, refl)
+      λ ¬∃n → ¬∃n ((succ k) ,, refl)
 
-
-  MP≡→isWFminCor→isWFseq- : MP≡ → R isWFminCor → R isWFseq-
-  MP≡→isWFminCor→isWFseq- mp≡ wfmc s s-inc =
-    isWFminCor→Cor¬¬ wfmc (λ a → ¬ Σ[ k ∈ ℕ ] (s k ≡ a) )
-                    (cor→seqLemma mp≡ s s-inc) (s zero)
+  open import Relations.WellFounded.WFCoreductiveImplications R
+  MP≡→isWFminCor→isWFseq- : R isWFminCor → R isWFseq-
+  MP≡→isWFminCor→isWFseq- wfmc s s-inc =
+    isWFminCor→isWFCor¬¬ wfmc (λ a → ¬ Σ[ k ∈ ℕ ] (s k ≡ a) )
+                    (cor→seqLemma s s-inc) (s zero)
                     λ ¬Ex → ¬Ex ((0 ,, refl ))
 
-  corDNE→isWFcor¬¬→isWFcor : (∀ P → corDNE R P) → R isWFcor¬¬ → R isWFcor
-  corDNE→isWFcor¬¬→isWFcor corDNE-all RisWFcor¬¬ x φ φ∈Cor = corDNE-all φ φ∈Cor x (RisWFcor¬¬ φ φ∈Cor x)
--- SA: Sep 15th Do we want to split up the above module into different classical properties or keep it grouped as a general corecurive module?
-module AccDNEWeakImplications {A : Set} (R : 𝓡 A) (acc∈DNE : AccDNE R) where
+module DNEcorWeakImplications (corDNE-all : (P : 𝓟 A) → corDNE R P) where
+  corDNE→isWFcor¬¬→isWFcor : R isWFcor¬¬ → R isWFcor
+  corDNE→isWFcor¬¬→isWFcor RisWFcor¬¬ x φ φ∈Cor = corDNE-all φ φ∈Cor x (RisWFcor¬¬ φ φ∈Cor x)
+
+module AccDNEWeakImplications (acc∈DNE : AccDNE R) where
   -- 3. Implications relying on ¬¬-closure of accessibility
   isWFacc¬¬→¬¬isWFacc : R isWFacc¬¬ → ¬¬ (R isWFacc)
   isWFacc¬¬→¬¬isWFacc RisWFacc¬¬ ¬RisWFacc  = ¬RisWFacc λ x → acc∈DNE x (RisWFacc¬¬ x)
