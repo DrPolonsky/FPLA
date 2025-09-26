@@ -15,13 +15,6 @@ open import Relations.WellFounded.WFBasicImplications public
 open ConstructiveImplications
 open import Relations.Coreductive R
 
-module WFx→¬¬WFxImplications where
-  doubleNegIntro : ∀ {A : Set} → A → ¬¬ A
-  doubleNegIntro x nx = nx x
-
-  isWFacc→¬¬isWFacc : R isWF → ¬¬ (R isWF)
-  isWFacc→¬¬isWFacc RisWF  = doubleNegIntro RisWF
-
 module ¬¬WFx→WFx¬¬Implications where
   -- Remark.  The converse of this is exactly the DNS for accessibility
   ¬¬isWFacc→isWFacc¬¬ :  ¬¬ (R isWFacc) → R isWFacc¬¬
@@ -96,54 +89,6 @@ module WeakConstructiveImplications where
   isWFseq-→isWFminCor+ RisWFseq P CI {a} ¬pa =  ∅ (RisWFseq seq seq-inc) where
     open CorSequence (CS {P} {CI} (a ,, ¬pa))
 
-  module ReductionSequence (wfSeq- : R isWFseq-) (s : ℕ → A) (H : ¬ Σ-syntax ℕ (λ n → ¬ R (s (succ n)) (s n))) where
-
-    -- RedSeq n asserts that s is R-decreasing up to n
-    data RedSeq : ℕ → Set where
-      rsinit : RedSeq 0
-      rsstep : ∀ n → RedSeq n → R (s (succ n)) (s n) → RedSeq (succ n)
-
-    ¬¬RS : ∀ n → ¬¬ (RedSeq n)
-    ¬¬RS zero = λ z → z rsinit
-    ¬¬RS (succ n) = λ ¬RSsuccn → H (n ,, λ Rnsn → ¬¬RS n λ n∈RS → ¬RSsuccn (rsstep n n∈RS Rnsn) )
-
-    ¬¬∁∁RS⊆RS : ¬¬ (∁∁ RedSeq ⊆ RedSeq)
-    ¬¬∁∁RS⊆RS not⊆ = not⊆ f where
-      f : _
-      f zero y = rsinit
-      f (succ x) ¬sx∉RS = {!   !} -- ∅ (not⊆ λ y ¬y∉RS → {!   !} )
-
-    -- ∁∁RS⊆RS : ∁∁ RedSeq ⊆ RedSeq
-    -- ∁∁RS⊆RS zero ¬n∉RS = rsinit
-    -- ∁∁RS⊆RS (succ n) ¬n∉RS with ∁∁RS⊆RS n
-    -- ... | rc = rsstep n (rc (¬¬RS n )) {!   !}
-
-    DNSRS : ¬¬ (∀ n → RedSeq n)
-    DNSRS notAllRS = wfSeq- s (λ n → {!   !} )
-
-  --
-  MP→isWFcor→isWFseq : MP≡ {A = A} → R isWFcor → R isWFseq
-  MP→isWFcor→isWFseq mp RisWFcor s with RisWFcor (s 0) (∁ (λ x → Σ[ k ∈ ℕ ] (s k ≡ x))) ccor
-    where ccor : _
-          ccor a H with mp s a H
-          ... | (k ,, sk=a) = (s (succ k) ,, {! transp (R (succ k))   !} , (λ ne → ne (succ k ,, refl) ) ) 
-  MP→isWFcor→isWFseq mp RisWFcor s | c = ∅ (c (0 ,, refl ))
-
-  -- MP→isWFcor→isWFseq mp RisWFcor s with RisWFcor (s 0) (λ x → ((R ⋆) x (s 0) ) → ¬ (Σ[ k ∈ ℕ ] ((R ⋆) (s k) x))) f ε⋆
-  --   where
-  --     f : _
-  --     f x H with mp s x
-  --     ... | c with c (λ p → H λ R*xs0 → λ {(j ,, R*sjx) → {!   !} } )
-  --     ... | n = {!   !}
-  -- MP→isWFcor→isWFseq mp RisWFcor s | z  = ∅ (z (0 ,, ε⋆))
-
-  isWFseq-→isWFseq¬¬ : R isWFseq- → R isWFseq¬¬ -- Think we need R to be not not closed. We don't have this. But we might be able to get away with R not being not not closed
-  isWFseq-→isWFseq¬¬ RisWFseq- s H = {!   !} -- RisWFseq- s (λ k → {!   !})
-
-  -- g where
-  --   g : Σ ℕ (λ z → (x : R (s (succ z)) (s z)) → ⊥)
-  --   g = {!   !}
-
   isWFseq¬¬→isWFseq- : R isWFseq¬¬ → R isWFseq-
   isWFseq¬¬→isWFseq- RisWFseq¬¬ s s-dec = RisWFseq¬¬ s f
     where f : _
@@ -155,7 +100,7 @@ open import Relations.FinitelyBranching
 module FBWeakImplications (RisFB : (~R R) isFB) where
   FB→isWFminDNE¬¬→isWFacc¬¬ : R isWFminDNE¬¬ → R isWFacc¬¬
   FB→isWFminDNE¬¬→isWFacc¬¬ RisWF x₀ x₀∉acc =
-    RisWF (∁ (R -accessible)) (λ a nnnac ac → ∅ (nnnac (RisWF→¬¬RisWF ac))) x₀∉acc f
+    RisWF (∁ (R -accessible)) (¬¬Closed∁ (R -accessible)) x₀∉acc f
       where f : ¬ Σ-syntax A (R - ∁ (R -accessible)-minimal)
             f (z ,, z∉acc , z∈min) =
               FB→DNS (~R R) (R -accessible) z (RisFB z)
@@ -163,16 +108,16 @@ module FBWeakImplications (RisFB : (~R R) isFB) where
                      λ za → z∉acc (acc za)
 module accCorWeakImplications (acc∈Cor : accessibilityIsCoreductive R) where
 -- This implication also follows from isWFminDNE¬¬→isWFmin¬¬→isWFseq-→isWFaccc- (with accCor)
-  accCor∧isWFminDNE¬¬→isWFacc¬¬ : R isWFminDNE¬¬ → R isWFacc¬¬
-  accCor∧isWFminDNE¬¬→isWFacc¬¬ RisWF = isWFminDNE¬¬→isWFCor¬¬ RisWF (R -accessible) acc∈Cor
+  accCor→isWFminDNE¬¬→isWFacc¬¬ : R isWFminDNE¬¬ → R isWFacc¬¬
+  accCor→isWFminDNE¬¬→isWFacc¬¬ RisWF = isWFminDNE¬¬→isWFCor¬¬ RisWF (R -accessible) acc∈Cor
 
   -- A Noteworthy Consequence
-  accCorec→isWFseq-→isWFacc¬¬ : R isWFseq- → R isWFacc¬¬
-  accCorec→isWFseq-→isWFacc¬¬ RisWFseq- a a∉acc = RisWFseq- seq seq-inc  where
+  accCor→isWFseq-→isWFacc¬¬ : R isWFseq- → R isWFacc¬¬
+  accCor→isWFseq-→isWFacc¬¬ RisWFseq- a a∉acc = RisWFseq- seq seq-inc  where
     open CorSequence (CS {R -accessible} {acc∈Cor} (a ,, a∉acc))
 
-  accCorec→isWFminCor+→isWFacc¬¬ : R isWFminCor+ → R isWFacc¬¬
-  accCorec→isWFminCor+→isWFacc¬¬ WFmc a a∉acc
+  accCor→isWFminCor+→isWFacc¬¬ : R isWFminCor+ → R isWFacc¬¬
+  accCor→isWFminCor+→isWFacc¬¬ WFmc a a∉acc
     with WFmc (R -accessible) acc∈Cor a∉acc
   ... | (m ,, m∉acc , p) = m∉acc (acc p)
 
@@ -187,21 +132,21 @@ module MP≡WeakImplication (mp≡ : MP≡) where
   MP≡→isWFminCor→isWFseq- wfmc s s-inc =
     isWFminCor→isWFCor¬¬ wfmc (λ a → ¬ Σ[ k ∈ ℕ ] (s k ≡ a) )
                     (cor→seqLemma s s-inc) (s zero)
-                    λ ¬Ex → ¬Ex ((0 ,, refl ))
+                    λ ¬Ex → ¬Ex ((0 ,, refl )) 
 
-module DNEcorWeakImplications (corDNE-all : (P : 𝓟 A) → corDNE R P) where
+module DNEcorWeakImplications (cor⊆DNE : coreductivesAreNotNotClosed R) where
   corDNE→isWFcor¬¬→isWFcor : R isWFcor¬¬ → R isWFcor
-  corDNE→isWFcor¬¬→isWFcor RisWFcor¬¬ x φ φ∈Cor = corDNE-all φ φ∈Cor x (RisWFcor¬¬ φ φ∈Cor x)
+  corDNE→isWFcor¬¬→isWFcor RisWFcor¬¬ x φ φ∈Cor = cor⊆DNE φ φ∈Cor x (RisWFcor¬¬ φ φ∈Cor x)
 
-module AccDNEWeakImplications (acc∈DNE : AccDNE R) where
+module AccDNEWeakImplications (acc∈DNE : accessibilityIsNotNotClosed R) where
   -- 3. Implications relying on ¬¬-closure of accessibility
-  isWFacc¬¬→¬¬isWFacc : R isWFacc¬¬ → ¬¬ (R isWFacc)
-  isWFacc¬¬→¬¬isWFacc RisWFacc¬¬ ¬RisWFacc  = ¬RisWFacc λ x → acc∈DNE x (RisWFacc¬¬ x)
+  acc∈DNE→isWFacc¬¬→¬¬isWFacc : R isWFacc¬¬ → ¬¬ (R isWFacc)
+  acc∈DNE→isWFacc¬¬→¬¬isWFacc RisWFacc¬¬ ¬RisWFacc  = ¬RisWFacc λ x → acc∈DNE x (RisWFacc¬¬ x)
 
-  ¬¬isWFacc→isWFacc : ¬¬ (R isWFacc) → R isWFacc
-  ¬¬isWFacc→isWFacc ¬¬isWFaccR = λ x → acc∈DNE x (λ ¬accx → ¬¬isWFaccR (λ ∀acc → ¬accx (∀acc x ) ))
+  acc∈DNE→¬¬isWFacc→isWFacc : ¬¬ (R isWFacc) → R isWFacc
+  acc∈DNE→¬¬isWFacc→isWFacc ¬¬isWFaccR = λ x → acc∈DNE x (λ ¬accx → ¬¬isWFaccR (λ ∀acc → ¬accx (∀acc x ) ))
 
-  ¬¬isWFind→isWFind : ¬¬ (R isWFind) → R isWFind
-  ¬¬isWFind→isWFind ¬¬isWFindR = isWFacc→isWFind (¬¬isWFacc→isWFacc g)
+  acc∈DNE→¬¬isWFind→isWFind : ¬¬ (R isWFind) → R isWFind
+  acc∈DNE→¬¬isWFind→isWFind ¬¬isWFindR = isWFacc→isWFind (acc∈DNE→¬¬isWFacc→isWFacc g)
     where   g : ¬¬ (R isWFacc)
             g = λ ¬Racc → ¬¬isWFindR (λ Rind → ¬Racc (isWFind→isWFacc Rind ) )

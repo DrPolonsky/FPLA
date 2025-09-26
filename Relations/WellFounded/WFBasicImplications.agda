@@ -19,10 +19,6 @@ module PropertyImplications {A : Set} {R : 𝓡 A} where
   ¬acc : ∀ {x : A} → x ∉ R -accessible → ¬ (∀ y → R y x → y ∈ R -accessible)
   ¬acc ¬xisRacc ∀yisRacc = ¬xisRacc (acc ∀yisRacc)
 
-  -- May 2nd note: This must exist somewhere in general form?
-  RisWF→¬¬RisWF : ∀ {a} → (R -accessible) a → ¬ (¬ (R -accessible) a)
-  RisWF→¬¬RisWF RisWF ¬RisWF = ∅ (¬RisWF RisWF)
-
   ¬ind : ∀ (P : 𝓟 A) → R -inductive P → ∀ x → ¬ (P x) → ¬ (∀ y → R y x → P y)
   ¬ind P Pind x ¬Px ∀y = ¬Px (Pind x ∀y )
 
@@ -61,7 +57,7 @@ module DecdabilityImplications {A : Set} (R : 𝓡 A) (dR : R isDec) where
   isDec→isWFind→isWFseq : R isWFind → R isWFseq
   isDec→isWFind→isWFseq wfInd = isDec→isWFacc→isWFseq (isWFind→isWFacc wfInd)
 
-module AccDNEImplications {A : Set} (R : 𝓡 A) (acc∈DNE : AccDNE R) where
+module AccDNEImplications {A : Set} (R : 𝓡 A) (acc∈DNE : accessibilityIsNotNotClosed R) where
   DNEacc→isWFminDNE→isWFacc : R isWFminDNE → R isWFacc
   DNEacc→isWFminDNE→isWFacc wfDNE x = acc∈DNE x f where
           f : ¬¬ (x ∈ R -accessible)
@@ -80,7 +76,7 @@ module MP≡Implications {A : Set} (R : 𝓡 A) (mp≡ : MP≡) where
     λ Rsk+1Rsk → ¬sz→Rzy (s (succ k)) ((succ k) ,, refl) 
       (transp (R (s (succ k))) sk≡y Rsk+1Rsk) 
 
-module DNEcorImplications {A : Set} (R : 𝓡 A) (cor∈DNE : (P : 𝓟 A) → corDNE R P) where 
+module DNEcorImplications {A : Set} (R : 𝓡 A) (cor⊆DNE : coreductivesAreNotNotClosed R ) where 
   WFmin→WFcor¬¬ : R isWFmin → ∀ (x : A) → (P : 𝓟 A) → R -coreductive P → ¬¬ (P x)
   WFmin→WFcor¬¬ RisWFmin x P Pcor x∉P with RisWFmin (∁ P) x x∉P   
   ... | m ,, m∉P , m∈min with Pcor m m∉P 
@@ -88,12 +84,12 @@ module DNEcorImplications {A : Set} (R : 𝓡 A) (cor∈DNE : (P : 𝓟 A) → c
     
   corDNE→WFmin→WFcor : R isWFmin → R isWFcor
   corDNE→WFmin→WFcor RisWFmin x P P∈cor with WFmin→WFcor¬¬ RisWFmin x P P∈cor 
-  ...| nnPx = cor∈DNE P P∈cor x nnPx 
+  ...| nnPx = cor⊆DNE P P∈cor x nnPx 
 
   acc→WFcorLocal :
     ∀ x → x ∈ R -accessible → WFcor R x
   acc→WFcorLocal x (acc IH) P Pcor =
-    cor∈DNE P Pcor x (rec (acc IH))
+    cor⊆DNE P Pcor x (rec (acc IH))
     where
       rec : ∀ {z} → z ∈ R -accessible → ¬ (P z) → ⊥
       rec {z} (acc IHz) nz with Pcor z nz
@@ -103,7 +99,7 @@ module DNEcorImplications {A : Set} (R : 𝓡 A) (cor∈DNE : (P : 𝓟 A) → c
   corDNE→WFacc→WFcor RisWFacc x = acc→WFcorLocal x (RisWFacc x)
 
   corDNE→WFminDNE→WFcor : R isWFminDNE → R isWFcor
-  corDNE→WFminDNE→WFcor RisWFminDNE x P Pcor = cor∈DNE P Pcor x ¬¬Px
+  corDNE→WFminDNE→WFcor RisWFminDNE x P Pcor = cor⊆DNE P Pcor x ¬¬Px
     where 
       ¬¬Px : ¬¬ P x
       ¬¬Px ¬Px with RisWFminDNE (∁ P) (¬¬Closed∁ P) x ¬Px 
@@ -114,7 +110,7 @@ module DNEcorImplications {A : Set} (R : 𝓡 A) (cor∈DNE : (P : 𝓟 A) → c
   open CorSequence
 
   corDNE→WFseq→WFcor : R isWFseq → R isWFcor 
-  corDNE→WFseq→WFcor RisWFseq x P Pcor = cor∈DNE P Pcor x ¬¬Px 
+  corDNE→WFseq→WFcor RisWFseq x P Pcor = cor⊆DNE P Pcor x ¬¬Px 
     where 
       ¬¬Px : ¬¬ P x
       ¬¬Px ¬Px with (CS {Pcor = Pcor} (x ,, ¬Px)) 

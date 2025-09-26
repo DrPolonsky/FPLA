@@ -40,7 +40,7 @@ module ARS.SMImplications {A : Set} (R : 𝓡 A) where
   SM-⊆SMseq- x ¬¬x∈SM ¬x∈SMseq = ¬¬x∈SM (λ smx → ¬x∈SMseq (SM⊆SMseq x smx))
 
   -- Trying to show SMseq- -> SM- with certain conditions. 
-  -- Start with a lemma which mirrors RisFBRel→accWDec→accCor to imply sm is correductive. And then follow accCorec→isWFseq-→isWFacc¬¬ to complete the proof. ** July 23rd 
+  -- Start with a lemma which mirrors RisFBRel→accWDec→accCor to imply sm is correductive. And then follow accCor→isWFseq-→isWFacc¬¬ to complete the proof. ** July 23rd 
 
   open import Relations.WellFounded.WFDefinitions using (_-coreductive_) 
   open import Relations.Coreductive (~R R)

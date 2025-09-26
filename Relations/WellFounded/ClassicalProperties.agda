@@ -6,8 +6,8 @@ module Relations.WellFounded.ClassicalProperties {A : Set} (R : 𝓡 A) where
     accessibilityIsCoreductive : Set 
     accessibilityIsCoreductive = R -coreductive (R -accessible)
 
-    AccDNE : Set
-    AccDNE = ¬¬Closed (R -accessible)
+    accessibilityIsNotNotClosed : Set
+    accessibilityIsNotNotClosed = ¬¬Closed (R -accessible)
 
-    corDNE : ∀ (P : 𝓟 A) → Set 
-    corDNE P = R -coreductive P → ¬¬Closed P
+    coreductivesAreNotNotClosed : Set₁ 
+    coreductivesAreNotNotClosed = ∀ (P : 𝓟 A) → R -coreductive P → ¬¬Closed P

@@ -229,9 +229,9 @@ WCR∧SNx→UNx RisWCR x x∈SN y∈NF z∈NF R*xy R*xz with WCR∧SNx→NPx Ris
 
 open import Relations.Decidable
 
-WN→isMinDec- : ∀ (x : A) → x ∈ WN  → x ∈ MinDec- (~R R)
-WN→isMinDec- x (.x ,, ε⋆ , n∈NF) x∉NF = ∅ (x∉NF (λ y → n∈NF))
-WN→isMinDec- x (n ,, (_,⋆_ {y = y} Rxy R*yn) , n∈NF) x∉NF = y ,, Rxy
+WN→is∁RMin⊆ΣR : ∀ (x : A) → x ∈ WN  → x ∈ ∁RMin⊆ΣR (~R R)
+WN→is∁RMin⊆ΣR x (.x ,, ε⋆ , n∈NF) x∉NF = ∅ (x∉NF (λ y → n∈NF))
+WN→is∁RMin⊆ΣR x (n ,, (_,⋆_ {y = y} Rxy R*yn) , n∈NF) x∉NF = y ,, Rxy
 
 decMin∧SNx∧UNx→NP  : (~R R) isMinDec  → ∀ x → SN x → UN x → NP x     -- Formerly UN-lemma
 decMin∧SNx∧UNx→NP decNF x x∈SN x∈UN y∈NF R*xy  ε⋆ = R*xy
