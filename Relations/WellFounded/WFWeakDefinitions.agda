@@ -30,14 +30,14 @@ _isWFminEM¬¬ : Set₁
 _isWFminEM¬¬ = ∀ (P : 𝓟 A) → dec P → ∀ {a} → a ∈ P → ¬¬ Σ[ m ∈ A ] (m ∈ R - P -minimal)
 
 open import Relations.Coreductive 
-
 _isWFcor¬¬ : Set₁
 _isWFcor¬¬ = ∀ P → R -coreductive P → ∀ x → ¬¬ P x
  
--- isWFmin+, but restricted to coreductive predicates
-_isWFminCor+ : Set₁
-_isWFminCor+ = ∀ (P : 𝓟 A) → R -coreductive P → ∀ {a : A} → a ∉ P → Σ[ m ∈ A ] (m ∉ P × (∀ x → R x m → P x))
-
--- an equivalent variation
+-- The below definitions are equivalent to _isWFcor¬¬; this is shown in WFCoreductiveImplications.agda. 
+-- isWFminCor: isWFmin restricted to complements of coreductive predicates. 
 _isWFminCor : Set₁
 _isWFminCor = ∀ (P : 𝓟 A) → R -coreductive P → ∀ {a : A} → a ∉ P → Σ[ m ∈ A ] (m ∈ R - ∁ P -minimal)
+
+-- isWFmincor+: A seemingly stronger formulation that is in fact equivalent. 
+_isWFminCor+ : Set₁
+_isWFminCor+ = ∀ (P : 𝓟 A) → R -coreductive P → ∀ {a : A} → a ∉ P → Σ[ m ∈ A ] (m ∉ P × (∀ x → R x m → P x))

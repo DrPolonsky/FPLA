@@ -11,7 +11,7 @@ module Relations.WellFounded.WFCoreductiveImplications {A : Set} (R : 𝓡 A) wh
   ... | (y ,, ¬py , ymin) with Pco y ¬py
   ... | (z ,, Rzy , ¬pz) = ymin z ¬pz Rzy
 
-  Cor¬¬→isWFminCor : (∀ P → R -coreductive P → ∀ x → ¬¬ P x) → R isWFminCor
+  Cor¬¬→isWFminCor : R isWFcor¬¬ → R isWFminCor
   Cor¬¬→isWFminCor H P Pcor {a} a∉P = ∅ (H P Pcor a a∉P )
 
   isWFcor→isWFminCor : R isWFcor  → R isWFminCor

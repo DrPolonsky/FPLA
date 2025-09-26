@@ -71,3 +71,12 @@ module MP→isWFcor→isWFseq {A : Set} {R : 𝓡 A} (RisWFcor : R isWFcor) (s :
   ... | k ,, sk≡x = s (succ k) ,, {!   !}           
 
   lr = RisWFcor (s 0) (λ x → Σ[ k ∈ ℕ ] ((s k) ≡ x) → (Σ[ k ∈ ℕ ] ( ¬ (R ⋆) (s k) x))) f (0 ,, refl)
+
+
+
+isWFminDNE→isWFminCor+ : R isWFminDNE → R isWFminCor+ -- We have a stronger version of this implication.
+  isWFminDNE→isWFminCor+ RisWFminDNE P Pco {a} a∉P
+    with  RisWFminDNE (∁ P) DNS¬ a a∉P
+    where DNS¬ = λ x ¬Px ¬¬Px → ¬Px (λ z → z ¬¬Px)
+  ... | (y ,, ¬Py , ymin) with Pco y ¬Py
+  ... | (z ,, Rzy , ¬Pz) = ∅ (ymin z ¬Pz Rzy)

@@ -21,10 +21,10 @@ module Theorem-1-2-2 where
     ... | z ,, R*xz , ε⋆ = R*xz
     ... | z ,, R*xz , (Ryy₀ ,⋆ R*y₀z) = ∅ (y∈NF Ryy₀)
 
-    NP→UN : R isNP₌ → R isUN
+    NP→UN : R isNP₌ → R isUN₌
     NP→UN RisNP₌ x∈NF y∈NF R⁼xy = NF→ε x∈NF (RisNP₌ y∈NF R⁼xy)
 
-    CP→UN : R isCR → R isUN
+    CP→UN : R isCR → R isUN₌
     CP→UN RisCR = NP→UN (CR→NP RisCR)
 
     ii+ : R isWN × R isUN → R isCR
@@ -72,7 +72,7 @@ module Theorem-1-2-3 where
   i RisWN RisUN₌ f f-inc with RisWN (f zero)
   ... | (n ,, R*f0n , n∈NF) = n ,, g where
     g : ∀ k → (R ⋆) (f k) n
-    g k with Theorem-1-2-2.ii (RisWN , RisUN)  (f 0) R*f0n (seq-lemma R f f-inc k)
+    g k with Theorem-1-2-2.ii (RisWN , RisUN₌)  (f 0) R*f0n (seq-lemma R f f-inc k)
     ... | .n ,, ε⋆ , R*fkn = R*fkn
     ... | n' ,, (Rnn₀ ,⋆ R*n₀n') , R*fkn = ∅ (n∈NF Rnn₀ )
 
@@ -87,7 +87,7 @@ module Theorem-1-2-3 where
 
 
   -- A variant on theorem 1-2-3 ii)
-  iiSeq : R isWN → R isUN₌ → R isRP → isWFseq- (~R R)
+  iiSeq : R isWN → R isUN₌ → R isRP → (~R R) isWFseq- 
   iiSeq wnR unR rp s sIsRdec with i wnR unR
   ... | bdR with wnR (s 0)
   ... | a ,, R*s₀a , a∈NF with bdR s sIsRdec
@@ -124,14 +124,10 @@ module Theorem-1-2-3 where
       s→n : (R ⋆) s n
       s∈SN : SN s
 
-  -- open WFDefinitions
-  -- open MinimalComplement
   open import Relations.Coreductive
-  open import Relations.WellFounded.WFDefinitions
-  AccCor : Set
-  AccCor = (~R R) -coreductive (~R R -accessible)
+  open import Relations.WellFounded.ClassicalProperties (~R R)
 
-  x∉SN→∃y∉SN : AccCor → ∀ {x} → ¬(SN x) → Σ[ y ∈ A ] (¬(SN y) × R x y)
+  x∉SN→∃y∉SN : accessibilityIsCoreductive → ∀ {x} → ¬(SN x) → Σ[ y ∈ A ] (¬(SN y) × R x y)
   x∉SN→∃y∉SN accCor {x} x∉SN with accCor x x∉SN
   ... | (y ,, Rxy , y∉SN) = y ,, y∉SN , Rxy
 
@@ -151,7 +147,7 @@ module Theorem-1-2-3 where
   ... | w ,, ε⋆ , R*zw = R*zw
   ... | w ,, (Ry- ,⋆ _) , R*zw = ∅ (y∈NF Ry-)
 
-  preSNlemma2 : R isWCR → dec (SN) → AccCor →
+  preSNlemma2 : R isWCR → dec (SN) → accessibilityIsCoreductive →
                 ∀ n x → preSN n x → Σ[ y ∈ A ] ((R ⁺) x y × preSN n y)
   preSNlemma2 RisWCR decSN accCor n x (pSN n∈NF x∉SN s x→s s→n s∈SN)
     with x∉SN→∃y∉SN accCor x∉SN
@@ -161,7 +157,7 @@ module Theorem-1-2-3 where
     with preSNlemma1 decSN (R*yz ⋆!⋆ WCR→SN⊆NP RisWCR s s∈SN n∈NF s→n R*sz )  n∈NF y∉SN
   ... | (v ,, R*yv , p) = (v ,, RR⋆⊆R⁺ R Rxy R*yv , p)
 
-  preSNlemma3 : R isWCR → dec (SN) → AccCor → ∀ n x → preSN n x →
+  preSNlemma3 : R isWCR → dec (SN) → accessibilityIsCoreductive → ∀ n x → preSN n x →
                   Σ[ f ∈ (ℕ → A) ] ((∀ k → preSN n (f k)) × f ∈ (R ⁺) -increasing)
   preSNlemma3 RisWCR decSN acccor n x p = f ,, pf , finc where
     f : ℕ → A
@@ -201,7 +197,7 @@ module Theorem-1-2-3 where
   seq→sseq-bnd f finc b fbnd k = snd (seq→sseq f finc k) ⋆!⋆ (fbnd k)
 
 
-  Theorem123Lemma : R isWCR → dec (SN) → AccCor → ∀ n x → preSN n x →
+  Theorem123Lemma : R isWCR → dec (SN) → accessibilityIsCoreductive → ∀ n x → preSN n x →
                     Σ[ f ∈ (ℕ → A) ] (f ∈ R -increasing × is R - f bound n)
   Theorem123Lemma RisWCR decSN ac n x p
     with preSNlemma3 RisWCR decSN ac n x p
@@ -210,7 +206,7 @@ module Theorem-1-2-3 where
         ,,  seq→sseq-inc f fisR+inc
           , seq→sseq-bnd f fisR+inc n (λ k → x→s (pf k) ,⋆ s→n (pf k) ) where open preSN
 
-  iii : R isWN → R isWCR → R isRP- → dec (SN) → AccCor → R isSN
+  iii : R isWN → R isWCR → R isRP- → dec (SN) → accessibilityIsCoreductive → R isSN
   iii RisWN RisWCR RisRP decSN ac x with decSN x
   ... | in1 x∈SN = x∈SN
   ... | in2 x∉SN with RisWN x

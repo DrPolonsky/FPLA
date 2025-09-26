@@ -161,7 +161,7 @@ module FBWeakImplications (RisFB : (~R R) isFB) where
               FB→DNS (~R R) (R -accessible) z (RisFB z)
                      (λ y Ryx y∉acc → z∈min y y∉acc Ryx )
                      λ za → z∉acc (acc za)
-module accCorWeakImplications (acc∈Cor : AccCor R) where
+module accCorWeakImplications (acc∈Cor : accessibilityIsCoreductive R) where
 -- This implication also follows from isWFminDNE¬¬→isWFmin¬¬→isWFseq-→isWFaccc- (with accCor)
   accCor∧isWFminDNE¬¬→isWFacc¬¬ : R isWFminDNE¬¬ → R isWFacc¬¬
   accCor∧isWFminDNE¬¬→isWFacc¬¬ RisWF = isWFminDNE¬¬→isWFCor¬¬ RisWF (R -accessible) acc∈Cor

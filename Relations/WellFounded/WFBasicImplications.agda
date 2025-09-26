@@ -68,7 +68,7 @@ module AccDNEImplications {A : Set} (R : 𝓡 A) (acc∈DNE : AccDNE R) where
           f x∉acc with wfDNE (∁ (R -accessible)) (λ y nnny ya → nnny (λ z → z ya)) x x∉acc
           ... | (y ,, y∉acc , yIH) = y∉acc (acc λ z Rzy → acc∈DNE z (λ z∉acc → yIH z z∉acc Rzy ) )
 
-module accCorImplications {A : Set} (R : 𝓡 A) (acc∈Cor : AccCor R) where 
+module accCorImplications {A : Set} (R : 𝓡 A) (acc∈Cor : accessibilityIsCoreductive R) where 
   accCor∧isWFcor→isWFacc : R isWFcor → R isWFacc 
   accCor∧isWFcor→isWFacc RisWFcor x = RisWFcor x (R -accessible) acc∈Cor 
 
