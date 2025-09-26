@@ -5,6 +5,7 @@ open import Datatypes
 open import Lists
 open import Relations.Decidable using (_isDec)
 open import Relations.Core
+open import Classical
 
 module Relations.FinitelyBranching {A : Set} (R : 𝓡 A) where
 
@@ -38,3 +39,11 @@ FB→DNS P a aisFB H1 H2 with aisFB
           ¬¬Allxs ¬allPxs = ListDNS (λ y → R a y → P y) xs (h xs) ¬allPxs
           g : List∀ (λ y → R a y → P y) xs → (∀ y → R a y → P y)
           g allxs y Ray = All∈List (λ z → R a z → P z) (w y Ray) allxs Ray
+ 
+FBRel∧WDec→EMRyx :  _isFBRel → ∀ (P : 𝓟 A) → dec (∁ P) → ∀ {x} → EM (Σ[ y ∈ A ] (R x y × ¬ (P y)))
+FBRel∧WDec→EMRyx RisFBRel P PwDec {x} with RisFBRel x 
+...| ys ,, Rys 
+    with decList∃ (∁ P) PwDec ys
+... | in2 no = in2 (λ ∃y → no (List∃intro (∁ P) ys (fst ∃y) (pr1 (Rys (fst ∃y)) (pr1 (snd ∃y)) , pr2 (snd ∃y)))) 
+... | in1 yes with List∃elim (∁ P) ys yes 
+... | y ,, y∈ys , ¬Py = in1 (y ,, (pr2 (Rys y) y∈ys) , ¬Py)

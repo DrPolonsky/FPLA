@@ -27,18 +27,11 @@ module Relations.Coreductive {A : Set} (R : 𝓡 A) where
   ... | in1 yes with List∃elim _ _ yes
   ... | y ,, y∈Rx , y∉P = y ,, pr2 (snd (RisFBRel a) y) y∈Rx , y∉P
 
-  -- TODO: move this function below to finitely branching as it doesn't directly deal with coreductive
-  FBRel∧WDec→EMRyx : (~R R) isFBRel → ∀ (P : 𝓟 A) → dec (∁ P) → ∀ {x} → EM (Σ[ y ∈ A ] (R y x × ¬ (P y)))
-  FBRel∧WDec→EMRyx RisFBRel P PwDec {x} with RisFBRel x 
-  ...| ys ,, Rys 
-    with decList∃ (∁ P) PwDec ys
-  ... | in2 no = in2 (λ ∃y → no (List∃intro (∁ P) ys (fst ∃y) (pr1 (Rys (fst ∃y)) (pr1 (snd ∃y)) , pr2 (snd ∃y)))) 
-  ... | in1 yes with List∃elim (∁ P) ys yes 
-  ... | y ,, y∈ys , ¬Py = in1 (y ,, (pr2 (Rys y) y∈ys) , ¬Py)
+  
 
   -- Rename below to make explicit classical properties. Then rename the function two above with the same type to make clear it is an alternative way of proving the same thing. We prefer the below function to the one 2 above. 
   indP→CorP : (~R R) isFBRel → ∀ (P : 𝓟 A) → dec (∁ P) → R -inductive P → R -coreductive P
-  indP→CorP RisFBRel P PwDec Rind a a∉P with FBRel∧WDec→EMRyx RisFBRel P PwDec {a} 
+  indP→CorP RisFBRel P PwDec Rind a a∉P with FBRel∧WDec→EMRyx (~R R) RisFBRel P PwDec {a} 
   ... | in1 yes = yes
   ... | in2 no = ∅ (FB→DNS (~R R) P a (FBRel⊆FB ((~R R)) a (RisFBRel a)) (λ y Rya y∉P → no (y ,, Rya , y∉P)) λ H → a∉P (Rind a H)) 
   -- Can we weaken this to FB from FBRel?
