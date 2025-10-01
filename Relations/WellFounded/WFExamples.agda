@@ -28,3 +28,5 @@ module naturalNumbers where
         f : (x : ℕ) (x<sn : x < succ n) → (_<_ -accessible) x 
         f x base< = acc h
         f x (succ< x<n) = h x x<n  
+
+    

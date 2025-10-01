@@ -62,8 +62,17 @@ module isWFminImpliesDec {A : Set} (R : 𝓡 A) (wfMin : R isWFmin) (P : 𝓟 A)
   ... | in2 yMin = in2 (λ pa → mIsMin y (cPmin pa yMin) Rym )
 
 
+module wfMin→EM (wfMin< : _<_ isWFmin) (P : Set) where 
 
-
+  P∨succ : ℕ → Set 
+  P∨succ 0 = P 
+  P∨succ (succ n) = ⊤ 
+  
+  EMP : EM P 
+  EMP with wfMin< (P∨succ) (succ 0) tt  
+  ... | zero ,, p , _ = in1 p
+  ... | succ n ,, tt , H = in2 (λ p → H 0 p zero<) 
+  
 -- If natural numbers satisfy WFminDNE, then we get weak excluded middle. (P is ¬P or ¬¬P). This shows that we can't prove in Agda that ℕ and < together satisfy WFminDNE.
 module wfMinDNE→WEM (wfMinDNE< : _<_ isWFminDNE) (P : Set) where 
 
