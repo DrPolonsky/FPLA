@@ -29,7 +29,6 @@ _isWFminDNE¬¬ = ∀ (P : 𝓟 A) → ¬¬Closed P → ∀ {a} → a ∈ P → 
 _isWFminEM¬¬ : Set₁
 _isWFminEM¬¬ = ∀ (P : 𝓟 A) → dec P → ∀ {a} → a ∈ P → ¬¬ Σ[ m ∈ A ] (m ∈ R - P -minimal)
 
-open import Relations.Coreductive 
 _isWFcor¬¬ : Set₁
 _isWFcor¬¬ = ∀ P → R -coreductive P → ∀ x → ¬¬ P x
  
