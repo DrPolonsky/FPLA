@@ -3,7 +3,7 @@
 open import Relations.Decidable
 
 
-wf→irrefl : R isWF → ∀ x → ¬ R x x 
+wf→irrefl : R isWF → ∀ x → ¬ R x x
 wf→irrefl RisWF x = go x (RisWF x) where
   go : ∀ y → y ∈ R -accessible → ¬ R y y
   go y (acc Hy) Ryy = go y (Hy y Ryy) Ryy
@@ -29,4 +29,3 @@ module FBImplications {A : Set} {R : 𝓡 A} (RisFB : (~R _) isFB) where
 
   FB→ind∁∁acc : R -inductive (∁ ∁ R -accessible)
   FB→ind∁∁acc x H x∉acc = FB→DNS (~R R) (R -accessible) x (RisFB x) H (λ f → x∉acc (acc f) )
-
