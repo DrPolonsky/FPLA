@@ -68,6 +68,10 @@ module Hierarchy-Implications where
     ... | in1 (y ,, Rxy) with SM→WM decR (x∈acc y Rxy)
     ... | r ,, R*yr , r∈acc = r ,, (Rxy ,⋆ R*yr) , r∈acc
 
+    open import Relations.FinitelyBranching
+    dec∧FB→SN⊆WN : R isDec → R isFB → SN ⊆ WN
+    dec∧FB→SN⊆WN RisDec RisFB = SNdec→WN (dec∧FB→isMinDec R RisDec RisFB)
+
 -- Equivalence of RP definitions
 open Hierarchy-Implications
 
@@ -130,10 +134,10 @@ module Normalizing-Implications where
     isWN∧isSM→isSN : R isWN → R isSM → R isSN
     isWN∧isSM→isSN RisWN RisSM x =  isWN∧SM→SN RisWN (RisSM x)
 
-    isWN∧isSMseq→isSNseq : R isWN → (∀ {y} → SMseq R y) → (~R R) isWFseq- 
+    isWN∧isSMseq→isSNseq : R isWN → (∀ {y} → SMseq R y) → (~R R) isWFseq-
     isWN∧isSMseq→isSNseq RisWN RisSMseq f f-inc with RisSMseq f refl f-inc
-    ... | i ,, i∈MF with pr1 MF∧WN↔NF (i∈MF , RisWN (f i)) 
-    ... | fi∈NF = fi∈NF (f-inc i)    
+    ... | i ,, i∈MF with pr1 MF∧WN↔NF (i∈MF , RisWN (f i))
+    ... | fi∈NF = fi∈NF (f-inc i)
 
 
     open import ARS.NewmansLemma
@@ -182,7 +186,7 @@ module Terese-Alternative where
     RP∧BP→SMseq RisRP RisBP f f0≡x f-inc with RisBP f f-inc
     ... | (b ,, b-bnd) = RisRP f f-inc b b-bnd
 
-    RisSMseq→RisRP : (∀ {x : A} → SMseq R x) → R isRP   
+    RisSMseq→RisRP : (∀ {x : A} → SMseq R x) → R isRP
     RisSMseq→RisRP RisSM f f-inc a a-bnd = RisSM f refl f-inc
 
     RisSMseq→RisBP : (∀ {x : A} → SMseq R x) → R isBP

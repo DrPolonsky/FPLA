@@ -95,8 +95,7 @@ module DNEcorImplications {A : Set} (R : 𝓡 A) (cor⊆DNE : coreductivesAreNot
   corDNE→WFmin→WFcor RisWFmin x P P∈cor with WFmin→WFcor¬¬ RisWFmin x P P∈cor
   ...| nnPx = cor⊆DNE P P∈cor x nnPx
 
-  acc→WFcorLocal :
-    ∀ x → x ∈ R -accessible → WFcor R x
+  acc→WFcorLocal : ∀ x → x ∈ R -accessible → WFcor R x
   acc→WFcorLocal x (acc IH) P Pcor =
     cor⊆DNE P Pcor x (rec (acc IH))
     where

@@ -3,7 +3,7 @@ open import Logic
 open import Predicates
 open import Datatypes
 open import Lists
-open import Relations.Decidable using (_isDec)
+open import Relations.Decidable using (_isDec; _isMinDec)
 open import Relations.Core
 open import Classical
 
@@ -27,6 +27,13 @@ _isFBRel = ∀ (a : A) → a ∈ FBRel
 dec∧FB→FBRel  : R isDec → _isFB → _isFBRel
 dec∧FB→FBRel RisDec RisFB a with filterList (λ x → R a x) (λ x → RisDec) (fst (RisFB a))
 ... | xs ,, f = xs ,, λ b → (λ Rba → pr2 (f b) (snd (RisFB a) b Rba , Rba ) ) , λ b∈xs → pr2 (pr1 (f b) b∈xs)
+
+dec∧FB→isMinDec : R isDec → _isFB → (~R R) isMinDec
+dec∧FB→isMinDec RisDec RisFB x₀ with decList∃ (R x₀) (λ _ → RisDec) (fst (RisFB x₀))
+... | in2 ∄y = in2 (λ y Ryx₀ →
+ ∄y (List∃intro (R x₀) (fst (RisFB x₀)) y (snd (RisFB x₀) y Ryx₀ , Ryx₀)))
+... | in1 ∃y with List∃elim (R x₀) (fst (RisFB x₀)) ∃y
+... | (y ,, _ , Ryx₀) = in1 (y ,, Ryx₀ )
 
 -- [AP: redo]
 FB→DNS : ∀ (P : 𝓟 A) → ∀ x → x ∈ FB → (∀ y → R x y → ¬¬ P y) → ¬¬ (∀ y → R x y → P y)

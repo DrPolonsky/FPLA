@@ -106,6 +106,10 @@ module FBWeakImplications (RisFB : (~R R) isFB) where
               FB→DNS (~R R) (R -accessible) z (RisFB z)
                      (λ y Ryx y∉acc → z∈min y y∉acc Ryx )
                      λ za → z∉acc (acc za)
+
+  FB→ind∁∁acc : R -inductive (∁ ∁ R -accessible)
+  FB→ind∁∁acc x H x∉acc = FB→DNS (~R R) (R -accessible) x (RisFB x) H (λ f → x∉acc (acc f) )
+
 module accCorWeakImplications (acc∈Cor : accessibilityIsCoreductive R) where
 -- This implication also follows from isWFminDNE¬¬→isWFmin¬¬→isWFseq-→isWFaccc- (with accCor)
   accCor→isWFminDNE¬¬→isWFacc¬¬ : R isWFminDNE¬¬ → R isWFacc¬¬
@@ -121,7 +125,7 @@ module accCorWeakImplications (acc∈Cor : accessibilityIsCoreductive R) where
     with WFmc (R -accessible) acc∈Cor a∉acc
   ... | (m ,, m∉acc , p) = m∉acc (acc p)
 
-module MP≡WeakImplication (mp≡ : MP≡) where 
+module MP≡WeakImplication (mp≡ : MP≡) where
   cor→seqLemma : (s : ℕ → A) → s ∈ (R -decreasing) → R -coreductive (λ a → ¬ Σ-syntax ℕ (λ k → s k ≡ a))
   cor→seqLemma s s-inc x ¬¬x∈s with mp≡ s x ¬¬x∈s
   ... | k ,, sk≡x = (s (succ k)) ,, transp (R (s (succ k))) sk≡x (s-inc (k)) ,
@@ -132,7 +136,7 @@ module MP≡WeakImplication (mp≡ : MP≡) where
   MP≡→isWFminCor→isWFseq- wfmc s s-inc =
     isWFminCor→isWFCor¬¬ wfmc (λ a → ¬ Σ[ k ∈ ℕ ] (s k ≡ a) )
                     (cor→seqLemma s s-inc) (s zero)
-                    λ ¬Ex → ¬Ex ((0 ,, refl )) 
+                    λ ¬Ex → ¬Ex ((0 ,, refl ))
 
 module DNEcorWeakImplications (cor⊆DNE : coreductivesAreNotNotClosed R) where
   corDNE→isWFcor¬¬→isWFcor : R isWFcor¬¬ → R isWFcor
