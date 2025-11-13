@@ -3,8 +3,6 @@ open import Classical
 open import Datatypes using (ℕ; zero; succ)
 open import ARS.Properties
 open import Relations.ClosureOperators
--- open import Predicates
--- open import Relations.Seq
 open import Relations.WellFounded.WFDefinitions
 
 module ARS.Examples where

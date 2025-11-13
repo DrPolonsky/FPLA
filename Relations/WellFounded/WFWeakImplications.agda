@@ -45,7 +45,6 @@ module WeakConstructiveImplications where
     where f : ∀ x → x ∈ P → x ∈ R -accessible → ¬¬ Σ[ y ∈ A ] (y ∈ R - P -minimal)
           f x x∈P (acc xac) ¬Σ = ¬Σ (x ,, x∈P , (λ y y∈P Ryx → f y y∈P (xac y Ryx) ¬Σ))
 
-  -- redundant [AP]
   isWFind¬¬→isWFmin¬¬ : R isWFind¬¬  → R isWFmin¬¬
   isWFind¬¬→isWFmin¬¬ RisWFind¬¬ P {d} d∈P =
     let φ : 𝓟 A
@@ -62,7 +61,6 @@ module WeakConstructiveImplications where
           ... | n ,, sn≡d = pr2 dRBmin (s (succ n)) (succ n ,, refl)
                                 (transp (R (s (succ n))) sn≡d (s-dec n))
 
-  -- redundant [AP]
   isWFacc¬¬→isWFseq- : R isWFacc¬¬ → R isWFseq-
   isWFacc¬¬→isWFseq- RisWFacc¬¬ s0 s0-inc =
     RisWFacc¬¬ (s0 0) (λ s00∈acc → f (s0 0) s00∈acc s0 s0-inc refl ) where

@@ -98,7 +98,6 @@ module Proposition-1-1-10 {R : 𝓡 A} where
     v→i : (R ~∘ R ⋆) ⊆ (R ⋆ ∘~ R ⋆) → confluent R
     v→i v = vi→i (v→vi v)
 
-
 module Proposition-1-1-11  where
     lemmai : ∀ {R : 𝓡 A} → {x y z : A} → ◆ R → (R ⋆) x y → R x z → Σ[ q ∈ A ] (R y q × (R ⋆) z q)
     lemmai R◆ ε⋆ R◆xz = _ ,, R◆xz , ε⋆

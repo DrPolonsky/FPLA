@@ -20,7 +20,6 @@ module naturalNumbers where
     zero< {zero} = base<
     zero< {succ m} = succ< zero<
 
-    -- 
     <isWFacc : _<_ isWFacc
     <isWFacc zero = acc λ {y ()}
     <isWFacc (succ n) with <isWFacc n 

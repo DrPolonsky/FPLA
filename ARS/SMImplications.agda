@@ -10,8 +10,6 @@ open import ARS.Implications
 
 
 module ARS.SMImplications {A : Set} (R : 𝓡 A) where
-  -- should be easy, following the same thing for SN/WF
-
   open LocalProperties {R = R}
   open MiscProperties R
 
@@ -39,9 +37,6 @@ module ARS.SMImplications {A : Set} (R : 𝓡 A) where
   SM-⊆SMseq- : SM- ⊆ SMseq-
   SM-⊆SMseq- x ¬¬x∈SM ¬x∈SMseq = ¬¬x∈SM (λ smx → ¬x∈SMseq (SM⊆SMseq x smx))
 
-  -- Trying to show SMseq- -> SM- with certain conditions. 
-  -- Start with a lemma which mirrors RisFBRel→accWDec→accCor to imply sm is correductive. And then follow accCor→isWFseq-→isWFacc¬¬ to complete the proof. ** July 23rd 
-
   open import Relations.WellFounded.WFDefinitions using (_-coreductive_) 
   open import Relations.Coreductive (~R R)
 
@@ -49,7 +44,6 @@ module ARS.SMImplications {A : Set} (R : 𝓡 A) where
   FBrel→decCSM→SMcor RisFBRel SMwDec = 
     indP→CorP RisFBRel SM SMwDec SMind 
 
-  -- -- Define CorSequence in Coreductive file and refactor here and wellfounded. All below needs uncommenting. 
   SMCor→SMseq-→SM- : (~R R) -coreductive (SM) → isSMseq- → isSM-    
   SMCor→SMseq-→SM- SMisCor RisSMseq- a a∉SM- = RisSMseq- a λ H → seq⊆CP ((fst (H seq refl seq-inc))) (MF⊆SM (seq (fst (H seq refl seq-inc))) ((snd (H seq refl seq-inc) )))  where 
     open CorSequence (CS {SM} {SMisCor} (a ,, a∉SM-))      
@@ -58,18 +52,3 @@ module ARS.SMImplications {A : Set} (R : 𝓡 A) where
   FB∧dec→SMseq-⊆SM- : R isFBRel → dec (∁ SM) → isSMseq- → isSM-
   FB∧dec→SMseq-⊆SM- RisFBRel SMwDec RisSMseq- with FBrel→decCSM→SMcor RisFBRel SMwDec 
   ... | SMisCor = SMCor→SMseq-→SM- SMisCor RisSMseq-
-
-  SMCor→SMDNE : (~R R) -coreductive (SM) → ¬¬Closed SM 
-  SMCor→SMDNE SMisCor x nnx∈SM = SMind x f where
-    -- x∉SM : ¬ (x ∈ SM)
-    -- x∉SM (MF⊆SM .x x∈MF) = ?
-    -- x∉SM (SMind .x x∈SMind) = ? 
-    f : ∀ y → R x y → y ∈ SM  
-    f y Rxy with Cor→ind¬¬ SM SMisCor x
-    ...| z = {!   !} 
-    -- Try and spend some time playing with the assumptions: accCor SMDNE SMCor accDNE. 
-
--- If we have a relation that is bp and rp, why is it difficult to show that it has the relation SM. Classically we can take the chain RPandBP -> SMseq -> SMseq- -> SM- -> SM We could show the BP∧RP∧(Classical assumptions) → SM 
--- WN SM -> SN. WN BP RP -> SN (constructively)?
-
--- Want to compare  SM coreductive and SM not not closed. 

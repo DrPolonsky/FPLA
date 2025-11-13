@@ -14,7 +14,7 @@ _isWFind¬¬ : Set₁
 _isWFind¬¬ = ∀ (φ : 𝓟 A) → R -inductive φ → ∀ x → ¬¬ (φ x)
 
 -- The classical concept of a well-founded relation [TeReSe]
-_isWFseq- : Set -- Don't modify this one just yet 20th August
+_isWFseq- : Set 
 _isWFseq- = ∀ (s : ℕ → A) → ¬ (s ∈ R -decreasing)
 
 _isWFseq¬¬ : Set

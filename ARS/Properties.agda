@@ -82,14 +82,12 @@ module GlobalProperties (R : 𝓡 A) where
     _isNP₌ : Set
     _isNP₌ = ∀ {x y} → NF y → (R ⁼) x y → (R ⋆) x y
 
-    -- [AP.  What's the problem with getting this from local UN?]
     _isUN₌ : Set
     _isUN₌ = ∀ {x y : A} → x ∈ NF → y ∈ NF → (R ⁼) x y → x ≡ y
     -- NB. This is stronger than global UN, which is UN→ below
 
     _isUN : Set
     _isUN = ∀ x → UN x
-
 
     _isRP : Set
     _isRP = ∀ (f : ℕ → A) → f ∈ R -increasing → ∀ a → (is R - f bound a)

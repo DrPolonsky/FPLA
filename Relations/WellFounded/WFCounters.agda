@@ -47,7 +47,6 @@ module LTnotWFmin (P : 𝓟 ℕ) where
 
 module isWFminImpliesDec {A : Set} (R : 𝓡 A) (wfMin : R isWFmin) (P : 𝓟 A) where
   -- Here we show that if R is well founded minimality wise and R normal forms are decidable, then every predicate is decidable.
-  -- open ClassicalImplications
   open import Relations.Decidable
 
   data cP (a₀ : A) : 𝓟 A where
@@ -86,16 +85,3 @@ module wfMinDNE→WEM (wfMinDNE< : _<_ isWFminDNE) (P : Set) where
   ... | zero ,, nnp , _ = in2 nnp
   ... | succ n ,, tt , H = in1 (λ p → H 0 (λ z → z p) zero<)
 
-
-
-
-
-
-
-
-
-
-
-
-
--- the end

@@ -83,4 +83,3 @@ module GlobalWFDefinitions (R : 𝓡 A) where
   _isWF = _isWFacc
 
 open GlobalWFDefinitions public
--- open LocalWFDefinitions public

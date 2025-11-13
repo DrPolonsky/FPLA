@@ -108,10 +108,7 @@ module Theorem-1-2-3 where
   ... | in1 R*fbₙfcₙ = (f cₙ) ,, ((R*bfbₙ ⋆!⋆ R*fbₙfcₙ) , R*cfcₙ)
   ... | in2 R*fcₙfbₙ = (f bₙ) ,, R*bfbₙ , (R*cfcₙ ⋆!⋆ R*fcₙfbₙ)
 
-  -- Proving the reverse: Prove this with an assumption of finite branchingness.  
-  -- iv← : R isCR → _isFB →  R isCP
-  -- iv← = ? 
-
+ 
   -- The proof of Theorem-1-2-3-iii requires classical principles
   open import Classical
   record preSN (n x : A) : Set where
