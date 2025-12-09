@@ -60,6 +60,61 @@ module isWFminImpliesDec {A : Set} (R : 𝓡 A) (wfMin : R isWFmin) (P : 𝓟 A)
   ... | in1 (z ,, Rzy) = ∅ (mIsMin y (cPsuc Rzy) Rym )
   ... | in2 yMin = in2 (λ pa → mIsMin y (cPmin pa yMin) Rym )
 
+module isWFminDNEImpliesWDec {A : Set} (R : 𝓡 A) (wfMinDNE : R isWFminDNE) (P : 𝓟 A) where
+  -- Here we show that if R is WFminDNE and R normal forms are decidable, then every predicate is weakly decidable.
+  open import Relations.Decidable
+  open import Relations.ClosureOperators
+
+  data cP (a₀ : A) : 𝓟 A where
+    cPmin : ¬¬ P a₀ → ∀ {x} → (∀ y → ¬ R y x) → cP a₀ x
+    cPsuc : ∀ {x y} → R y x → cP a₀ x
+
+  wfMinDNE→WN : ∀ x → Σ[ y ∈ A ] (RMin R y × (R ⋆) y x)
+  wfMinDNE→WN x with wfMinDNE (λ x → ∁∁ ( Σ[ y ∈ A ] (RMin R y × (R ⋆) y x))) (¬¬Closed∁ _) x (λ {x₁ → x₁ {!   !}}) 
+  ...| z = {!   !}
+
+  wfMinDNE→decRmin : ∀ x → EM (RMin R x) -- (EM ∘ RMin R) 
+  wfMinDNE→decRmin x with wfMinDNE (RMin R) (λ y → {! ¬¬Closed∁  !}) x -- This goal has possibly been proved else where: normal forms are not not closed. 
+  ... | z = {!   !} 
+  
+  wfMinDNE→isMinDec : R isMinDec 
+  wfMinDNE→isMinDec x = {!   !} 
+  
+  nncp : ∀ {a} → R isMinDec → ¬¬Closed (cP a) 
+  nncp dmR x nnx with dmR x 
+  ... | in1 (z ,, Rzx) = cPsuc Rzx
+  ... | in2 xMin = ∅ (nnx (λ {(cPmin nnPa xMin') → nnPa 
+                            (λ Pa → nnx λ {(cPmin nnPa xMin'') → nnPa (λ Pa → nnPa 
+                              (λ Pa' → nnx (λ {(cPmin nnPa' xMin'') → xMin {!   !} {!   !}
+                                             ; (cPsuc x) → {!   !}}))) 
+                            -- nnPa
+                            --   (λ _ →
+                            --      nnPa
+                            --      (λ z →
+                            --         nnx
+                            --         (λ z₁ →
+                            --            (λ { (cPmin nnPa xMin'')
+                            --                   → ?5 (xMin = xMin''') (nnx = (λ z₂ → z₂ z₁)) (nnPa = (λ z₂ → z₂ z))
+                            --                     (xMin' = xMin''') (Pa = z) (nnPa = nnPa) (xMin'' = xMin'')
+                            --               ; (cPsuc Ryx) → xMin'' y Ryx
+                            --               })
+                            --            z₁))) -- auto provides a broken solution
+                                          ; (cPsuc Ryx) → xMin' _ Ryx})
+                            ; (cPsuc Ryx) → xMin _ Ryx}))
+  
+  cPlemma : ∀ {b c} → R b c → R isMinDec → wdec P
+    -- _isWFminDNE = ∀ (P : 𝓟 A) → ¬¬Closed P → ∀ a → a ∈ P → Σ[ m ∈ A ] _-_-minimal P m
+  cPlemma Rbc dmR a with wfMinDNE (cP a) (nncp {a} dmR) _ (cPsuc Rbc)
+    where
+      nncp2 : ¬¬Closed (cP a) 
+      nncp2 x nnx with dmR x 
+      ... | in1 (z ,, Rzx) = cPsuc Rzx
+      ... | in2 xMin = ∅ (nnx (λ {(cPmin nnPa xMin') → nnPa 
+                                (λ Pa → nnx λ {(cPmin nnPa xMin'') → {!   !} -- auto provides a broken solution
+                                             ; (cPsuc Ryx) → xMin' _ Ryx})
+                                ; (cPsuc Ryx) → xMin _ Ryx}))
+  ... | x ,, cPmin nnPa xMin , q = in2 nnPa
+  ... | x ,, cPsuc Ryx , q = in1 (λ Pa → q {!   !} (cPmin (λ z → z Pa) {!   !}) Ryx)
 
 module wfMin→EM (wfMin< : _<_ isWFmin) (P : Set) where
 

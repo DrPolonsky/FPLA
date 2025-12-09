@@ -145,6 +145,9 @@ module ClassicalProperties {A : Set} where
   dec : 𝓟 A → Set
   dec P = ∀ x → EM (P x)
 
+  wdec : 𝓟 A → Set 
+  wdec P = dec (∁ P)
+
   -- dec≡ : Set
   -- dec≡ = ∀ x → dec (_≡_ x)
   
