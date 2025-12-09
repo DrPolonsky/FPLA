@@ -127,7 +127,7 @@ module isWFminDNEImpliesWDec {A : Set} (R : 𝓡 A) (wfMinDNE : R isWFminDNE) (P
             nncP^ x nnpx q = λ np → nnpx (λ h → h q np )
     ... | (x ,, x=a→nnp , xmin) = case yes no (Adec {x} {a}) where
       yes = λ x=a → in2 (x=a→nnp x=a)
-      no = λ x≠a → in1 (λ p → ? )
+      no = λ x≠a → in1 (λ p → xmin a (λ _ ¬p → ¬p p) {!   !} )
 
 
     -- P^ : 𝓟 A
