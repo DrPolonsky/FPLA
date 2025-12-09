@@ -30,6 +30,14 @@ module PropertyImplications {A : Set} {R : 𝓡 A} where
           ... | in1 (y ,, Ryx , y∈P) = f y (x∈acc y Ryx) y∈P
           ... | in2 no = x ,, x∈P , (λ y y∈P Ryx → no (y ,, (Ryx , y∈P)))
 
+  -- Could something like this be proved??
+  -- RisWFminDNE→RisDec : R isWFminDNE → R isDec
+  -- RisWFminDNE→RisDec WFminDNE {x} {y} with WFminDNE (λ z → (y ≡ z) ⊔ R x y) nnpp y (in1 refl)
+  --   where nnpp : _
+  --         nnpp z nnp = {!    !}
+  -- ... | z ,, in1 refl , zMin = in2 (λ Rxy → zMin x (in2 Rxy) Rxy)
+  -- ... | z ,, in2 Rxy , zMin = in1 Rxy
+
 open PropertyImplications public
 
 
