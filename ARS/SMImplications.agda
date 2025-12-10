@@ -40,8 +40,8 @@ module ARS.SMImplications {A : Set} (R : 𝓡 A) where
   open import Relations.WellFounded.WFDefinitions using (_-coreductive_) 
   open import Relations.Coreductive (~R R)
 
-  FBrel→decCSM→SMcor : R isFBRel → dec (∁ (SM)) → (~R R) -coreductive (SM)
-  FBrel→decCSM→SMcor RisFBRel SMwDec = 
+  FBrel→wdecSM→SMcor : R isFBRel → wdec (SM) → (~R R) -coreductive (SM)
+  FBrel→wdecSM→SMcor RisFBRel SMwDec = 
     indP→CorP RisFBRel SM SMwDec SMind 
 
   SMCor→SMseq-→SM- : (~R R) -coreductive (SM) → isSMseq- → isSM-    
@@ -49,6 +49,6 @@ module ARS.SMImplications {A : Set} (R : 𝓡 A) where
     open CorSequence (CS {SM} {SMisCor} (a ,, a∉SM-))      
 
   
-  FB∧dec→SMseq-⊆SM- : R isFBRel → dec (∁ SM) → isSMseq- → isSM-
-  FB∧dec→SMseq-⊆SM- RisFBRel SMwDec RisSMseq- with FBrel→decCSM→SMcor RisFBRel SMwDec 
+  FB∧wdecSM→SMseq-⊆SM- : R isFBRel → wdec (SM) → isSMseq- → isSM-
+  FB∧wdecSM→SMseq-⊆SM- RisFBRel SMwDec RisSMseq- with FBrel→wdecSM→SMcor RisFBRel SMwDec 
   ... | SMisCor = SMCor→SMseq-→SM- SMisCor RisSMseq-

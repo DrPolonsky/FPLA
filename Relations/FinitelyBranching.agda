@@ -47,7 +47,7 @@ FB→DNS P a aisFB H1 H2 with aisFB
           g : List∀ (λ y → R a y → P y) xs → (∀ y → R a y → P y)
           g allxs y Ray = All∈List (λ z → R a z → P z) (w y Ray) allxs Ray
 
-FBRel∧WDec→EMRyx :  _isFBRel → ∀ (P : 𝓟 A) → dec (∁ P) → ∀ {x} → EM (Σ[ y ∈ A ] (R x y × ¬ (P y)))
+FBRel∧WDec→EMRyx :  _isFBRel → ∀ (P : 𝓟 A) → wdec (P) → ∀ {x} → EM (Σ[ y ∈ A ] (R x y × ¬ (P y)))
 FBRel∧WDec→EMRyx RisFBRel P PwDec {x} with RisFBRel x
 ...| ys ,, Rys
     with decList∃ (∁ P) PwDec ys
