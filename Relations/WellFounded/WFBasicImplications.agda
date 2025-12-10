@@ -30,6 +30,28 @@ module PropertyImplications {A : Set} {R : 𝓡 A} where
           ... | in1 (y ,, Ryx , y∈P) = f y (x∈acc y Ryx) y∈P
           ... | in2 no = x ,, x∈P , (λ y y∈P Ryx → no (y ,, (Ryx , y∈P)))
 
+  module NonemptyRelation {a b : A} (Rab : R a b) where
+
+    R≠∅→isWFmin→EM : R isWFmin → ∀ X → EM X
+    R≠∅→isWFmin→EM RisWFmin X with RisWFmin X^ b (in2 refl) where
+      X^ : 𝓟 A
+      X^ x = X × (x ≡ a) ⊔ (x ≡ b)
+    ... | y ,, in1 (x , y=a) , _ = in1 x
+    ... | y ,, in2 y=b , y∈min = in2 (λ x → y∈min a (in1 (x , refl) ) (transp (R a) (~ y=b) Rab ))
+
+  open NonemptyRelation public
+
+  EM→isWFmin→isWFacc : (∀ X → EM X) → R isWFmin → R isWFacc
+  EM→isWFmin→isWFacc em RisWFmin x with em (x ∈ R -accessible)
+  ... | in1 x∈acc = x∈acc
+  ... | in2 x∉acc with RisWFmin (∁ (R -accessible)) x x∉acc
+  ... | y ,, y∉acc , y∈min = ∅ (y∉acc (acc λ z Rzy →
+    case I (λ z∉acc → ∅ (y∈min z z∉acc Rzy) ) (em (z ∈ R -accessible)) ) )
+
+  isWFmin→isWFacc : R isWFmin → R isWFacc
+  isWFmin→isWFacc RisWFmin x =
+    acc (λ y Ryx → EM→isWFmin→isWFacc (R≠∅→isWFmin→EM Ryx RisWFmin) RisWFmin y ) 
+
   -- Could something like this be proved??
   -- RisWFminDNE→RisDec : R isWFminDNE → R isDec
   -- RisWFminDNE→RisDec WFminDNE {x} {y} with WFminDNE (λ z → (y ≡ z) ⊔ R x y) nnpp y (in1 refl)

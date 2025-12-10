@@ -45,6 +45,12 @@ module WeakConstructiveImplications where
     where f : ∀ x → x ∈ P → x ∈ R -accessible → ¬¬ Σ[ y ∈ A ] (y ∈ R - P -minimal)
           f x x∈P (acc xac) ¬Σ = ¬Σ (x ,, x∈P , (λ y y∈P Ryx → f y y∈P (xac y Ryx) ¬Σ))
 
+  -- -- This implication does not appear to be provable
+  -- isWFmin¬¬→isWFacc¬¬ : R isWFmin¬¬ → R isWFacc¬¬
+  -- isWFmin¬¬→isWFacc¬¬ RisWFmin¬¬ x x∉acc = RisWFmin¬¬ (∁ (R -accessible)) x∉acc f
+  --   where f : _
+  --         f (y ,, y∉acc , y∈min) = {!   !}
+
   isWFind¬¬→isWFmin¬¬ : R isWFind¬¬  → R isWFmin¬¬
   isWFind¬¬→isWFmin¬¬ RisWFind¬¬ P {d} d∈P =
     let φ : 𝓟 A
@@ -152,3 +158,13 @@ module AccDNEWeakImplications (acc∈DNE : accessibilityIsNotNotClosed R) where
   acc∈DNE→¬¬isWFind→isWFind ¬¬isWFindR = isWFacc→isWFind (acc∈DNE→¬¬isWFacc→isWFacc g)
     where   g : ¬¬ (R isWFacc)
             g = λ ¬Racc → ¬¬isWFindR (λ Rind → ¬Racc (isWFind→isWFacc Rind ) )
+
+open import Relations.WellFounded.WFCoreductiveImplications using (isWFcor¬¬→isWFminCor+)
+open accCorWeakImplications
+-- Excluded middle makes all notions of well-foundedness equivalent
+EM→WFcor¬¬→WFmin : (∀ P → EM P) → R isWFcor¬¬ → R isWFmin
+EM→WFcor¬¬→WFmin em RisWFcor¬¬ P a a∈P = case I f (em (Σ[ x ∈ A ] (x ∈ R - P -minimal)))
+  where RisWFacc¬¬ = accCor→isWFminCor+→isWFacc¬¬
+                    (EM→accessibilityIsCoreductive R em) (isWFcor¬¬→isWFminCor+ R RisWFcor¬¬ )
+        RisWFmin¬¬ = isWFacc¬¬→isWFmin¬¬ RisWFacc¬¬
+        f = λ ¬∃min → ∅ (RisWFmin¬¬ P a∈P ¬∃min)
