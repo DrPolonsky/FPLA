@@ -159,6 +159,13 @@ module AccDNEWeakImplications (acc∈DNE : accessibilityIsNotNotClosed R) where
     where   g : ¬¬ (R isWFacc)
             g = λ ¬Racc → ¬¬isWFindR (λ Rind → ¬Racc (isWFind→isWFacc Rind ) )
 
+  acc∈DNE→isWFminDNE¬¬→isWFacc¬¬ : R isWFminDNE¬¬ → R isWFacc¬¬
+  acc∈DNE→isWFminDNE¬¬→isWFacc¬¬ RisWFminDNE¬¬ x x∉acc =
+    RisWFminDNE¬¬ (∁ (R -accessible)) (¬¬Closed∁ (R -accessible)) x∉acc f
+    where f : _
+          f (m ,, m∉acc , m∈minacc) =
+            m∉acc (acc λ y Rym → acc∈DNE y (λ y∉acc → m∈minacc y y∉acc Rym ) )
+
 open import Relations.WellFounded.WFCoreductiveImplications using (isWFcor¬¬→isWFminCor+)
 open accCorWeakImplications
 -- Excluded middle makes all notions of well-foundedness equivalent

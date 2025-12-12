@@ -114,95 +114,75 @@ module isWFminDNEImpliesWDec {A : Set} (R : 𝓡 A) (wfMinDNE : R isWFminDNE) (P
 
   module nonemptyRimpliesWEM (a b : A) (Rab : R a b) (P : Set) where
 
-    -- data P^ : 𝓟 A where
-    --   cPa : P → P^ a
-    --   cPb : P^ b
-
     P^ : 𝓟 A
-    P^ x = x ≡ a → ¬¬ P
+    P^ x = ¬ (x ≡ b) → ¬ P
+
+    DNE-P^ : ¬¬Closed P^
+    DNE-P^ x nnP^ = (λ x≠b p → nnP^ λ x∈P^ → ∅ (x∈P^ x≠b p ) )
 
     cPmin→WEM : (_≡_ {A = A}) isDec → WEM P
-    cPmin→WEM Adec with wfMinDNE P^ nncP^ b (λ b=x → {!   !})
-      where nncP^ : _
-            nncP^ x nnpx q = λ np → nnpx (λ h → h q np )
-    ... | (x ,, x=a→nnp , xmin) = case yes no (Adec {x} {a}) where
-      yes = λ x=a → in2 (x=a→nnp x=a)
-      no = λ x≠a → in1 (λ p → xmin a (λ _ ¬p → ¬p p) {!   !} )
-
-
-    -- P^ : 𝓟 A
-    -- P^ x = ¬ ((x ≡ b → ⊥) × (x ≡ a → P → ⊥))
-    --
-    -- cPmin→WEM : WEM P
-    -- cPmin→WEM with wfMinDNE P^ nncP^ b (λ {(l , r) → l refl})
-    --   where nncP^ : _
-    --         nncP^ x nnpx q = nnpx (λ p^x → p^x q)
-    -- ... | x ,, h , xmin = in2 (λ ¬p → xmin a ((λ {(¬a=b , f) → {!   !} } ))
-    --   (∅ (h ((λ x=b → xmin a (λ {(g1 , g2) → {!   !} })
-    --         {!   !} ) , {!   !} ) ) ) )
-
-            -- in1 (λ p → xmin a (λ {(l , r) → r refl p })
-            --               (∅ (h ((λ x=b → xmin a ((λ {(l , r) → r refl p })) (transp (R a) (~ x=b) Rab ) )
-            --                   , λ x=a p → {!   !} ) ) ) )
-
-{-    P^ : 𝓟 A
-    P^ x = ¬¬ (x ≡ b) ⊔ ¬ (x ≡ a → P → ⊥)
-
-    cPmin→WEM : WEM P
-    cPmin→WEM with wfMinDNE P^ nncP^ b (in1 λ z → z refl)
-      where nncP^ : _
-            nncP^ x nnpx = in1 (λ x≠b → nnpx λ { (in1 s) → s x≠b ; (in2 r) → {!   !} } )
-    ... | x ,, in1 h , xmin = in1 (λ p → h (λ {x=b → xmin a (in2 λ g → g refl p ) (transp (R a) (~ x=b) Rab ) }) )
-    ... | x ,, in2 h , xmin = in2 (λ ¬p → h (λ _ p → ¬p p ) )
--}
+    cPmin→WEM eqDec with wfMinDNE P^ DNE-P^ b (λ ¬b=b p → ¬b=b refl)
+    ... | (x ,, x≠b→¬P , x∈minP^)
+      with eqDec {x} {b}
+    ... | in1 yes = in2 (λ ¬p → x∈minP^ a (λ _ p → ¬p p )  (transp (R a) (~ yes) Rab ) )
+    ... | in2 no = in1 (x≠b→¬P no )
 
   data cP (a₀ : A) : 𝓟 A where
     cPmin : ¬¬ P a₀ → ∀ {x} → (∀ y → ¬ R y x) → cP a₀ x
     cPsuc : ∀ {x y} → R y x → cP a₀ x
 
   wfMinDNE→WN : ∀ x → Σ[ y ∈ A ] (RMin R y × (R ⋆) y x)
-  wfMinDNE→WN x with wfMinDNE (λ x → ∁∁ ( Σ[ y ∈ A ] (RMin R y × (R ⋆) y x))) (¬¬Closed∁ _) x (λ {x₁ → x₁ {!   !}})
-  ...| z = {!   !}
+  -- wfMinDNE→WN x with wfMinDNE (λ x → ∁∁ ( Σ[ y ∈ A ] (RMin R y × (R ⋆) y x))) (¬¬Closed∁ _) x (λ {x₁ → x₁ {!   !}})
+  wfMinDNE→WN x with wfMinDNE (∁∁ (((~R R) ⋆) x)) (¬¬Closed∁ _) x (λ z → z ε⋆)
+  ...| (y ,, ¬¬R⋆yx , ymin) = y
+    ,,  (λ z Rzy → ymin z (λ H → ¬¬R⋆yx (λ R*xy → H ( R*xy ⋆!⋆ ax⋆ (~R R) Rzy ) ) ) Rzy )
+    , {!   !}
 
-  wfMinDNE→decRmin : ∀ x → EM (RMin R x) -- (EM ∘ RMin R)
-  wfMinDNE→decRmin x with wfMinDNE (RMin R) (λ y → {! ¬¬Closed∁  !}) x -- This goal has possibly been proved else where: normal forms are not not closed.
-  ... | z = {!   !}
+  -- This goal has possibly been proved else where: normal forms are not not closed.
+  wfMinDNE→decRmin : _≡_ {A = A} isDec → dec (RMin R) -- (EM ∘ RMin R)
+  wfMinDNE→decRmin eqDec x with wfMinDNE (∁∁ (((~R R) ⋆) x)) (¬¬Closed∁ _) x (λ z → z ε⋆)
+  ...| (y ,, ¬¬R⋆yx , ymin) with eqDec {x} {y}
+  ... | in1 yes = in1 (λ z Rzx → ymin z (λ H → H (ax⋆ (~R R) Rzx ) ) (transp (R z) yes Rzx ) )
+  ... | in2 no  = in2 (λ H → ¬¬R⋆yx (λ { ε⋆ → no refl ; (Rzx ,⋆ R*yx) → H _ Rzx } ) )
 
-  wfMinDNE→isMinDec : R isMinDec
-  wfMinDNE→isMinDec x = {!   !}
+  -- This seems to be false
+  -- wfMinDNE→eqDec→∁∁R⊆R : _≡_ {A = A} isDec → (∀ y x → ¬¬ (R y x) → R y x)
+  -- wfMinDNE→eqDec→∁∁R⊆R eqDec y x ¬¬Ryx = ?
+  --   with wfMinDNE (λ z → (x ≡ z) ⊔ ((z ≡ y) × R z x)) nnPP x (in1 refl)
+  --     where nnPP : _
+  --           nnPP z ¬z∉P with eqDec {z} {y}
+  --           ... | in1 yes = in2 (yes , ∅ (¬z∉P λ {(in1 x=z) → {!   !} ; (in2 (z=y , Rzx)) → ¬¬Ryx {!   !} } ) )
+  --           ... | in2 no  = {!   !}
+  -- ... | c = {!   !}
 
-  nncp : ∀ {a} → R isMinDec → ¬¬Closed (cP a)
-  nncp dmR x nnx with dmR x
-  ... | in1 (z ,, Rzx) = cPsuc Rzx
-  ... | in2 xMin = ∅ (nnx (λ {(cPmin nnPa xMin') → nnPa
-                            (λ Pa → nnx λ {(cPmin nnPa xMin'') → nnPa (λ Pa → nnPa
-                              (λ Pa' → nnx (λ {(cPmin nnPa' xMin'') → xMin {!   !} {!   !}
-                                             ; (cPsuc x) → {!   !}})))
-                            -- nnPa
-                            --   (λ _ →
-                            --      nnPa
-                            --      (λ z →
-                            --         nnx
-                            --         (λ z₁ →
-                            --            (λ { (cPmin nnPa xMin'')
-                            --                   → ?5 (xMin = xMin''') (nnx = (λ z₂ → z₂ z₁)) (nnPa = (λ z₂ → z₂ z))
-                            --                     (xMin' = xMin''') (Pa = z) (nnPa = nnPa) (xMin'' = xMin'')
-                            --               ; (cPsuc Ryx) → xMin'' y Ryx
-                            --               })
-                            --            z₁))) -- auto provides a broken solution
-                                          ; (cPsuc Ryx) → xMin' _ Ryx})
-                            ; (cPsuc Ryx) → xMin _ Ryx}))
+  -- Proof idea: let Pz be true if z is x or z is y and Ryx .
+  wfMinDNE→eqDec→Rwdec : _≡_ {A = A} isDec → (∁ (~R R)) isDec
+  wfMinDNE→eqDec→Rwdec eqDec {x} {y}
+    with wfMinDNE (λ z → (z ≡ x) ⊔ ((z ≡ y) × ¬¬ R y x)) nnPP x (in1 refl) where
+      nnPP : _
+      nnPP z ¬¬Pz with eqDec {z} {x}
+      ... | in1 z=x = in1 z=x
+      ... | in2 z≠x with eqDec {z} {y}
+      ... | in1 z=y = in2 (z=y , λ ¬Ryx → ¬¬Pz (λ { (in1 z=x) → z≠x z=x ;
+                                                    (in2 (z=y , ¬¬Ryx)) → ¬¬Ryx ¬Ryx } ) )
+      ... | in2 z≠y = ∅ (¬¬Pz λ { (in1 z=x) → z≠x z=x ; (in2 (z=y , ¬¬Ryz)) → z≠y z=y } )
+  ... | z ,, in1 z=x , z∈minP = in1 (λ Ryx → z∈minP y (in2 (refl , λ ¬Ryx → ¬Ryx Ryx))
+                                                      (transp (R y) (~ z=x) Ryx ) )
+  ... | z ,, in2 (z=y , ¬¬Ryx) , z∈minP = in2 ¬¬Ryx
 
-  cPlemma : ∀ {b c} → R b c → R isMinDec → wdec P
-    -- _isWFminDNE = ∀ (P : 𝓟 A) → ¬¬Closed P → ∀ a → a ∈ P → Σ[ m ∈ A ] _-_-minimal P m
-  cPlemma Rbc dmR a with wfMinDNE (cP a) (nncp {a} dmR) _ (cPsuc Rbc)
-    where
-      nncp2 : ¬¬Closed (cP a)
-      nncp2 x nnx with dmR x
-      ... | in1 (z ,, Rzx) = cPsuc Rzx
-      ... | in2 xMin = ∅ (nnx (λ {(cPmin nnPa xMin') → nnPa
-                                (λ Pa → nnx λ {(cPmin nnPa xMin'') → {!   !} -- auto provides a broken solution
-                                             ; (cPsuc Ryx) → xMin' _ Ryx})
-                                ; (cPsuc Ryx) → xMin _ Ryx}))
-  ... | x ,, cPmin nnPa xMin , q = in2 nnPa
-  ... | x ,, cPsuc Ryx , q = in1 (λ Pa → q {!   !} (cPmin (λ z → z Pa) {!   !}) Ryx)
+  wfMinDNE→eqDec→∁∁R⊆R→∁RMin⊆ΣR : _≡_ {A = A} isDec
+    → (∀ x y → ¬¬ (R y x) → R y x) → ∀ x → ∁RMin⊆ΣR R x
+  wfMinDNE→eqDec→∁∁R⊆R→∁RMin⊆ΣR eqDec Ris¬¬Closed x x∉RMin
+    with wfMinDNE (((~R R) ʳ) x) nnPP x εʳ
+      where nnPP : _
+            nnPP y ¬¬Rryx with eqDec {x} {y}
+            ... | in1 x=y = transp ((~R R ʳ) x) x=y εʳ
+            ... | in2 x≠y = axʳ (Ris¬¬Closed x y (λ ¬Ryx → ¬¬Rryx
+                  λ { (axʳ Ryx) → ¬Ryx Ryx ; εʳ → x≠y refl } ))
+  ... | y ,, axʳ Ryx , y∈minP = y ,, Ryx
+  ... | y ,, εʳ , y∈minP = ∅ (x∉RMin λ y Ryx → y∈minP y (axʳ Ryx ) Ryx )
+
+  wfMinDNE→eqDec→∁∁R⊆R→isMinDec : _≡_ {A = A} isDec → (∀ x y → ¬¬ (R y x) → R y x) → R isMinDec
+  wfMinDNE→eqDec→∁∁R⊆R→isMinDec eqDec Ris¬¬Closed x =
+    ∁RMin⊆ΣR∩decNF⊆MinDec R x (wfMinDNE→eqDec→∁∁R⊆R→∁RMin⊆ΣR eqDec Ris¬¬Closed x
+                            , wfMinDNE→decRmin eqDec x )
