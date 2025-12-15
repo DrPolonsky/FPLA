@@ -98,16 +98,6 @@ module isWFminImpliesDec {A : Set} (R : 𝓡 A) (wfMin : R isWFmin) (P : 𝓟 A)
   ... | in1 (z ,, Rzy) = ∅ (mIsMin y (cPsuc Rzy) Rym )
   ... | in2 yMin = in2 (λ pa → mIsMin y (cPmin pa yMin) Rym )
 
-  module nonemptyRimpliesEM (a b : A) (Rab : R a b) (P : Set) where
-
-    data P^ : 𝓟 A where
-      cPa : P → P^ a
-      cPb : P^ b
-
-    cPmin→EM : EM P
-    cPmin→EM with wfMin P^ b cPb
-    ... | x ,, cPa p , xmin = in1 p
-    ... | x ,, cPb , xmin = in2 (λ p → xmin a (cPa p) Rab )
 
 module isWFminDNEImpliesWDec {A : Set} (R : 𝓡 A) (wfMinDNE : R isWFminDNE) (P : 𝓟 A) where
   -- Here we show that if R is WFminDNE and R normal forms are decidable, then every predicate is weakly decidable.
