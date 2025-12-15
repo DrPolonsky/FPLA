@@ -89,9 +89,9 @@ module WeakConstructiveImplications where
           f (m ,, m∉P , mmin) with Pcor m m∉P
           ... | (n ,, Rnm , n∉P) = mmin n (λ _ → mmin n n∉P Rnm) Rnm
 
-  isWFseq-→isWFminCor+ : R isWFseq- → R isWFminCor+
-  isWFseq-→isWFminCor+ RisWFseq P CI {a} ¬pa =  ∅ (RisWFseq seq seq-inc) where
-    open CorSequence (CS {P} {CI} (a ,, ¬pa))
+  isWFseq-→isWFmincor¬¬ : R isWFseq- → R isWFcor¬¬
+  isWFseq-→isWFmincor¬¬ RisWFseq P Pcor a a∉P = ∅ (RisWFseq seq seq-inc) where
+    open CorSequence (CS {P} {Pcor} (a ,, a∉P))
 
   isWFseq¬¬→isWFseq- : R isWFseq¬¬ → R isWFseq-
   isWFseq¬¬→isWFseq- RisWFseq¬¬ s s-dec = RisWFseq¬¬ s f
@@ -124,10 +124,8 @@ module accCorWeakImplications (acc∈Cor : accessibilityIsCoreductive R) where
   accCor→isWFseq-→isWFacc¬¬ RisWFseq- a a∉acc = RisWFseq- seq seq-inc  where
     open CorSequence (CS {R -accessible} {acc∈Cor} (a ,, a∉acc))
 
-  accCor→isWFminCor+→isWFacc¬¬ : R isWFminCor+ → R isWFacc¬¬
-  accCor→isWFminCor+→isWFacc¬¬ WFmc a a∉acc
-    with WFmc (R -accessible) acc∈Cor a∉acc
-  ... | (m ,, m∉acc , p) = m∉acc (acc p)
+  accCor→isWFcor¬¬→isWFacc¬¬ : R isWFcor¬¬ → R isWFacc¬¬
+  accCor→isWFcor¬¬→isWFacc¬¬ WFcor a a∉acc = WFcor (R -accessible) acc∈Cor a a∉acc  
 
 module MP≡WeakImplication (mp≡ : MP≡) where
   cor→seqLemma : (s : ℕ → A) → s ∈ (R -decreasing) → R -coreductive (λ a → ¬ Σ-syntax ℕ (λ k → s k ≡ a))
@@ -136,9 +134,8 @@ module MP≡WeakImplication (mp≡ : MP≡) where
       λ ¬∃n → ¬∃n ((succ k) ,, refl)
 
   open import Relations.WellFounded.WFCoreductiveImplications R
-  MP≡→isWFminCor→isWFseq- : R isWFminCor → R isWFseq-
-  MP≡→isWFminCor→isWFseq- wfmc s s-inc =
-    isWFminCor→isWFCor¬¬ wfmc (λ a → ¬ Σ[ k ∈ ℕ ] (s k ≡ a) )
+  MP≡→isWFcor¬¬→isWFseq- : R isWFcor¬¬ → R isWFseq-
+  MP≡→isWFcor¬¬→isWFseq- wfcornn s s-inc = wfcornn (λ a → ¬ Σ[ k ∈ ℕ ] (s k ≡ a) )
                     (cor→seqLemma s s-inc) (s zero)
                     λ ¬Ex → ¬Ex ((0 ,, refl ))
 
@@ -171,7 +168,7 @@ open accCorWeakImplications
 -- Excluded middle makes all notions of well-foundedness equivalent
 EM→WFcor¬¬→WFmin : (∀ P → EM P) → R isWFcor¬¬ → R isWFmin
 EM→WFcor¬¬→WFmin em RisWFcor¬¬ P a a∈P = case I f (em (Σ[ x ∈ A ] (x ∈ R - P -minimal)))
-  where RisWFacc¬¬ = accCor→isWFminCor+→isWFacc¬¬
-                    (EM→accessibilityIsCoreductive R em) (isWFcor¬¬→isWFminCor+ R RisWFcor¬¬ )
+  where RisWFacc¬¬ = accCor→isWFcor¬¬→isWFacc¬¬
+                    (EM→accessibilityIsCoreductive R em) RisWFcor¬¬
         RisWFmin¬¬ = isWFacc¬¬→isWFmin¬¬ RisWFacc¬¬
         f = λ ¬∃min → ∅ (RisWFmin¬¬ P a∈P ¬∃min)
