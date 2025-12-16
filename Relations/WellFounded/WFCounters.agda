@@ -176,3 +176,5 @@ module isWFminDNEImpliesWDec {A : Set} (R : 𝓡 A) (wfMinDNE : R isWFminDNE) (P
   wfMinDNE→eqDec→∁∁R⊆R→isMinDec eqDec Ris¬¬Closed x =
     ∁RMin⊆ΣR∩decNF⊆MinDec R x (wfMinDNE→eqDec→∁∁R⊆R→∁RMin⊆ΣR eqDec Ris¬¬Closed x
                             , wfMinDNE→decRmin eqDec x )
+
+  
