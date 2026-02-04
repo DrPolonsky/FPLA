@@ -34,12 +34,38 @@ module Substitution (S : Signature) where
 
   data Pattern : ℕ → Set where
     hole : Pattern 1
-    funp : ∀ (f : Fs) → (W : Vec ℕ (Ar f))
-             → (ps : ∀ (p : Fin (Ar f)) → Pattern (lookup W p))
-             → Pattern (sum W)
+    funp : ∀ (f : Fs) → (W : Vec (Σ[ k ∈ ℕ ] Pattern k) (Ar f))
+             → Pattern (sum (map fst W))
              -- f(g([],a),f([],[])) : Pattern 3, where f = f, W = [1,2],
              -- ps = λ { o → g([],a); io → f([],[]) }
-  
+
+
+  substPattern :  ∀ {V} {h : ℕ} (p : Pattern h) → Vec (Terms V) h → Terms V 
+  substPatterns : ∀ {V} {n : ℕ} (W : Vec (Σ-syntax ℕ Pattern) n) (ts : Vec (Terms V) (sum (map (λ r → fst r) W)))
+                  → Vec (Terms V) n
+  substPattern hole (t ∷ []) = t
+  substPattern (funp f W) ts = fun f (substPatterns W ts)
+  substPatterns {V} {n = 0F} [] [] = []
+  substPatterns {V} {n = suc n} ((h ,, p) ∷ W) ts 
+    with sum (map fst W) in e 
+  ... | m 
+    with splitAt h ts 
+  ... | tsh ,, tsm ,, ts=tsh++tsm = substPattern p tsh ∷ substPatterns W (transp _ (~ e) tsm)
+
+  record Match_With_ {V : Set} {h : ℕ} (t : Terms V) (p : Pattern h) : Set  where 
+    constructor match 
+    field 
+      sub : Vec (Terms V) h 
+      sub-id : t ≡ substPattern p sub 
+
+  matchDec : ∀ {V : Set} {h : ℕ} (p : Pattern h) (t : Terms V) → EM (Match t With p)
+  matchDec {V} {h} hole t = in1 (match (t ∷ []) refl)
+  matchDec {V} {h} (funp f W) t = {!    !}
+
+
+
+
+{-
   record RRule : Set where
     constructor RR
     field
@@ -59,36 +85,35 @@ module Substitution (S : Signature) where
   finElimCoprod {A} {0F} {n} fm fn x = fn x
   finElimCoprod {A} {suc m} {n} fm fn 0F = fm 0F
   finElimCoprod {A} {suc m} {n} fm fn (suc x) = finElimCoprod {m = m} fm' fn x 
-    where fm' = λ j → fm (suc j) 
+    where fm' = λ j → fm (suc j)
+
+  -- foldLemma : 
+
+  open import Function.Core
 
   sumLemma : ∀ {n} {A B C : Set} {D : B → Set} (W : Vec A n) (ts : Vec C n)
-             → (rf1 : A → B → B) → (bc1 : B)
-             → (rf2 : Fin n × C → (Σ[ y ∈ B ] (D y)) → (Σ[ y ∈ B ] (D y))) → (bc2 : D bc1)
-             → (∀ (p : Fin n) (b : B) (c : C) (d : D b) → rf1 (lookup W p) b ≡ fst (rf2 (p ,, c) (b ,, d)))
-             →  foldr (λ _ → B) rf1 bc1 W  
-              ≡ fst (foldr (λ _ → Σ[ y ∈ B ] (D y)) rf2 (bc1 ,, bc2) (zip (allFin n) ts))
-  sumLemma {0F} {A} {B} {C} {D} [] [] rf1 bc1 rf2 bc2 Heq = refl 
-  sumLemma {suc n} {A} {B} {C} {D} (w ∷ W) (t ∷ ts) rf1 bc1 rf2 bc2 Heq 
-    with foldr (λ _ → B) rf1 bc1 W in e1 
-       | fst (foldr (λ _ → Σ[ y ∈ B ] (D y)) (λ { (p ,, c) → rf2 (suc p ,, c) })  (bc1 ,, bc2) (zip (allFin (n)) (ts))) in e2
-  ... | b1 | b2 with rf2 (0F ,, t ) (foldr  (λ _ → Σ B D) (λ { (p ,, c) → rf2 (suc p ,, c) }) (bc1 ,, bc2) (zip (allFin n) ts)) in e3
-  ... | b ,, d = {!  !} 
-  -- ... | k with Heq 0F b1 {!  !}  {!  !}
-  -- ... | c = {!   !}   
-  --
-  {-
-    with sumLemma {n} {A} {B} {C} {D} W ts rf1 bc1 rf2' bc2 Heq' 
-      where rf2' : _ 
-            rf2' (p ,, c) bd = rf2 (suc p ,, c) bd
-            Heq' : _ 
-            Heq' p b c d = Heq (suc p) b c d 
-  ... | e1 with (foldr (λ _ → Σ[ y ∈ B ] (D y)) rf2' (bc1 ,, bc2) (zip (allFin n) ts))
-      where rf2' : _ 
-            rf2' (p ,, c) bd = rf2 (suc p ,, c) bd
-  ... | (b ,, d) with Heq 0F b t d
-  -- ... | e2 = e2 ! cong fst (cong (rf2 (0F ,, t)) {!   !}) 
-  ... | e2 = {!  !}  
-  -}
+             → (bc1 : B) → (bc2 : D bc1)
+             → (rf1 : A → B → B)
+             → (rf2 : ∀ (pc : Fin n × C) → (q : Σ[ y ∈ B ] (D y)) → D (rf1 (lookup W (fst pc)) (fst q)))
+             → (xs : Vec (Fin n × C) n) → (∀ (i : Fin n) → fst (lookup xs i) ≡ i)
+                                → (∀ (i : Fin n) → snd (lookup xs i) ≡ lookup ts i)
+             →       foldr (λ _ → B) rf1 bc1 W  
+              ≡ fst (foldr (λ _ → Σ[ y ∈ B ] (D y)) 
+                           (λ {(p ,, c) q → (rf1 (lookup W p) (fst q) ,, rf2 (p ,, c) q) })
+                           (bc1 ,, bc2)
+                           xs)
+  sumLemma {0F} {A} {B} {C} {D} [] [] bc1 bc2 rf1 rf2 [] H1 H2 = refl
+  sumLemma {suc n} {A} {B} {C} {D} (w ∷ W) (t ∷ ts) bc1 bc2 rf1 rf2 (x ∷ xs) H1 H2 
+    with sumLemma {n} {A} {B} {C} {D} W ts bc1 bc2 rf1 ? xs ? ? 
+  ... | e = {! cong (rf1 w) !}
+  --   with sumLemma {n} {A} {B} {C} {D} W ts bc1 bc2 rf1 {!   !}
+  -- ... | e = cong (rf1 w) (e ! {!  !})  
+  {-        = cong (rf1 w) eqTail where 
+    eqTail : _ 
+    eqTail with (foldr (λ _ → Σ-syntax B D) (λ { (p ,, c) q → rf1 (lookup (w ∷ W) p) (fst q) ,, rf2 (p ,, c) q })
+                       (bc1 ,, bc2) (zipWith _,,_ (tabulate (id Function.Core.∘ suc)) ts)) in e1 
+    ... | (b ,, d) = {!  !} -- sumLemma {n} {A} {B} {C} {D} W ts bc1 bc2 rf1 ? 
+    -}
 
   match : ∀ {V : Set} {h : ℕ} (p : Pattern h) → Terms V → ↑ (Fin h → Terms V)
   match hole t = i (λ _ → t )
@@ -98,55 +123,16 @@ module Substitution (S : Signature) where
   ... | in1 refl = result where 
     A = Fin (Ar f) × Terms V
     B = λ _ → Σ[ k ∈ ℕ ] (↑ (Fin k → Terms V))
-    xs =  zip (allFin (Ar f)) ts
     op : _
-    op (pi ,, ti) (si ,, o) = lookup W pi + si ,, o
-    op (pi ,, ti) (si ,, i σ) with match (ps pi) ti 
-    ... | o = lookup W pi + si ,, o
-    ... | i τi = lookup W pi + si ,, i (finElimCoprod τi σ)
+    op (pi ,, ti) (si ,, y) = lookup W pi + si 
+                  ,, io (λ σ → io (λ τi → i (finElimCoprod τi σ)) o (match (ps pi) ti)) o y
     b0 = (0 ,, i (λ {()}))
-    res = foldr B op b0 xs
-    e : _ 
-    e p b c (i x) with match (ps p) c
-    ... | o = refl
-    ... | i tau = refl
-    e p b c o = refl 
-    fst=sum : sum W ≡ fst res
-    fst=sum = sumLemma W ts _+_ 0 op (snd b0) e  
-    result = transp (λ k → ↑ (Fin k → Terms V)) (~ fst=sum) (snd res)
-
-{-  A = Fin (Ar f) × Terms V
-    B = λ k → ↑ (Fin k → Terms V)
-    n = Ar f
     xs =  zip (allFin (Ar f)) ts
-    b0 : B 0 
-    b0 = {!  !} 
-    fn : Fin n → B n → B (suc n)
-    fn pi o = o
-    fn pi (i σ) = {!   !} 
-    -- fn pi (i σ) with match (ps pi) (lookup ts pi)
-    -- ... | o = o
-    -- ... | i τ = i λ { 0F → {! τ  !}
-    --                 ; (suc x) → σ x }
-    result = foldSum {A} {B} {n} W xs b0 fn  
--}
-{-    pts : (Vec (Fin (Ar f) × Terms V) (Ar f))
-    pts = zip (allFin (Ar f)) ts
-    pfun : _ 
-    pfun (pi ,, ti) = match {h = lookup W pi} (ps pi) ti   
-    mms = map pfun pts
-    rf : _ 
-    rf ni ti = match {h = ni} ps (?? ni
-    zs = zipWith rf W ts
-    B : ℕ → Set 
-    B k = ↑ (Fin (sum W) → Terms V)
-    W×ts = zip W ts 
-    basecase = ?  
-    recFun : _ 
-    recFun = ? 
-    res0 = (foldl B recFun basecase W×ts) 
-    res5 = transp (λ k →  ↑ (Fin k → Terms V)) ? r
-    result = ? -}
+    res = foldr B op b0 xs
+    fst=sum : sum W ≡ fst res
+    fst=sum = ? 
+    -- fst=sum = sumLemma W ts 0 (snd b0) _+_ (λ pt sy → snd (op pt sy))
+    result = transp (λ k → ↑ (Fin k → Terms V)) (~ fst=sum) (snd res)
 
   {- match f([x],g(a,[y])) f(f(a,b),g(a,g(b,b))) = i σ, where
            σ = λ {[x] → f(a,b); [y] → g(b,b)}     -}
@@ -215,7 +201,7 @@ R12 V = GeneralTRS.InScope.R S {RuleIdx = Fin 2} p12 V
 
 
 
-
+-}
    -- data _[_]=_ {A : Set a} : ∀ {n} → Vec A n → Fin n → A → Set a where
    --   here  : ∀ {n}     {x}   {xs : Vec A n} → x ∷ xs [ zero ]= x
    --   there : ∀ {n} {i} {x y} {xs : Vec A n}
