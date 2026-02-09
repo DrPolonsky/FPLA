@@ -166,4 +166,7 @@ in2inj refl = refl
 in1≠in2 : ∀ {A B : Set} {a : A} {b : B} → in1 a ≡ in2 b → ⊥
 in1≠in2 ()
 
+_,_inj : ∀ {A B} {a1 a2 : A} {b1 b2 : B} → (a1 , b1) ≡ (a2 , b2) → (a1 ≡ a2) × (b1 ≡ b2) 
+_,_inj refl = (refl , refl)
+
 -- THE END

@@ -4,6 +4,7 @@ open import Lifting
 -- open import Datatypes using (ℕ)
 open import Relations.Decidable
 open import Data.Vec
+open import Data.Vec.Properties
 open import Data.Fin renaming (_+_ to _Fin+_)
 open import Data.Product using (_×_)
 open import Predicates
@@ -22,6 +23,10 @@ record Signature : Set₁ where
     var : V → Terms V
     fun : ∀ (f : Fs) → Vec (Terms V) (Ar f) → Terms V
 
+  fun≡inv : ∀ {V} (f : Fs) (s t : Vec (Terms V) (Ar f)) → fun f s ≡ fun f t → s ≡ t 
+  fun≡inv f s t refl = refl 
+  
+
 -- open Signature
 module Substitution (S : Signature) where
   open Signature S
@@ -30,7 +35,9 @@ module Substitution (S : Signature) where
   subst : ∀ {V W} → Terms V → (V → Terms W) → Terms W
   subst (var x) ts = ts x
   subst (fun f args) ts = fun f (map (λ s → subst s ts) args)
-      -- f(a1,..,ak) [vs := ts] = f(a1[vs:=ts],...,ak[vk:=ts])
+      -- f(a1,..,ak) [vs := ts] = f(a1[vs:=ts],...,ak[vs:=ts])
+
+  -- depFold :: ∀ {V} {m : ℕ} (ns : Vec ℕ m) (
 
   data Pattern : ℕ → Set where
     hole : Pattern 1
@@ -38,7 +45,6 @@ module Substitution (S : Signature) where
              → Pattern (sum (map fst W))
              -- f(g([],a),f([],[])) : Pattern 3, where f = f, W = [1,2],
              -- ps = λ { o → g([],a); io → f([],[]) }
-
 
   substPattern :  ∀ {V} {h : ℕ} (p : Pattern h) → Vec (Terms V) h → Terms V 
   substPatterns : ∀ {V} {n : ℕ} (W : Vec (Σ-syntax ℕ Pattern) n) (ts : Vec (Terms V) (sum (map (λ r → fst r) W)))
@@ -52,16 +58,74 @@ module Substitution (S : Signature) where
     with splitAt h ts 
   ... | tsh ,, tsm ,, ts=tsh++tsm = substPattern p tsh ∷ substPatterns W (transp _ (~ e) tsm)
 
-  record Match_With_ {V : Set} {h : ℕ} (t : Terms V) (p : Pattern h) : Set  where 
-    constructor match 
-    field 
-      sub : Vec (Terms V) h 
-      sub-id : t ≡ substPattern p sub 
+  splitAt≡ : ∀ {V : Set} {m n : ℕ} (h : Vec V m) (t : Vec V n) → 
+    ((h , t) ≡ (fst (splitAt m (h ++ t)) , fst (snd (splitAt m (h ++ t)))))
+  splitAt≡ {V} {0F} {n} [] t = refl 
+  splitAt≡ {V} {suc m} {n} (x ∷ h) t 
+    with splitAt (suc m) (x ∷ h ++ t) 
+  ... | y ∷ ys ,, ts ,, eq with ++-injective (x ∷ h) (y ∷ ys) eq
+  ... | e1 ,, e2 = cong2 _,_ e1 e2
 
-  matchDec : ∀ {V : Set} {h : ℕ} (p : Pattern h) (t : Terms V) → EM (Match t With p)
-  matchDec {V} {h} hole t = in1 (match (t ∷ []) refl)
-  matchDec {V} {h} (funp f W) t = {!    !}
+  subPat≡ : ∀ {V} {n : ℕ} (W : Vec (Σ-syntax ℕ Pattern) n) 
+                  (ts : Vec (Terms V) (sum (map (λ r → fst r) W))) (us : Vec (Terms V) n)
+                  → substPatterns W ts ≡ us 
+                  → ∀ j → Σ[ tj ∈ Vec (Terms V) (fst (lookup W j)) ] 
+                            (lookup us j ≡ substPattern (snd (lookup W j)) tj)
+  subPat≡ {n} (_∷_ {m} (k ,, p) W) ts us refl 0F with splitAt k ts 
+  ... | tsk ,, tsl ,, e2 = tsk ,, refl
+  subPat≡ {n} (_∷_ {m} (k ,, p) W) ts (u ∷ us) refl (suc j) 
+    = subPat≡ W (fst (snd (splitAt k ts))) us (cong (substPatterns W) refl) j 
 
+  subPat≡inv : ∀ {V} {n : ℕ} (W : Vec (Σ-syntax ℕ Pattern) n) (us : Vec (Terms V) n)
+                  → (∀ j → Σ[ tj ∈ Vec (Terms V) (fst (lookup W j)) ] 
+                            (lookup us j ≡ substPattern (snd (lookup W j)) tj) )
+                  → Σ[ ts ∈ Vec (Terms V) (sum (map (λ r → fst r) W)) ] (us ≡ substPatterns W ts)
+  subPat≡inv {V} {0F} [] [] H = [] ,, refl
+  subPat≡inv {V} {suc n} ((h ,, p) ∷ W) (u ∷ us) H 
+    with H 0F | subPat≡inv {V} {n} W us (λ j → H (suc j) ) 
+  ... | th ,, refl | tls ,, refl 
+    with splitAt≡ th tls 
+  ... | c 
+    = th ++ tls ,, cong2 _∷_ (cong (substPattern p) e1) (cong (substPatterns W) e2)
+      where e1 = pr1 (_,_inj (splitAt≡ th tls))
+            e2 = pr2 (_,_inj (splitAt≡ th tls))
+
+  Match_To_ : ∀ {V : Set} {h : ℕ} (t : Terms V) (p : Pattern h) → Set 
+  Match_To_ {V} {h} t p = Σ[ sub ∈ Vec (Terms V) h ] (t ≡ substPattern p sub)
+
+  matchDec : ∀ {V : Set} {h : ℕ} (p : Pattern h) (t : Terms V) → EM (Match t To p)
+  matchDecs : ∀ {V : Set} {n : ℕ} (ps : Vec (Σ-syntax ℕ Pattern) n) (ts : Vec (Terms V) n)
+    → (∀ (i : Fin n) → Match (lookup ts i) To snd (lookup ps i))
+       ⊔ Σ[ i ∈ Fin n ] (¬ Match (lookup ts i) To snd (lookup ps i))
+  matchDec {V} {h} hole t = in1 (t ∷ [] ,, refl)
+  matchDec {V} {h} (funp f W) (var x)  = in2 λ {(_ ,, ())}
+  matchDec {V} {h} (funp f W) (fun g ts) with FsDec {f} {g} 
+  ... | in2 no = in2 λ {(s ,, refl) → no refl}
+  ... | in1 refl -- = {!  !}
+    with matchDecs {n = Ar f} W ts
+  ... | in1 yes with subPat≡inv W ts yes 
+  ... | sub ,, eq = in1 (sub ,, cong (fun f) eq)
+  matchDec {V} {h} (funp f W) (fun g ts) | in1 refl | in2 (j ,, q) 
+    with lookup W j in e1 | lookup ts j in e2
+  ... | (k ,, p) | tj =
+    in2 c where 
+      c : _ 
+      c (nts ,, e3) with fun≡inv f ts (substPatterns W nts) e3 
+      ... | e4 
+        with subPat≡ W nts ts (~ e4) j 
+      ... | (sub ,, e5) rewrite e1 = q (sub ,, (e2 ~! e5)) 
+
+  matchDecs {V} {0F} [] [] = in1 λ { () }
+  matchDecs {V} {suc n} ((k ,, p) ∷ ps) (t ∷ ts) 
+    with matchDec p t 
+  ... | in2 no  = in2 (0F ,, no)
+  ... | in1 qQ
+    with matchDecs ps ts 
+  ... | in2 (j ,, J) = in2 (suc j ,, J)
+  ... | in1 yes = in1 YES 
+    where YES : _ 
+          YES 0F = qQ
+          YES (suc k) = yes k 
 
 
 
