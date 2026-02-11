@@ -3,9 +3,9 @@ open import Classical
 open import Lifting
 -- open import Datatypes using (ℕ)
 open import Relations.Decidable
-open import Data.Vec
+open import Data.Vec 
 open import Data.Vec.Properties
-open import Data.Fin renaming (_+_ to _Fin+_)
+open import Data.Fin renaming (_+_ to _Fin+_) hiding (splitAt)
 open import Data.Product using (_×_)
 open import Predicates
 open import Agda.Builtin.Nat renaming (Nat to ℕ)
@@ -63,15 +63,16 @@ module Substitution (S : Signature) where
   splitAt≡ {V} {0F} {n} [] t = refl 
   splitAt≡ {V} {suc m} {n} (x ∷ h) t 
     with splitAt (suc m) (x ∷ h ++ t) 
-  ... | y ∷ ys ,, ts ,, eq with ++-injective (x ∷ h) (y ∷ ys) eq
-  ... | e1 ,, e2 = cong2 _,_ e1 e2
+  ... | y ∷ ys ,, ts ,, eq 
+    with _,_inj (splitAt≡ h t)
+  ... | e3 , e4 = cong2 _,_ (cong (_∷_ x) e3) e4
 
   subPat≡ : ∀ {V} {n : ℕ} (W : Vec (Σ-syntax ℕ Pattern) n) 
                   (ts : Vec (Terms V) (sum (map (λ r → fst r) W))) (us : Vec (Terms V) n)
                   → substPatterns W ts ≡ us 
                   → ∀ j → Σ[ tj ∈ Vec (Terms V) (fst (lookup W j)) ] 
                             (lookup us j ≡ substPattern (snd (lookup W j)) tj)
-  subPat≡ {n} (_∷_ {m} (k ,, p) W) ts us refl 0F with splitAt k ts 
+  subPat≡ {n} (_∷_ {m} (k ,, p) W) ts us refl zero with splitAt k ts 
   ... | tsk ,, tsl ,, e2 = tsk ,, refl
   subPat≡ {n} (_∷_ {m} (k ,, p) W) ts (u ∷ us) refl (suc j) 
     = subPat≡ W (fst (snd (splitAt k ts))) us (cong (substPatterns W) refl) j 
@@ -82,7 +83,7 @@ module Substitution (S : Signature) where
                   → Σ[ ts ∈ Vec (Terms V) (sum (map (λ r → fst r) W)) ] (us ≡ substPatterns W ts)
   subPat≡inv {V} {0F} [] [] H = [] ,, refl
   subPat≡inv {V} {suc n} ((h ,, p) ∷ W) (u ∷ us) H 
-    with H 0F | subPat≡inv {V} {n} W us (λ j → H (suc j) ) 
+    with H zero | subPat≡inv {V} {n} W us (λ j → H (suc j) ) 
   ... | th ,, refl | tls ,, refl 
     with splitAt≡ th tls 
   ... | c 
@@ -118,13 +119,13 @@ module Substitution (S : Signature) where
   matchDecs {V} {0F} [] [] = in1 λ { () }
   matchDecs {V} {suc n} ((k ,, p) ∷ ps) (t ∷ ts) 
     with matchDec p t 
-  ... | in2 no  = in2 (0F ,, no)
+  ... | in2 no  = in2 (zero ,, no)
   ... | in1 qQ
     with matchDecs ps ts 
   ... | in2 (j ,, J) = in2 (suc j ,, J)
   ... | in1 yes = in1 YES 
     where YES : _ 
-          YES 0F = qQ
+          YES zero = qQ
           YES (suc k) = yes k 
 
   -- This defines the type of left-linear Term Rewriting Systems
@@ -166,10 +167,10 @@ module Example1 where
 S : Signature
 S = Sig (Fin 4) ar (λ {x} {y} → fdec x y )  where
   ar : _
-  ar 0F = 0 -- a
-  ar 1F = 0 -- b
-  ar 2F = 2 -- F
-  ar 3F = 2 -- G
+  ar zero = 0 -- a
+  ar (suc zero) = 0 -- b
+  ar (suc (suc zero)) = 2 -- F
+  ar (suc (suc (suc zero))) = 2 -- G
   fdec : ∀ x y → EM (x ≡ y)
   fdec x y with x ≟ y
   ... | yes p = in1 p
@@ -178,50 +179,45 @@ S = Sig (Fin 4) ar (λ {x} {y} → fdec x y )  where
 open Signature S
 
 p1lhs : Pattern S 1 -- F(a,x)
-p1lhs = funp 2F (Pa ∷ Px ∷ []) where
-  Pa = 0 ,, funp 0F []
+p1lhs = funp (suc (suc zero)) (Pa ∷ Px ∷ []) where
+  Pa = 0 ,, funp zero []
   Px = 1 ,, hole
 p2lhs : Pattern S 0 -- b
-p2lhs = funp 1F []
+p2lhs = funp (suc zero) []
 
 p1 : RRule S
-p1 = RR 1 p1lhs (fun 3F (var 0F ∷ var 0F ∷ []) )
+p1 = RR 1 p1lhs (fun (suc (suc (suc zero))) (var zero ∷ var zero ∷ []) )
 
 p2 : RRule S
-p2 = RR 0 p2lhs (fun 2F (b ∷ b ∷ []) )
-  where b = fun 1F []
+p2 = RR 0 p2lhs (fun (suc (suc zero)) (b ∷ b ∷ []) )
+  where b = fun (suc zero) []
 
 p12 : Fin 2 → RRule S
-p12 0F = p1
-p12 1F = p2
+p12 zero = p1
+p12 (suc zero) = p2
 
 R12 : ∀ {V} → 𝓡 (Terms V)
 R12 {V} = GeneralTRS.InScope.R S {RuleIdx = Fin 2} p12 V
 
 s : Terms ⊥  -- F(a,b) 
-s = fun 2F (fun 0F [] ∷ fun 1F [] ∷ [])
+s = fun (suc (suc zero)) (fun zero [] ∷ fun (suc zero) [] ∷ [])
 
 t : Terms ⊥ -- G(b,F(b,b))
-t = fun 3F (fun 1F [] ∷ fun 2F (fun 1F [] ∷ fun 1F [] ∷ []) ∷ [])
+t = fun (suc (suc (suc zero))) (fun (suc zero) [] ∷ fun (suc (suc zero)) (fun (suc zero) [] ∷ fun (suc zero) [] ∷ []) ∷ [])
 
 open import Relations.ClosureOperators
 
 s→*t : (R12 ⋆) s t 
-s→*t = Rax (0F ,, refl) ,⋆ (Rfun 3F (b ∷ b ∷ []) 1F b→fbb refl refl ,⋆ ε⋆)
+s→*t = Rax (zero ,, refl) ,⋆ (Rfun (suc (suc (suc zero))) (b ∷ b ∷ []) (suc zero) b→fbb refl refl ,⋆ ε⋆)
   where b : Terms ⊥ 
-        b = fun 1F [] 
+        b = fun (suc zero) [] 
         fbb : Terms ⊥ 
-        fbb = fun 2F (b ∷ b ∷ [])
+        fbb = fun (suc (suc zero)) (b ∷ b ∷ [])
         b→fbb : R12 b fbb 
-        b→fbb = Rax (1F ,, refl) 
+        b→fbb = Rax ((suc zero) ,, refl) 
 
--- data RootRed ∀ {V}
-
-
-{-
-
--}
    -- data _[_]=_ {A : Set a} : ∀ {n} → Vec A n → Fin n → A → Set a where
    --   here  : ∀ {n}     {x}   {xs : Vec A n} → x ∷ xs [ zero ]= x
    --   there : ∀ {n} {i} {x y} {xs : Vec A n}
    --           (xs[i]=x : xs [ i ]= x) → y ∷ xs [ suc i ]= x
+

@@ -2,7 +2,7 @@ open import Logic
 open import Lifting
 open import Relations.Decidable
 
-module TRS.TRS-Base where
+module TRS.TRS-Abstract where
 
 record Signature : Set₁ where
   constructor Sig
