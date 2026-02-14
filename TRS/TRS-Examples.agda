@@ -264,6 +264,83 @@ module Example-NewmanCandidate where
   Rnc : ∀ {V} → 𝓡 (Terms V)
   Rnc {V} = GeneralTRS.InScope.R {RuleIdx = Fin 4} rules V
 
+  open LocalProperties
+  -- open Substitution
+
+  -- open Signature 
+  {- Plan: 
+  -- a,b,k are normal forms 
+  -- p(a), p(b) are minimal forms 
+  -- the rhs of each rule results in one of the above
+  -- f(p(a),p(b)) -> f(p(a),p(a)) -> k 
+  -- For p, need lemma: t ->⋆ a, then t = a, also if t ->⋆ b, then t = b
+  --
+  -- Needed lemmas:
+  -- p(p(t)) ->⋆ p(u) ⇒ p(t) → u 
+  -- p(f(t1,t2)) ->⋆ p(u) ⇒ f(t1,t2) → u
+  -}
+
+  -- p(p(t)) -> p(u) ⇒ p(t) → u 
+  p-lemma-1 : ∀ {V} (t : Terms V) (u : Terms V) 
+                → Rnc (fun pS (fun pS (t ∷ []) ∷ [])) (fun pS (u ∷ []))
+                → Rnc (fun pS (t ∷ [])) u
+  p-lemma-1 t u (Substitution.Rax (suc (suc (suc zero)) ,, ()))
+  p-lemma-1 t u (Substitution.Rax (suc (suc (suc (suc ()))) ,, snd₁))
+  p-lemma-1 t u (Substitution.Rfun f ts zero Rtu refl refl) = Rtu
+
+  -- p(f(t1,t2)) -> p(u) ⇒ f(t1,t2) → u
+  p-lemma-2 : ∀ {V} (t1 t2 u : Terms V)
+                → Rnc (fun pS (fun fS (t1 ∷ t2 ∷ []) ∷ [])) (fun pS (u ∷ []))
+                → Rnc (fun fS (t1 ∷ t2 ∷ [])) u
+  p-lemma-2 t1 t2 u (Substitution.Rax (suc (suc (suc zero)) ,, ()))
+  p-lemma-2 t1 t2 u (Substitution.Rax (suc (suc (suc (suc ()))) ,, snd₁))
+  p-lemma-2 t1 t2 u (Substitution.Rfun f ts zero Rtu refl refl) = Rtu
+
+  -- prove t ∈ MF → p(t) ∈ MF 
+  p-lemma-3 : ∀ {V} (t : Terms V) → t ∈ MF {R = Rnc} → fun pS (t ∷ []) ∈ MF {R = Rnc}
+  p-lemma-3 (Signature.var x) t∈MF u t→*u = {!  !} -- ∈ NF 
+  p-lemma-3 (Signature.fun zero x) t∈MF u t→*u = {! !} -- p(a) is recurrent (hence MF)
+  p-lemma-3 (Signature.fun (suc zero) x) t∈MF u t→*u = {! !} -- p(b) ∈ MF 
+  p-lemma-3 (Signature.fun (suc (suc f)) x) t∈MF u ε⋆ = ε⋆
+  p-lemma-3 (Signature.fun (suc (suc f)) x) t∈MF u (_,⋆_ {y = v} (Substitution.Rax (suc (suc (suc zero)) ,, ())) v→*u)
+  p-lemma-3 (Signature.fun (suc (suc f)) x) t∈MF u (_,⋆_ {y = v} (Substitution.Rax (suc (suc (suc (suc ()))) ,, snd₁)) v→*u)
+  p-lemma-3 (Signature.fun (suc (suc zero)) (x ∷ [])) t∈MF u (_,⋆_ {y = v} (Substitution.Rfun (suc (suc zero)) (x₃ ∷ []) zero t→v refl refl) v→*u) = {!t∈MF _ v→*u  !}
+  p-lemma-3 (Signature.fun (suc (suc (suc f))) x) t∈MF u (_,⋆_ {y = v} (Substitution.Rfun (suc (suc zero)) (x₃ ∷ []) zero t→v refl refl) v→*u) = {! !} 
+  -- 
+{-
+  p-lemma-3 t t∈MF u ε⋆ = ε⋆
+  p-lemma-3 (Signature.var x) t∈MF u (_,⋆_ {y = v} pt→v v→*u) = {!  !} -- easy, p(x) ∈ NF 
+  p-lemma-3 (Signature.fun zero x) t∈MF u (_,⋆_ {y = v} pt→v v→*u) = {! !} -- p(a) -> p(b) ∈ MF 
+  p-lemma-3 (Signature.fun (suc zero) x) t∈MF u (_,⋆_ {y = v} pt→v v→*u) = {! !} -- p(b) → p(a) ∈ MF 
+  -- p-lemma-3 (Signature.fun (suc (suc zero)) x) t∈MF u (_,⋆_ {y = v} pt→v v→*u) 
+  -- p-lemma-3 (Signature.fun (suc (suc zero)) (x ∷ [])) t∈MF u (_,⋆_ {y = v} pt→v v→*u) 
+  p-lemma-3 (Signature.fun (suc (suc zero)) (x ∷ [])) t∈MF u (_,⋆_ {y = v} (Substitution.Rax (suc (suc (suc zero)) ,, ())) v→*u)
+  p-lemma-3 (Signature.fun (suc (suc zero)) (x ∷ [])) t∈MF u (_,⋆_ {y = v} (Substitution.Rax (suc (suc (suc (suc ()))) ,, snd₁)) v→*u)
+  -- p-lemma-3 (Signature.fun (suc (suc zero)) (x ∷ [])) t∈MF u (_,⋆_ {y = v} (Substitution.Rfun f ts j pt→v x₁ x₂) v→*u)
+  p-lemma-3 (Signature.fun (suc (suc zero)) (x ∷ [])) t∈MF u (_,⋆_ {y = v} 
+    (Substitution.Rfun .pS .(fun (suc (suc zero)) (x ∷ []) ∷ []) zero pt→v refl refl) v→*u) 
+    = {!   !}
+  p-lemma-3 (Signature.fun (suc (suc (suc zero))) x) t∈MF u (_,⋆_ {y = v} pt→v v→*u) = {! !}
+  p-lemma-3 (Signature.fun (suc (suc (suc (suc zero)))) x) t∈MF u (_,⋆_ {y = v} pt→v v→*u) = {! !}
+-} 
+
+  RncIsSM : ∀ {V} → Rnc {V} isSM 
+  RncIsSM (Signature.var x) = {!  !}  -- EASY
+  RncIsSM (Signature.fun zero ts) = {! !} -- a ∈ NF 
+  RncIsSM (Signature.fun (suc zero) ts) = {! !} -- b ∈ NF  
+  RncIsSM (Signature.fun (suc (suc zero)) (t ∷ [])) 
+    with RncIsSM t 
+  ... | MF⊆SM m t∈SM = MF⊆SM _ (p-lemma-3 t t∈SM)
+  ... | SMind u H = SMind _ t∈SM where 
+    t∈SM : _ 
+    t∈SM y (Substitution.Rax x) = {! x  !} -- p(a) or p(b), hence MF, and SM 
+    t∈SM y (Substitution.Rfun (suc (suc zero)) (Signature.var x ∷ []) zero (Substitution.Rax (suc (suc (suc zero)) ,, ())) refl refl)
+    t∈SM y (Substitution.Rfun (suc (suc zero)) (Signature.var x ∷ []) zero (Substitution.Rax (suc (suc (suc (suc ()))) ,, snd₁)) refl refl)
+    t∈SM y (Substitution.Rfun (suc (suc zero)) (Signature.fun f x ∷ []) zero t→y refl refl) = {! H _ t→y   !}
+    
+  RncIsSM (Signature.fun (suc (suc (suc zero))) ts) = {! !} -- f 
+  RncIsSM (Signature.fun (suc (suc (suc (suc zero)))) ts) = {! !} -- k ∈ NF 
+
   a : Terms ⊥
   a = fun aS []
 
