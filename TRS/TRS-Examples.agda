@@ -304,6 +304,24 @@ module Example-NewmanCandidate where
   p-lemma-1 t u (Substitution.Rfun (suc (suc zero)) (v ∷ []) zero {u = w} ppt→u refl refl) 
     = w ,, refl , ppt→u
 
+  -- Base case easy. Induction step should be mix p-lemma1 with inductive call.
+  p-lemma-1* : ∀ {V} (t : Terms V) (u : Terms V) 
+                → (Rnc ⋆) (fun pS (fun pS (t ∷ []) ∷ [])) u 
+                → Σ[ v ∈ Terms V ] ((u ≡ fun pS (v ∷ [])) × (Rnc ⋆) (fun pS (t ∷ [])) v)
+  
+  -- p-lemma-1* t .(fun pS (fun pS (t ∷ []) ∷ [])) ε⋆ = fun pS (t ∷ []) ,, refl , ε⋆ 
+  -- p-lemma-1* t u (Rppty ,⋆ R*yu) with p-lemma-1 t _ Rppty 
+  -- ... | v ,, refl , pt→v = fun pS (v ∷ []) ,, {! refl ,, ?  !} 
+  p-lemma-1* t u ε⋆ = fun pS (t ∷ []) ,, refl , ε⋆
+  p-lemma-1* t u (Substitution.Rax (fS ,, ()) ,⋆ Q)
+  p-lemma-1* t u (Substitution.Rax (suc (suc (suc (suc ()))) ,, snd₁) ,⋆ R*yu)
+  p-lemma-1* t u (Substitution.Rfun .pS .(fun pS (t ∷ []) ∷ []) aS (Substitution.Rax (aS ,, ar)) refl refl ,⋆ R*yu) with applyRuleInv rules _ _ _ _ ar 
+  ...| sub ,, eq rewrite eq = {!   !}
+  p-lemma-1* t u (Substitution.Rfun .pS .(fun pS (t ∷ []) ∷ []) j (Substitution.Rax (suc fst₁ ,, snd₁)) refl refl ,⋆ R*yu) = {!   !}
+  p-lemma-1* t u (Substitution.Rfun f ts j (Substitution.Rfun f₁ ts₁ j₁ x x₃ x₄) x₁ x₂ ,⋆ R*yu) = {!   !} 
+  --  with p-lemma-1 t u {!  x !} 
+  -- ... | Q = {!   !} 
+
   -- p(f(t1,t2)) -> p(u) ⇒ f(t1,t2) → u
   p-lemma-2 : ∀ {V} (t1 t2 u : Terms V)
                 → Rnc (fun pS (fun fS (t1 ∷ t2 ∷ []) ∷ [])) u 
@@ -316,14 +334,10 @@ module Example-NewmanCandidate where
   p-lemma-3 (var x) t∈MF u t→*u = {!  !}  -- p(var) is a nf
   p-lemma-3 (fun aS ts) t∈MF u t→*u = {!  !}  -- p(a) is mf 
   p-lemma-3 (fun bS ts) t∈MF u t→*u = {!  !}  -- p(b) is mf 
-  p-lemma-3 (Signature.fun pS ts) t∈MF u ε⋆ = ε⋆
-  p-lemma-3 (Signature.fun pS (t ∷ [])) t∈MF u (_,⋆_ {y = w} ppt→w w→*u) 
-    with p-lemma-1 t w ppt→w
-  ... | v ,, refl , Rpptw 
-    with 
-    -- with t∈MF ? Rpptw 
-  -- ... | Rwppt 
-    = {!t∈MF v Rpptw   !}
+  p-lemma-3 {V} (Signature.fun pS (t ∷ [])) t∈MF u t→*u  
+      with p-lemma-1* t u t→*u
+  ... | w ,, refl , pt→w with t∈MF w pt→w 
+  ... | w→pt = Rfun-cong rules V pS (w ∷ []) (fun pS (t ∷ []) ∷ [] ) λ { aS → w→pt}
   p-lemma-3 (Signature.fun fS ts) t∈MF u ε⋆ = ε⋆
   p-lemma-3 (Signature.fun fS ts) t∈MF u (x ,⋆ t→*u) = {! !}
   p-lemma-3 (fun kS ts) t∈MF u t→*u = {!  !}  -- p(k) is nf

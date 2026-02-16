@@ -1,3 +1,5 @@
+{-# OPTIONS --allow-unsolved-metas #-}
+
 open import Logic hiding (_×_)
 open import Classical
 open import Lifting
@@ -9,6 +11,7 @@ open import Data.Fin renaming (_+_ to _Fin+_) hiding (splitAt)
 open import Data.Product using (_×_)
 open import Predicates
 open import Agda.Builtin.Nat renaming (Nat to ℕ)
+open import Relations.ClosureOperators
 
 module TRS.TRS-Base where
 
@@ -19,12 +22,14 @@ record Signature : Set₁ where
     Ar : Fs → ℕ
     FsDec : (_≡_ {A = Fs} isDec)
 
-  data Terms (V : Set) : Set where
+  data  Terms (V : Set) : Set where
     var : V → Terms V
     fun : ∀ (f : Fs) → Vec (Terms V) (Ar f) → Terms V
 
   fun≡inv : ∀ {V} (f : Fs) (s t : Vec (Terms V) (Ar f)) → fun f s ≡ fun f t → s ≡ t 
   fun≡inv f s t refl = refl 
+  
+
   
 
 -- open Signature
@@ -147,6 +152,12 @@ module Substitution (S : Signature) where
       ... | in1 (sub ,, lhs[sub]=s) = t ≡ subst (rhs (Rules ri)) (lookup sub)
       ... | in2 no = ⊥
 
+      applyRuleInv : ∀ (ri : RuleIdx) → ∀ (s t : Terms V) → applyRule ri s t 
+        → Σ[ sub ∈ _ ] ((_) × t ≡ subst (rhs (Rules ri)) (lookup sub))
+      applyRuleInv ri s t ar with matchDec (lhs (Rules ri)) s 
+      ... | in1 (sub ,, lhs[sub]=s) = sub ,, lhs[sub]=s , ar
+      ... | in2 x = ∅ ar 
+
       -- The root relation AKA contraction of a rewrite rule
       R₀ : 𝓡 (Terms V)
       R₀ s t = Σ[ ri ∈ RuleIdx ] (applyRule ri s t)
@@ -155,6 +166,11 @@ module Substitution (S : Signature) where
         Rax : ∀ {s t} → R₀ s t → R s t
         Rfun : ∀ (f : Fs) (ts : Vec (Terms V) (Ar f)) (j : Fin (Ar f)) {s t u : Terms V}
                  → R (lookup ts j) u → s ≡ fun f ts → t ≡ fun f (ts [ j ]≔ u) → R s t
+
+      Rfun-cong : ∀ (f : Fs) (xs ys : Vec (Terms V) (Ar f)) →
+                   (∀ (j : Fin (Ar f)) → (R ⋆) (lookup xs j) (lookup ys j))
+                   → (R ⋆) (fun f xs) (fun f ys)
+      Rfun-cong f xs ys H = {!  !}
 
     open InScope public 
   open GeneralTRS public 
@@ -167,3 +183,6 @@ open import Relation.Nullary
 --    --   there : ∀ {n} {i} {x y} {xs : Vec A n}
 --    --           (xs[i]=x : xs [ i ]= x) → y ∷ xs [ suc i ]= x
 
+-- show that 
+  -- \all XS ys.  \all f \all j in Ar f \to R (lookup XS j) (lookup ys j) 
+  -- -> R (fun f XS) (fun f ys)
