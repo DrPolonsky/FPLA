@@ -24,8 +24,8 @@ module Theorem-1-2-2 where
     NP→UN : R isNP₌ → R isUN₌
     NP→UN RisNP₌ x∈NF y∈NF R⁼xy = NF→ε x∈NF (RisNP₌ y∈NF R⁼xy)
 
-    CP→UN : R isCR → R isUN₌
-    CP→UN RisCR = NP→UN (CR→NP RisCR)
+    CR→UN : R isCR → R isUN₌
+    CR→UN RisCR = NP→UN (CR→NP RisCR)
 
     ii+ : R isWN × R isUN → R isCR
     ii+ (RisWN ,  RisUN) x {y}{z} R*xy R*xz with RisWN y | RisWN z

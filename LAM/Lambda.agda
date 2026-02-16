@@ -1,5 +1,5 @@
 -- {-# OPTIONS --allow-unsolved-metas #-}
-module Lambda where
+module LAM.Lambda where
 
 open import Logic
 open import Lifting
@@ -106,6 +106,8 @@ _[_] : ∀ {A B : Set} → Λ A → (A → Λ B) → Λ B
 var x   [ f ] = f x
 app s t [ f ] = app (s [ f ]) (t [ f ])
 abs r   [ f ] = abs (r [ lift f ])
+
+infix 25 _[_]
 
 -- A special case of the above for finitely many variables
 _[_]ᶠ : ∀ {m n : ℕ} → Λᶠ m → (Fin m → Λᶠ n) → Λᶠ n

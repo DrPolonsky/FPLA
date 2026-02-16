@@ -4,7 +4,6 @@ module Predicates where
 open import Logic
 open import Lifting
 open import Datatypes
-open import Lambda
 -- open import Data.Nat.Base using (ℕ; zero; succ)
 
 
@@ -214,26 +213,4 @@ module Lifting^ where
 
 open Lifting^ public
 
-module Lambda^ where
-  var^ : ∀ {n : ℕ} {A : Set} → 𝓟^ n A → 𝓟^ n (Λ A)
-  var^ {zero}   P         = P
-  var^ {succ n} P (var x) = var^ (P x)
-  var^ {succ n} P _       = K⊥
 
-  app^ : ∀ {n : ℕ} {A : Set} → 𝓟^ n (Λ A) → 𝓟^ n (Λ A) → 𝓟^ n (Λ A)
-  app^ {zero}   P Q             = P × Q
-  app^ {succ n} P Q (app t1 t2) = app^ (P t1) (Q t2)
-  app^ {succ n} P Q _           = K⊥
-
-  abs^ : ∀ {n : ℕ} {A : Set} → 𝓟^ n (Λ (↑ A)) → 𝓟^ n (Λ A)
-  abs^ {zero}   P         = P
-  abs^ {succ n} P (abs t) = abs^ (P t)
-  abs^ {succ n} P _       = K⊥
-
-  Λ^ : ∀  {n : ℕ} {A : Set} → 𝓟^ n A → 𝓟^ n (Λ A)
-  Λ^ {zero}   {A} P             = P
-  Λ^ {succ n} {A} P (var x)     = var^ (P x)
-  Λ^ {succ n} {A} P (app t1 t2) = app^ (Λ^ P t1) (Λ^ P t2)
-  Λ^ {succ n} {A} P (abs t0)    = abs^ (Λ^ (↑^ P) t0)
-open Lambda^ public
- 
