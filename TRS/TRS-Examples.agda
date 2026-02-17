@@ -178,29 +178,13 @@ module Example-bubble where
   t₁→t₂ : Rswap t₁ t₂
   t₁→t₂ = Rax (zero ,, refl)
 
-module Example-NewmanCandidate where
-
-  -- aS : Fin 5
-  -- aS = zero
-  --
-  -- bS : Fin 5
-  -- bS = suc zero
-  --
-  -- pS : Fin 5
-  -- pS = suc (suc zero)
-  --
-  -- fS : Fin 5
-  -- fS = suc (suc (suc zero))
-  --
-  -- kS : Fin 5
-  -- kS = suc (suc (suc (suc zero)))
+module Example-NewmanCandidatev2 where
 
   pattern aS = zero 
   pattern bS = suc zero 
   pattern pS = suc (suc zero) 
   pattern fS = suc (suc (suc zero)) 
   pattern kS = suc (suc (suc (suc zero)))
-
 
   -- Rules:
   --   p(a) -> p(b)
@@ -217,64 +201,62 @@ module Example-NewmanCandidate where
     ar fS = 2 -- f
     ar kS = 0 -- k
 
-  open Signature S
-  open Substitution S
+  open Signature 
+  open Substitution 
 
-  lhs₁ : Pattern 0
+  lhs₁ : Pattern S 0
   lhs₁ = funp pS ((0 ,, funp aS []) ∷ [])
 
-  rhs₁ : Terms (Fin 0)
+  rhs₁ : Terms S (Fin 0)
   rhs₁ = funp→term where
-    funp→term : Terms (Fin 0)
+    funp→term : Terms S (Fin 0)
     funp→term = fun pS (fun bS [] ∷ [])
 
-  lhs₂ : Pattern 0 
+  lhs₂ : Pattern S 0 
   lhs₂ = funp pS ((0 ,, funp bS []) ∷ [])
 
-  rhs₂ : Terms (Fin 0)
+  rhs₂ : Terms S (Fin 0)
   rhs₂ = fun pS (fun aS [] ∷ [])
 
-  lhs₃ : Pattern 0
+  lhs₃ : Pattern S 0
   lhs₃ = funp fS ((0 ,, funp pS ((0 ,, funp aS []) ∷ []))
                ∷ (0 ,, funp pS ((0 ,, funp aS []) ∷ []))
                ∷ [])
 
-  rhs₃ : Terms (Fin 0)
+  rhs₃ : Terms S (Fin 0)
   rhs₃ = fun kS []
 
-  lhs₄ : Pattern 0
+  lhs₄ : Pattern S 0
   lhs₄ = funp fS ((0 ,, funp pS ((0 ,, funp bS []) ∷ []))
                ∷ (0 ,, funp pS ((0 ,, funp bS []) ∷ []))
                ∷ [])
 
-  rhs₄ : Terms (Fin 0)
+  rhs₄ : Terms S (Fin 0)
   rhs₄ = fun kS []
 
-  r₁ : RRule
+  r₁ : RRule S
   r₁ = RR 0 lhs₁ rhs₁
 
-  r₂ : RRule
+  r₂ : RRule S
   r₂ = RR 0 lhs₂ rhs₂
 
-  r₃ : RRule
+  r₃ : RRule S
   r₃ = RR 0 lhs₃ rhs₃
 
-  r₄ : RRule
+  r₄ : RRule S
   r₄ = RR 0 lhs₄ rhs₄
 
-  rules : Fin 4 → RRule
+  rules : Fin 4 → RRule S
   rules zero = r₁
   rules (suc zero) = r₂
   rules (suc (suc zero)) = r₃
   rules (suc (suc (suc zero))) = r₄
 
-  Rnc : ∀ {V} → 𝓡 (Terms V)
-  Rnc {V} = GeneralTRS.InScope.R {RuleIdx = Fin 4} rules V
+  Rnc : ∀ {V} → 𝓡 (Terms S V)
+  Rnc {V} = GeneralTRS.InScope.R S {RuleIdx = Fin 4} rules V
 
   open LocalProperties
-  -- open Substitution
-
-  -- open Signature 
+  
   {- Plan: 
   -- a,b,k are normal forms 
   -- p(a), p(b) are minimal forms 
@@ -287,30 +269,18 @@ module Example-NewmanCandidate where
   -- p(f(t1,t2)) ->⋆ p(u) ⇒ f(t1,t2) → u
   -}
 
-  -- p(p(t)) -> p(u) ⇒ p(t) → u 
-  -- p-lemma-1 : ∀ {V} (t : Terms V) (u : Terms V) 
-  --               → Rnc (fun pS (fun pS (t ∷ []) ∷ [])) (fun pS (u ∷ []))
-  --               → Rnc (fun pS (t ∷ [])) u
-  -- p-lemma-1 t u (Substitution.Rax (suc (suc (suc zero)) ,, ()))
-  -- p-lemma-1 t u (Substitution.Rax (suc (suc (suc (suc ()))) ,, snd₁))
-  -- p-lemma-1 t u (Substitution.Rfun f ts zero Rtu refl refl) = Rtu
-
-  p-lemma-1 : ∀ {V} (t : Terms V) (u : Terms V) 
+  p-lemma-1 : ∀ {V} (t : Terms S V) (u : Terms S V) 
                 → Rnc (fun pS (fun pS (t ∷ []) ∷ [])) u 
-                → Σ[ v ∈ Terms V ] ((u ≡ fun pS (v ∷ [])) × Rnc (fun pS (t ∷ [])) v)
+                → Σ[ v ∈ Terms S V ] ((u ≡ fun pS (v ∷ [])) × Rnc (fun pS (t ∷ [])) v)
   p-lemma-1 t u (Substitution.Rax (suc (suc (suc zero)) ,, ()))
   p-lemma-1 t u (Substitution.Rax (suc (suc (suc (suc ()))) ,, snd₁))
   p-lemma-1 t u (Substitution.Rfun (suc (suc zero)) (v ∷ []) zero {u = w} ppt→u refl refl) 
     = w ,, refl , ppt→u
 
-  -- Base case easy. Induction step should be mix p-lemma1 with inductive call.
-  p-lemma-1* : ∀ {V} (t : Terms V) (u : Terms V) 
+  p-lemma-1* : ∀ {V} (t : Terms S V) (u : Terms S V) 
                 → (Rnc ⋆) (fun pS (fun pS (t ∷ []) ∷ [])) u 
-                → Σ[ v ∈ Terms V ] ((u ≡ fun pS (v ∷ [])) × (Rnc ⋆) (fun pS (t ∷ [])) v)
-  
-  -- p-lemma-1* t .(fun pS (fun pS (t ∷ []) ∷ [])) ε⋆ = fun pS (t ∷ []) ,, refl , ε⋆ 
-  -- p-lemma-1* t u (Rppty ,⋆ R*yu) with p-lemma-1 t _ Rppty 
-  -- ... | v ,, refl , pt→v = fun pS (v ∷ []) ,, {! refl ,, ?  !} 
+                → Σ[ v ∈ Terms S V ] ((u ≡ fun pS (v ∷ [])) × (Rnc ⋆) (fun pS (t ∷ [])) v)
+   
   p-lemma-1* t u ε⋆ = fun pS (t ∷ []) ,, refl , ε⋆
   p-lemma-1* t u (_,⋆_ {y = s} Rts R*su) 
     with p-lemma-1 t s Rts 
@@ -319,11 +289,11 @@ module Example-NewmanCandidate where
   ... | var x | Substitution.Rax (fS ,, ())
   ... | var x | Substitution.Rax (suc (suc (suc (suc ()))) ,, snd₁)
   ... | Signature.fun aS [] | Substitution.Rax (aS ,, refl) = f (p-lemma-1* (fun bS []) u R*su)
-    where f : _ → Σ[ v ∈ Terms _ ] ((u ≡ fun pS (v ∷ [])) × (Rnc ⋆) (fun pS ((fun aS []) ∷ [])) v)
+    where f : _ → Σ[ v ∈ Terms S _ ] ((u ≡ fun pS (v ∷ [])) × (Rnc ⋆) (fun pS ((fun aS []) ∷ [])) v)
           f (z ,, refl , pb→z) = z ,, refl , (Rax (zero ,, refl) ,⋆ pb→z)
   ... | Signature.fun aS [] | Substitution.Rax (fS ,, ())
   ... | Signature.fun bS [] | Substitution.Rax (bS ,, refl) = f (p-lemma-1* (fun aS []) u R*su)
-    where f : _ → Σ[ v ∈ Terms _ ] ((u ≡ fun pS (v ∷ [])) × (Rnc ⋆) (fun pS ((fun bS []) ∷ [])) v)
+    where f : _ → Σ[ v ∈ Terms S _ ] ((u ≡ fun pS (v ∷ [])) × (Rnc ⋆) (fun pS ((fun bS []) ∷ [])) v)
           f (z ,, refl , pa→z) = z ,, refl , (Rax (suc zero ,, refl) ,⋆ pa→z)
   ... | Signature.fun bS [] | Substitution.Rax (fS ,, ())
   ... | Signature.fun bS [] | Substitution.Rax (suc (suc (suc (suc ()))) ,, snd₁)
@@ -336,70 +306,113 @@ module Example-NewmanCandidate where
     with p-lemma-1* y u R*su 
   ... | z ,, refl , py→z  = z ,, refl , (Rfun pS (x ∷ []) zero Rxy refl refl ,⋆ py→z) 
   
-{-
-  p-lemma-1* t u (Substitution.Rax (fS ,, ()) ,⋆ Q)
-  p-lemma-1* t u (Substitution.Rax (suc (suc (suc (suc ()))) ,, snd₁) ,⋆ R*yu)
-  p-lemma-1* t u (Substitution.Rfun .pS .(fun pS (t ∷ []) ∷ []) aS (Substitution.Rax (aS ,, ar)) refl refl ,⋆ R*yu) with applyRuleInv rules _ _ _ _ ar 
-  ...| sub ,, eq rewrite eq = {!   !}
-  p-lemma-1* t u (Substitution.Rfun .pS .(fun pS (t ∷ []) ∷ []) j (Substitution.Rax (suc fst₁ ,, snd₁)) refl refl ,⋆ R*yu) = {!   !}
-  p-lemma-1* t u (Substitution.Rfun f ts j (Substitution.Rfun f₁ ts₁ j₁ x x₃ x₄) x₁ x₂ ,⋆ R*yu) = {!   !} 
-  --  with p-lemma-1 t u {!  x !} 
-  -- ... | Q = {!   !} 
--}
 
   -- p(f(t1,t2)) -> p(u) ⇒ f(t1,t2) → u
-  p-lemma-2 : ∀ {V} (t1 t2 u : Terms V)
+  p-lemma-2 : ∀ {V} (t1 t2 u : Terms S V)
                 → Rnc (fun pS (fun fS (t1 ∷ t2 ∷ []) ∷ [])) u 
-                → Σ[ v ∈ Terms V ] ((u ≡ fun pS (v ∷ [])) × (Rnc (fun fS (t1 ∷ t2 ∷ [])) v))
+                → Σ[ v ∈ Terms S V ] ((u ≡ fun pS (v ∷ [])) × (Rnc (fun fS (t1 ∷ t2 ∷ [])) v))
   p-lemma-2 t1 t2 u (Substitution.Rax (suc (suc (suc zero)) ,, ()))
   p-lemma-2 t1 t2 u (Substitution.Rax (suc (suc (suc (suc ()))) ,, snd₁))
   p-lemma-2 t1 t2 u (Substitution.Rfun f ts zero {u = w} Rtu refl refl) = w ,, refl , Rtu
 
-  p-lemma-3 :  ∀ {V} (t : Terms V) → t ∈ MF {R = Rnc} → fun pS (t ∷ []) ∈ MF {R = Rnc}
-  p-lemma-3 (var x) t∈MF u t→*u = {!  !}  -- p(var) is a nf
-  p-lemma-3 (fun aS ts) t∈MF u t→*u = {!  !}  -- p(a) is mf 
-  p-lemma-3 (fun bS ts) t∈MF u t→*u = {!  !}  -- p(b) is mf 
+  p-lemma-2* : ∀ {V} (t1 t2 : Terms S V) (u : Terms S V)
+    → (Rnc ⋆) (fun pS (fun fS (t1 ∷ t2 ∷ []) ∷ [])) u
+    → Σ[ v ∈ Terms S V ] ((u ≡ fun pS (v ∷ [])) × (Rnc ⋆) (fun fS (t1 ∷ t2 ∷ [])) v)
+  p-lemma-2* t1 t2 u ε⋆ = fun fS (t1 ∷ t2 ∷ []) ,, refl , ε⋆
+  p-lemma-2* t1 t2 u (Rxy ,⋆ R*yu) with p-lemma-2 t1 t2 _ Rxy
+  ... | v ,, eq , f→v rewrite eq with p-lemma-2* t1 t2 u {! R*yu  !}
+  ... | w ,, refl , f→*w = {!   !} -- w ,, refl , (f→v ,⋆ f→*w)
+
+  pa-step-shape : ∀ {V : Set} {u : Terms S V} → -- P(a) only reduces to P(b) in single step
+    Rnc  (fun pS (fun aS [] ∷ [])) u →
+    u ≡ fun pS (fun bS [] ∷ [])
+  pa-step-shape (Rax (aS ,, refl)) = refl
+  pa-step-shape (Rax (fS ,, ()))
+  pa-step-shape (Rax (suc (suc (suc (suc ()))) ,, snd₁))
+  pa-step-shape (Rfun pS (fun aS [] ∷ []) aS (Rax (fS ,, ())) x₁ x₂)
+  pa-step-shape (Rfun pS (fun aS [] ∷ []) aS (Rax (suc (suc (suc (suc ()))) ,, snd₁)) x₁ x₂)
+  pa-step-shape (Rfun pS (fun aS [] ∷ []) aS (Rfun f ts () x refl refl) refl refl)  
+
+  pb-step-shape : ∀ {V : Set} {u : Terms S V} → -- P(b) only reduces to P(a) in single step
+    Rnc  (fun pS (fun bS [] ∷ [])) u →
+    u ≡ fun pS (fun aS [] ∷ [])
+  pb-step-shape (Rax (bS ,, refl)) = refl
+  pb-step-shape (Rax (fS ,, ()))
+  pb-step-shape (Rax (suc (suc (suc (suc ()))) ,, snd₁))
+  pb-step-shape (Rfun pS (fun bS [] ∷ []) aS (Rax (fS ,, ())) refl refl)
+  pb-step-shape (Rfun pS (fun bS [] ∷ []) aS (Rax (suc (suc (suc (suc ()))) ,, snd₁)) refl refl)
+  pb-step-shape (Rfun pS (fun bS [] ∷ []) aS (Rfun f ts () x refl refl) refl refl)
+
+  pa-step-shape* : ∀ {V : Set} {u : Terms S V} → -- P(a) only reduces to P(b) or P(a) in multi step
+    (Rnc ⋆)  (fun pS (fun aS [] ∷ [])) u →
+    (u ≡ fun pS (fun bS [] ∷ [])) ⊔ (u ≡ fun pS (fun aS [] ∷ []))
+  pb-step-shape* : ∀ {V : Set} {u : Terms S V} → -- P(b) only reduces to P(a) or P(b) in multi step
+    (Rnc ⋆)  (fun pS (fun bS [] ∷ [])) u →
+    (u ≡ fun pS (fun bS [] ∷ [])) ⊔ (u ≡ fun pS (fun aS [] ∷ []))
+  
+  pa-step-shape* ε⋆ = in2 refl
+  pa-step-shape* (Rxy ,⋆ R*yu) rewrite pa-step-shape Rxy = pb-step-shape* R*yu
+  pb-step-shape* ε⋆ = in1 refl
+  pb-step-shape* (Rxy ,⋆ R*yu) rewrite pb-step-shape Rxy = pa-step-shape* R*yu 
+
+  -- t ∈ MF → p(t) ∈ MF 
+  p-lemma-3 :  ∀ {V} (t : Terms S V) → t ∈ MF {R = Rnc} → fun pS (t ∷ []) ∈ MF {R = Rnc}
+  p-lemma-3 (Signature.var x) t∈MF u ε⋆ = ε⋆
+  p-lemma-3 (Signature.var x) t∈MF u (Rxy ,⋆ R*yu) = ∅ (pvar-nostep Rxy)
+    where
+    pvar-nostep : ∀ {y} → (Rnc (fun pS (var x ∷ [])) y) → ⊥
+    pvar-nostep (Substitution.Rax (aS ,, ()))
+    pvar-nostep (Substitution.Rax (bS ,, ()))
+    pvar-nostep (Substitution.Rax (pS ,, ()))
+    pvar-nostep (Substitution.Rax (fS ,, ())) 
+    pvar-nostep (Substitution.Rfun pS (var t ∷ ts) aS (Substitution.Rax (fS ,, ())) refl refl)
+    pvar-nostep (Substitution.Rfun pS (var t ∷ ts) aS (Substitution.Rax (suc (suc (suc (suc ()))) ,, y)) refl refl)
+  p-lemma-3 (fun aS []) t∈MF u t→*u with pa-step-shape* t→*u -- p(a) is mf 
+  ... | in1 refl = Rax (bS ,, refl) ,⋆ ε⋆
+  ... | in2 refl = t→*u
+  p-lemma-3 (fun bS []) t∈MF u t→*u with pb-step-shape* t→*u -- p(b) is mf 
+  ... | in1 refl = t→*u
+  ... | in2 refl = Rax (aS ,, refl) ,⋆ ε⋆  
   p-lemma-3 {V} (Signature.fun pS (t ∷ [])) t∈MF u t→*u  
       with p-lemma-1* t u t→*u
   ... | w ,, refl , pt→w with t∈MF w pt→w 
-  ... | w→pt = Rfun-cong rules V pS (w ∷ []) (fun pS (t ∷ []) ∷ [] ) λ { aS → w→pt}
-  p-lemma-3 (Signature.fun fS ts) t∈MF u ε⋆ = ε⋆
-  p-lemma-3 (Signature.fun fS ts) t∈MF u (x ,⋆ t→*u) = {! !}  -- this one needs "p-lemma-2*"
-  p-lemma-3 (fun kS ts) t∈MF u t→*u = {!  !}  -- p(k) is nf
-
-{-
-  -- prove t ∈ MF → p(t) ∈ MF 
-  p-lemma-3 : ∀ {V} (t : Terms V) → t ∈ MF {R = Rnc} → fun pS (t ∷ []) ∈ MF {R = Rnc}
-  p-lemma-3 (Signature.var x) t∈MF u t→*u = {!  !} -- ∈ NF 
-  p-lemma-3 (Signature.fun zero x) t∈MF u t→*u = {! !} -- p(a) is recurrent (hence MF)
-  p-lemma-3 (Signature.fun (suc zero) x) t∈MF u t→*u = {! !} -- p(b) ∈ MF 
-  p-lemma-3 (Signature.fun (suc (suc f)) x) t∈MF u ε⋆ = ε⋆
-  p-lemma-3 (Signature.fun (suc (suc f)) x) t∈MF u (_,⋆_ {y = v} (Substitution.Rax (suc (suc (suc zero)) ,, ())) v→*u)
-  p-lemma-3 (Signature.fun (suc (suc f)) x) t∈MF u (_,⋆_ {y = v} (Substitution.Rax (suc (suc (suc (suc ()))) ,, snd₁)) v→*u)
-  p-lemma-3 (Signature.fun (suc (suc zero)) (x ∷ [])) t∈MF u (_,⋆_ {y = v} (Substitution.Rfun (suc (suc zero)) (x₃ ∷ []) zero t→v refl refl) v→*u) = {!t∈MF _ v→*u  !}
-  p-lemma-3 (Signature.fun (suc (suc (suc f))) x) t∈MF u (_,⋆_ {y = v} (Substitution.Rfun (suc (suc zero)) (x₃ ∷ []) zero t→v refl refl) v→*u) = {! !} 
-  -- 
-  p-lemma-3 t t∈MF u ε⋆ = ε⋆
-  p-lemma-3 (Signature.var x) t∈MF u (_,⋆_ {y = v} pt→v v→*u) = {!  !} -- easy, p(x) ∈ NF 
-  p-lemma-3 (Signature.fun zero x) t∈MF u (_,⋆_ {y = v} pt→v v→*u) = {! !} -- p(a) -> p(b) ∈ MF 
-  p-lemma-3 (Signature.fun (suc zero) x) t∈MF u (_,⋆_ {y = v} pt→v v→*u) = {! !} -- p(b) → p(a) ∈ MF 
-  -- p-lemma-3 (Signature.fun (suc (suc zero)) x) t∈MF u (_,⋆_ {y = v} pt→v v→*u) 
-  -- p-lemma-3 (Signature.fun (suc (suc zero)) (x ∷ [])) t∈MF u (_,⋆_ {y = v} pt→v v→*u) 
-  p-lemma-3 (Signature.fun (suc (suc zero)) (x ∷ [])) t∈MF u (_,⋆_ {y = v} (Substitution.Rax (suc (suc (suc zero)) ,, ())) v→*u)
-  p-lemma-3 (Signature.fun (suc (suc zero)) (x ∷ [])) t∈MF u (_,⋆_ {y = v} (Substitution.Rax (suc (suc (suc (suc ()))) ,, snd₁)) v→*u)
-  -- p-lemma-3 (Signature.fun (suc (suc zero)) (x ∷ [])) t∈MF u (_,⋆_ {y = v} (Substitution.Rfun f ts j pt→v x₁ x₂) v→*u)
-  p-lemma-3 (Signature.fun (suc (suc zero)) (x ∷ [])) t∈MF u (_,⋆_ {y = v} 
-    (Substitution.Rfun .pS .(fun (suc (suc zero)) (x ∷ []) ∷ []) zero pt→v refl refl) v→*u) 
-    = {!   !}
-  p-lemma-3 (Signature.fun (suc (suc (suc zero))) x) t∈MF u (_,⋆_ {y = v} pt→v v→*u) = {! !}
-  p-lemma-3 (Signature.fun (suc (suc (suc (suc zero)))) x) t∈MF u (_,⋆_ {y = v} pt→v v→*u) = {! !}
--}
+  ... | w→pt = Rfun-cong S rules V pS (w ∷ []) (fun pS (t ∷ []) ∷ [] ) λ { aS → w→pt}
+  p-lemma-3 (Signature.fun fS ts) t∈MF u ε⋆ = ε⋆        
+  p-lemma-3 (Signature.fun fS ts) t∈MF u (Rxy ,⋆ R*yu) = {! !}  -- this one needs "p-lemma-2*"
+  p-lemma-3 (fun kS []) t∈MF u ε⋆ = ε⋆                -- p(k) is nf
+  p-lemma-3 (fun kS []) t∈MF u (Rxy ,⋆ R*yu) = ∅ (pk-nostep Rxy )
+    where 
+    pk-nostep : ∀ {V : Set} {y : Terms S V} → (Rnc (fun pS (fun kS [] ∷ [])) y) → ⊥
+    pk-nostep (Rax (fS ,, ()))
+    pk-nostep (Rax (suc (suc (suc (suc ()))) ,, snd₁))
+    pk-nostep (Rfun pS ts aS (Rax (fS ,, ())) refl refl)
+    pk-nostep (Rfun pS ts aS (Rax (suc (suc (suc (suc ()))) ,, snd₁)) refl refl)
+    pk-nostep (Rfun pS ts aS (Rfun kS [] () x x₁ x₂) refl refl)
+    pk-nostep (Rfun pS ts aS (Rfun (suc (suc (suc (suc (suc f))))) ts₁ j x () x₂) refl refl)
 
   RncIsSM : ∀ {V} → Rnc {V} isSM 
-  RncIsSM (Signature.var x) = {!  !}  -- EASY
-  RncIsSM (Signature.fun zero ts) = {!  !} -- a ∈ NF 
-  RncIsSM (Signature.fun (suc zero) ts) = {! !} -- b ∈ NF  
-  RncIsSM (Signature.fun (suc (suc zero)) (t ∷ [])) 
+  RncIsSM (Signature.var x) = SMind (var x) impossible-step where
+    impossible-step : ∀ y → Rnc (Signature.var x) y → SM y
+    impossible-step y (Substitution.Rax (suc (suc (suc zero)) ,, ()))
+    impossible-step y (Substitution.Rax (suc (suc (suc (suc ()))) ,, snd₁))
+
+  RncIsSM (fun aS []) = SMind (fun aS []) impossible-step where -- a ∈ NF
+    impossible-step : ∀ y → Rnc (fun aS []) y → SM y
+    impossible-step y (Substitution.Rax (aS ,, ()))
+    impossible-step y (Substitution.Rax (bS ,, ()))
+    impossible-step y (Substitution.Rax (fS ,, ()))
+    impossible-step y (Substitution.Rax (suc (suc (suc (suc ()))) ,, snd₁))
+    impossible-step y (Substitution.Rfun aS [] () r refl refl)
+
+  RncIsSM (fun bS []) = SMind (fun bS []) impossible-step where -- b ∈ NF
+    impossible-step : ∀ y → Rnc (fun bS []) y → SM y
+    impossible-step y (Substitution.Rax (aS ,, ()))
+    impossible-step y (Substitution.Rax (bS ,, ()))
+    impossible-step y (Substitution.Rax (fS ,, ()))
+    impossible-step y (Substitution.Rax (suc (suc (suc (suc ()))) ,, snd₁))
+    impossible-step y (Substitution.Rfun bS [] () r refl refl) 
+  
+  RncIsSM (Signature.fun pS (t ∷ [])) 
     with RncIsSM t 
   ... | MF⊆SM m t∈SM = MF⊆SM _ (p-lemma-3 t t∈SM)
   ... | SMind .t H = SMind _ t∈SM where 
@@ -411,28 +424,34 @@ module Example-NewmanCandidate where
       -- with p-lemma-1 
       = {! H _ t→y   !}
     
-  RncIsSM (Signature.fun (suc (suc (suc zero))) ts) = {! !} -- f 
-  RncIsSM (Signature.fun (suc (suc (suc (suc zero)))) ts) = {! !} -- k ∈ NF 
+  RncIsSM (Signature.fun fS ts) = {! !} -- f 
+  RncIsSM (fun kS []) = SMind (fun kS []) impossible-step where -- k ∈ NF
+    impossible-step : ∀ y → Rnc (fun kS []) y → SM y
+    impossible-step y (Substitution.Rax (aS ,, ()))
+    impossible-step y (Substitution.Rax (bS ,, ()))
+    impossible-step y (Substitution.Rax (fS ,, ()))
+    impossible-step y (Substitution.Rax (suc (suc (suc (suc ()))) ,, snd₁))
+    impossible-step y (Substitution.Rfun kS [] () r refl refl)   
 
-  a : Terms ⊥
+  a : Terms S ⊥
   a = fun aS []
 
-  b : Terms ⊥
+  b : Terms S ⊥
   b = fun bS []
 
-  pa : Terms ⊥
+  pa : Terms S ⊥
   pa = fun pS (a ∷ [])
 
-  pb : Terms ⊥
+  pb : Terms S ⊥
   pb = fun pS (b ∷ [])
 
-  k : Terms ⊥
+  k : Terms S ⊥
   k = fun kS []
 
-  faa : Terms ⊥
+  faa : Terms S ⊥
   faa = fun fS (pa ∷ pa ∷ [])
 
-  fba : Terms ⊥
+  fba : Terms S ⊥
   fba = fun fS (pb ∷ pa ∷ [])
 
   p-a→p-b : Rnc pa pb
