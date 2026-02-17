@@ -152,11 +152,11 @@ module Substitution (S : Signature) where
       ... | in1 (sub ,, lhs[sub]=s) = t ≡ subst (rhs (Rules ri)) (lookup sub)
       ... | in2 no = ⊥
 
-      applyRuleInv : ∀ (ri : RuleIdx) → ∀ (s t : Terms V) → applyRule ri s t 
-        → Σ[ sub ∈ _ ] ((_) × t ≡ subst (rhs (Rules ri)) (lookup sub))
-      applyRuleInv ri s t ar with matchDec (lhs (Rules ri)) s 
-      ... | in1 (sub ,, lhs[sub]=s) = sub ,, lhs[sub]=s , ar
-      ... | in2 x = ∅ ar 
+      -- applyRuleInv : ∀ (ri : RuleIdx) → ∀ (s t : Terms V) → applyRule ri s t 
+      --   → Σ[ sub ∈ _ ] ((_) × t ≡ subst (rhs (Rules ri)) (lookup sub))
+      -- applyRuleInv ri s t ar with matchDec (lhs (Rules ri)) s 
+      -- ... | in1 (sub ,, lhs[sub]=s) = sub ,, lhs[sub]=s , ar
+      -- ... | in2 x = ∅ ar 
 
       -- The root relation AKA contraction of a rewrite rule
       R₀ : 𝓡 (Terms V)

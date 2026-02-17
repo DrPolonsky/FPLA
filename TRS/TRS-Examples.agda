@@ -29,7 +29,6 @@ module Example1 where
     ar (suc (suc zero)) = 2 -- F
     ar (suc (suc (suc zero))) = 2 -- G
  
-
   open Signature S
   open Substitution S
 
@@ -229,7 +228,7 @@ module Example-NewmanCandidate where
     funp→term : Terms (Fin 0)
     funp→term = fun pS (fun bS [] ∷ [])
 
-  lhs₂ : Pattern 0
+  lhs₂ : Pattern 0 
   lhs₂ = funp pS ((0 ,, funp bS []) ∷ [])
 
   rhs₂ : Terms (Fin 0)
@@ -313,6 +312,31 @@ module Example-NewmanCandidate where
   -- p-lemma-1* t u (Rppty ,⋆ R*yu) with p-lemma-1 t _ Rppty 
   -- ... | v ,, refl , pt→v = fun pS (v ∷ []) ,, {! refl ,, ?  !} 
   p-lemma-1* t u ε⋆ = fun pS (t ∷ []) ,, refl , ε⋆
+  p-lemma-1* t u (_,⋆_ {y = s} Rts R*su) 
+    with p-lemma-1 t s Rts 
+  ... | w ,, refl , pt→w 
+    with t | pt→w 
+  ... | var x | Substitution.Rax (fS ,, ())
+  ... | var x | Substitution.Rax (suc (suc (suc (suc ()))) ,, snd₁)
+  ... | Signature.fun aS [] | Substitution.Rax (aS ,, refl) = f (p-lemma-1* (fun bS []) u R*su)
+    where f : _ → Σ[ v ∈ Terms _ ] ((u ≡ fun pS (v ∷ [])) × (Rnc ⋆) (fun pS ((fun aS []) ∷ [])) v)
+          f (z ,, refl , pb→z) = z ,, refl , (Rax (zero ,, refl) ,⋆ pb→z)
+  ... | Signature.fun aS [] | Substitution.Rax (fS ,, ())
+  ... | Signature.fun bS [] | Substitution.Rax (bS ,, refl) = f (p-lemma-1* (fun aS []) u R*su)
+    where f : _ → Σ[ v ∈ Terms _ ] ((u ≡ fun pS (v ∷ [])) × (Rnc ⋆) (fun pS ((fun bS []) ∷ [])) v)
+          f (z ,, refl , pa→z) = z ,, refl , (Rax (suc zero ,, refl) ,⋆ pa→z)
+  ... | Signature.fun bS [] | Substitution.Rax (fS ,, ())
+  ... | Signature.fun bS [] | Substitution.Rax (suc (suc (suc (suc ()))) ,, snd₁)
+  ... | fun pS (t' ∷ []) | Substitution.Rax (fS ,, ())
+  ... | Signature.fun fS _ | Substitution.Rax (fS ,, ())
+  ... | Signature.fun fS _ | Substitution.Rax (suc (suc (suc (suc ()))) ,, snd₁)
+  ... | Signature.fun kS x | Substitution.Rax (fS ,, ())
+  ... | Signature.fun kS x | Substitution.Rax (suc (suc (suc (suc ()))) ,, snd₁)
+  ... | x | Substitution.Rfun .pS (t' ∷ []) zero {u = y} Rxy refl refl 
+    with p-lemma-1* y u R*su 
+  ... | z ,, refl , py→z  = z ,, refl , (Rfun pS (x ∷ []) zero Rxy refl refl ,⋆ py→z) 
+  
+{-
   p-lemma-1* t u (Substitution.Rax (fS ,, ()) ,⋆ Q)
   p-lemma-1* t u (Substitution.Rax (suc (suc (suc (suc ()))) ,, snd₁) ,⋆ R*yu)
   p-lemma-1* t u (Substitution.Rfun .pS .(fun pS (t ∷ []) ∷ []) aS (Substitution.Rax (aS ,, ar)) refl refl ,⋆ R*yu) with applyRuleInv rules _ _ _ _ ar 
@@ -321,6 +345,7 @@ module Example-NewmanCandidate where
   p-lemma-1* t u (Substitution.Rfun f ts j (Substitution.Rfun f₁ ts₁ j₁ x x₃ x₄) x₁ x₂ ,⋆ R*yu) = {!   !} 
   --  with p-lemma-1 t u {!  x !} 
   -- ... | Q = {!   !} 
+-}
 
   -- p(f(t1,t2)) -> p(u) ⇒ f(t1,t2) → u
   p-lemma-2 : ∀ {V} (t1 t2 u : Terms V)
@@ -339,7 +364,7 @@ module Example-NewmanCandidate where
   ... | w ,, refl , pt→w with t∈MF w pt→w 
   ... | w→pt = Rfun-cong rules V pS (w ∷ []) (fun pS (t ∷ []) ∷ [] ) λ { aS → w→pt}
   p-lemma-3 (Signature.fun fS ts) t∈MF u ε⋆ = ε⋆
-  p-lemma-3 (Signature.fun fS ts) t∈MF u (x ,⋆ t→*u) = {! !}
+  p-lemma-3 (Signature.fun fS ts) t∈MF u (x ,⋆ t→*u) = {! !}  -- this one needs "p-lemma-2*"
   p-lemma-3 (fun kS ts) t∈MF u t→*u = {!  !}  -- p(k) is nf
 
 {-
@@ -368,20 +393,23 @@ module Example-NewmanCandidate where
     = {!   !}
   p-lemma-3 (Signature.fun (suc (suc (suc zero))) x) t∈MF u (_,⋆_ {y = v} pt→v v→*u) = {! !}
   p-lemma-3 (Signature.fun (suc (suc (suc (suc zero)))) x) t∈MF u (_,⋆_ {y = v} pt→v v→*u) = {! !}
+-}
 
   RncIsSM : ∀ {V} → Rnc {V} isSM 
   RncIsSM (Signature.var x) = {!  !}  -- EASY
-  RncIsSM (Signature.fun zero ts) = {! !} -- a ∈ NF 
+  RncIsSM (Signature.fun zero ts) = {!  !} -- a ∈ NF 
   RncIsSM (Signature.fun (suc zero) ts) = {! !} -- b ∈ NF  
   RncIsSM (Signature.fun (suc (suc zero)) (t ∷ [])) 
     with RncIsSM t 
   ... | MF⊆SM m t∈SM = MF⊆SM _ (p-lemma-3 t t∈SM)
-  ... | SMind u H = SMind _ t∈SM where 
+  ... | SMind .t H = SMind _ t∈SM where 
     t∈SM : _ 
     t∈SM y (Substitution.Rax x) = {! x  !} -- p(a) or p(b), hence MF, and SM 
     t∈SM y (Substitution.Rfun (suc (suc zero)) (Signature.var x ∷ []) zero (Substitution.Rax (suc (suc (suc zero)) ,, ())) refl refl)
     t∈SM y (Substitution.Rfun (suc (suc zero)) (Signature.var x ∷ []) zero (Substitution.Rax (suc (suc (suc (suc ()))) ,, snd₁)) refl refl)
-    t∈SM y (Substitution.Rfun (suc (suc zero)) (Signature.fun f x ∷ []) zero t→y refl refl) = {! H _ t→y   !}
+    t∈SM y (Substitution.Rfun (suc (suc zero)) (Signature.fun f x ∷ []) zero t→y refl refl) 
+      -- with p-lemma-1 
+      = {! H _ t→y   !}
     
   RncIsSM (Signature.fun (suc (suc (suc zero))) ts) = {! !} -- f 
   RncIsSM (Signature.fun (suc (suc (suc (suc zero)))) ts) = {! !} -- k ∈ NF 
@@ -418,5 +446,4 @@ module Example-NewmanCandidate where
 
   faa→fba : Rnc faa fba
   faa→fba = Rfun fS (pa ∷ pa ∷ []) zero p-a→p-b refl refl
--}
  
