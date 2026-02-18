@@ -3,6 +3,7 @@ open import Logic
 open import Predicates
 open import Datatypes
 open import Lists
+open import Data.List using (map)
 open import Relations.Decidable using (_isDec; _isMinDec)
 open import Relations.Core
 open import Classical

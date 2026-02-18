@@ -1,6 +1,8 @@
 open import Logic
 open import Predicates
-open import Datatypes
+open import Datatypes hiding (_++_)
+open import Data.List using (map ; _++_)
+-- TODO: make sure Datatypes is using Agda's map instead of List→ 
 
 module Lists where
 
@@ -14,6 +16,18 @@ List∃ P (x ∷ xs) = P x ⊔ List∃ P xs
 
 _∈List_ : ∀ {A : Set} → A → List A → Set
 x ∈List ys = List∃ (λ y → x ≡ y) ys
+
+map∈ : ∀ {A B : Set} (f : A → B) (x : A) (xs : List A) → x ∈List xs → f x ∈List map f xs 
+map∈ f x (.x ∷ xs) (in1 refl) = in1 refl
+map∈ f x (y ∷ xs) (in2 x∈xs) = in2 (map∈ f x xs x∈xs)
+
+++∈L : ∀ {A : Set} (xs ys : List A) (x : A) → x ∈List xs → x ∈List (xs ++ ys) 
+++∈L (x ∷ xs) ys z (in1 refl) = in1 refl
+++∈L (_ ∷ xs) ys x (in2 x∈xs) = in2 (++∈L xs ys x x∈xs)
+
+++∈R : ∀ {A : Set} (xs ys : List A) (y : A) → y ∈List ys → y ∈List (xs ++ ys) 
+++∈R [] ys y y∈ys = y∈ys
+++∈R (x ∷ xs) ys y y∈ys = in2 (++∈R xs ys y y∈ys)
 
 List∃elim : ∀ {A : Set} (P : 𝓟 A) (xs : List A) → List∃ P xs →
               Σ[ y ∈ A ] (y ∈List xs × P y)
