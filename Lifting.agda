@@ -63,4 +63,11 @@ io-nat : ∀ {A B C : Set} (f : B → C) (g : A → B) (c : C) → io (f ∘ g) 
 io-nat f g d (i x) = refl
 io-nat f g d o = refl
 
--- open import Datatypes public 
+-- Preservation of decidability of equality
+dec≡↑ : ∀ {X} → dec≡ X → dec≡ (↑ X)
+dec≡↑ dX o     o     = in1 refl 
+dec≡↑ dX o     (i y) = in2 λ { () }
+dec≡↑ dX (i x) o     = in2 λ { () }
+dec≡↑ dX (i x) (i y) = case (λ e → in1 (cong i e)) (λ ne → in2 λ { refl → ne refl }) (dX x y)
+
+-- open import Datatypes public

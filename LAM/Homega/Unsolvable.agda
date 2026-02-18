@@ -5,7 +5,7 @@ module LAM.Homega.Unsolvable where
 open import Logic
 open import Lifting
 open import LAM.Lambda
-open import LAM.Reduction
+open import LAM.Reduction.Reduction
 open import Predicates
 
 open import Relations.ClosureOperators

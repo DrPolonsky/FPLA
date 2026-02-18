@@ -144,12 +144,15 @@ module ClassicalProperties {A : Set} where
   dec : 𝓟 A → Set
   dec P = ∀ x → EM (P x)
 
-  wdec : 𝓟 A → Set 
+  dec2 : 𝓡 A → Set 
+  dec2 R = ∀ x y → EM (R x y)
+
+  wdec : 𝓟 A → Set
   wdec P = dec (∁ P)
 
   -- dec≡ : Set
   -- dec≡ = ∀ x → dec (_≡_ x)
-  
+
   ¬¬Closed : 𝓟 A → Set
   ¬¬Closed P = ∁∁ P ⊆ P
 
@@ -162,13 +165,13 @@ module ClassicalProperties {A : Set} where
   DNS P = (∀ x → ¬¬ (P x)) → ¬¬ (∀ x → P x)
 
   dec→¬¬Closed : ∀ (P : 𝓟 A) → dec P → ¬¬Closed P
-  dec→¬¬Closed P dp a ¬¬pa = case I (λ ¬pa → ∅ (¬¬pa ¬pa) ) (dp a) 
+  dec→¬¬Closed P dp a ¬¬pa = case I (λ ¬pa → ∅ (¬¬pa ¬pa) ) (dp a)
 
   ¬¬Closed∁ : ∀ (P : 𝓟 A) → ¬¬Closed (∁ P)
   ¬¬Closed∁ P x ¬¬¬x∈P Px = ¬¬¬x∈P (λ ¬Px → ¬Px Px)
 
 
-  
+
 
 open ClassicalProperties public
 
@@ -212,5 +215,3 @@ module Lifting^ where
   -- The dependent eliminator into k-ary predicates ?
 
 open Lifting^ public
-
-

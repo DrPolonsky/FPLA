@@ -188,11 +188,23 @@ bind-map : ∀ {A B : Set} (s : Λ (↑ A)) (t : Λ A) (f : A → B)
            → Λ→ f (s [ t ]ₒ) ≡ (Λ→ (↑→ f) s [ Λ→ f t ]ₒ)
 bind-map s t f = bind-nat₂ {f = io var t} {f} !≅! s
               ~! bind-nat₁ (io𝓟 _ (λ x → refl) refl ) s
--- bind-map : ∀ {X Y Z : Set} (f : X → Y) (g : Y → Λ Z)
---               → bind (Λ→ f ∘ g) ∘ Λ→ (↑→ f) ≅ Λ→ f ∘ bind g ?????
--- bind-nat₁ : ∀ {X Y Z : Set} {f : X → Y} {g : Y → Λ Z} {h}
---               → h ≅ g ∘ f → bind h ≅ bind g ∘ Λ→ f
--- bind-nat₂ : ∀ {X Y Z : Set} {f : X → Λ Y} {g : Y → Z} {h}
---               → h ≅ Λ→ g ∘ f → bind h ≅ Λ→ g ∘ bind f
+
+-- Preservation of decidable equality 
+dec≡Λ : ∀ {V} → dec≡ V → dec≡ (Λ V) 
+dec≡Λ dV (var x) (var y) = case (in1 ∘ cong var) (λ ne → in2 λ { refl → ne refl }) (dV x y)
+dec≡Λ dV (var x) (app _ _) = in2 λ { () }
+dec≡Λ dV (var x) (abs t) = in2 λ { () }
+dec≡Λ dV (app s1 s2) (var x) = in2 λ { () }
+dec≡Λ dV (app s1 s2) (app t1 t2)
+  with dec≡Λ dV s1 t1 | dec≡Λ dV s2 t2 
+... | in1 e1 | in1 e2 = in1 (cong2 app e1 e2)
+... | in1 _ | in2 ne = in2 λ { refl → ne refl }
+... | in2 ne | _     = in2 λ { refl → ne refl }
+dec≡Λ dV (app s1 s2) (abs t) = in2 λ { () }
+dec≡Λ dV (abs s) (var x) = in2 λ { () }
+dec≡Λ dV (abs s) (app t t₁) = in2 λ { () }
+dec≡Λ dV (abs s) (abs t) = case yes no (dec≡Λ (dec≡↑ dV) s t)
+  where yes = in1 ∘ cong abs 
+        no  = λ ne → in2 λ { refl → ne refl }
 
 -- The End

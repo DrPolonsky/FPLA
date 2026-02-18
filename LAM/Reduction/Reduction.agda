@@ -1,5 +1,5 @@
 -- {-# OPTIONS --allow-unsolved-metas #-}
-module LAM.Reduction where
+module LAM.Reduction.Reduction where
 
 open import Logic
 open import Lifting
