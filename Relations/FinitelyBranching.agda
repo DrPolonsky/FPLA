@@ -1,9 +1,8 @@
-{-# OPTIONS --allow-unsolved-metas #-}
+-- {-# OPTIONS --allow-unsolved-metas #-}
 open import Logic
 open import Predicates
 open import Datatypes
 open import Lists
-open import Data.List using (map)
 open import Relations.Decidable using (_isDec; _isMinDec)
 open import Relations.Core
 open import Classical
@@ -35,6 +34,13 @@ dec∧FB→isMinDec RisDec RisFB x₀ with decList∃ (R x₀) (λ _ → RisDec)
  ∄y (List∃intro (R x₀) (fst (RisFB x₀)) y (snd (RisFB x₀) y Ryx₀ , Ryx₀)))
 ... | in1 ∃y with List∃elim (R x₀) (fst (RisFB x₀)) ∃y
 ... | (y ,, _ , Ryx₀) = in1 (y ,, Ryx₀ )
+
+dec≡∧FBRel→decR : dec≡ A → _isFBRel → R isDec 
+dec≡∧FBRel→decR dA fbR {x} {y} with fbR x 
+... | xs ,, f 
+  with decList∃ (_≡_ y) (dA y) xs 
+... | in1 yes = in1 (pr2 (f y) yes)
+... | in2 no  = in2 λ Rxy → no (pr1 (f y) Rxy)
 
 -- [AP: redo]
 FB→DNS : ∀ (P : 𝓟 A) → ∀ x → x ∈ FB → (∀ y → R x y → ¬¬ P y) → ¬¬ (∀ y → R x y → P y)

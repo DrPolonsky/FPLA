@@ -151,6 +151,10 @@ open import Agda.Builtin.Sigma renaming (_,_ to _,,_) public
 
 syntax Σ-syntax A (λ x → B) = Σ[ x ∈ A ] B
 
+Case : ∀ {A : Set} {B : A → Set} {C : Set}
+       → (Σ[ a ∈ A ] (B a)) → (∀ x → B x → C) → C
+Case (a ,, b) f = f a b
+
 dec≡ : Set → Set
 dec≡ A = ∀ (x y : A) → (x ≡ y) ⊔ ¬ (x ≡ y)
 

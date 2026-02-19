@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-
 open import Logic hiding (_×_)
 open import Classical
 open import Lifting
@@ -20,7 +18,7 @@ record Signature : Set₁ where
   field
     Fs : Set 
     Ar : Fs → ℕ
-    FsDec : (_≡_ {A = Fs} isDec)
+    FsDec : dec≡ Fs
 
   data  Terms (V : Set) : Set where
     var : V → Terms V
@@ -28,9 +26,31 @@ record Signature : Set₁ where
 
   fun≡inv : ∀ {V} (f : Fs) (s t : Vec (Terms V) (Ar f)) → fun f s ≡ fun f t → s ≡ t 
   fun≡inv f s t refl = refl 
-  
 
+  lookup≡ : ∀ {V : Set} {n} (xs ys : Vec V n) → (∀ j → lookup xs j ≡ lookup ys j) → xs ≡ ys
+  lookup≡ {V} {zero} [] [] H = refl
+  lookup≡ {V} {suc n} (x ∷ xs) (y ∷ ys) H = cong2 _∷_ (H zero) (lookup≡ xs ys λ j → H (suc j)) 
+
+  dec≡Terms : ∀ {V} → dec≡ V → dec≡ (Terms V) 
+  dec≡TermsVec : ∀ {V} {n} → dec≡ V → dec≡ (Vec (Terms V) n)
+
+  dec≡Terms dV (var x) (var y) = case (λ { refl → in1 refl }) (λ x≠y → in2 λ { refl → x≠y refl }) (dV x y)
+  dec≡Terms dV (var x) (fun f x₁) = in2 λ { () }
+  dec≡Terms dV (fun f x) (var x₁) = in2 λ { () }
+  dec≡Terms dV (fun f ts) (fun g us)
+    with FsDec f g
+  ... | in2 f≠g = in2 λ { refl → f≠g refl } 
+  ... | in1 refl 
+    with dec≡TermsVec dV ts us
+  ... | in1 yes = in1 (cong (fun f) yes)
+  ... | in2 no  = in2 λ { refl → no refl }
   
+  dec≡TermsVec {n = zero} dV  [] [] = in1 refl 
+  dec≡TermsVec {n = suc k} dV (x ∷ xs) (y ∷ ys) 
+    with dec≡Terms dV x y | dec≡TermsVec dV xs ys 
+  ... | in1 yes1 | in1 yes2 = in1 (cong2 _∷_ yes1 yes2)
+  ... | in1 yes1 | in2 no2  = in2 λ { refl → no2 refl } 
+  ... | in2 no1  | _        = in2 λ { refl → no1 refl }
 
 -- open Signature
 module Substitution (S : Signature) where
@@ -40,9 +60,6 @@ module Substitution (S : Signature) where
   subst : ∀ {V W} → Terms V → (V → Terms W) → Terms W
   subst (var x) ts = ts x
   subst (fun f args) ts = fun f (map (λ s → subst s ts) args)
-      -- f(a1,..,ak) [vs := ts] = f(a1[vs:=ts],...,ak[vs:=ts])
-
-  -- depFold :: ∀ {V} {m : ℕ} (ns : Vec ℕ m) (
 
   data Pattern : ℕ → Set where
     hole : Pattern 1
@@ -105,7 +122,7 @@ module Substitution (S : Signature) where
        ⊔ Σ[ i ∈ Fin n ] (¬ Match (lookup ts i) To snd (lookup ps i))
   matchDec {V} {h} hole t = in1 (t ∷ [] ,, refl)
   matchDec {V} {h} (funp f W) (var x)  = in2 λ {(_ ,, ())}
-  matchDec {V} {h} (funp f W) (fun g ts) with FsDec {f} {g} 
+  matchDec {V} {h} (funp f W) (fun g ts) with FsDec f g
   ... | in2 no = in2 λ {(s ,, refl) → no refl}
   ... | in1 refl -- = {!  !}
     with matchDecs {n = Ar f} W ts
@@ -142,10 +159,10 @@ module Substitution (S : Signature) where
       rhs : Terms (Fin holes)
     -- This encodes left-linear first-order TRSs
   open RRule
-
+ 
   module GeneralTRS {RuleIdx : Set} (Rules : RuleIdx → RRule) where
 
-    module InScope (V : Set) where
+    module GTRSScope {V : Set} where
 
       applyRule : RuleIdx → Terms V → Terms V → Set
       applyRule ri s t with matchDec (lhs (Rules ri)) s
@@ -167,13 +184,60 @@ module Substitution (S : Signature) where
         Rfun : ∀ (f : Fs) (ts : Vec (Terms V) (Ar f)) (j : Fin (Ar f)) {s t u : Terms V}
                  → R (lookup ts j) u → s ≡ fun f ts → t ≡ fun f (ts [ j ]≔ u) → R s t
 
-      Rfun-cong : ∀ (f : Fs) (xs ys : Vec (Terms V) (Ar f)) →
-                   (∀ (j : Fin (Ar f)) → (R ⋆) (lookup xs j) (lookup ys j))
-                   → (R ⋆) (fun f xs) (fun f ys)
-      Rfun-cong f xs ys H = {!  !}
+    open GTRSScope public 
+  -- open GeneralTRS public 
 
-    open InScope public 
-  open GeneralTRS public 
+  -- Finite TRS 
+  record FTRS {k : ℕ} : Set where 
+    constructor ftrs 
+    field 
+      Rules : Fin k → RRule 
+
+    open GeneralTRS Rules 
+    module FTRSScope {V : Set} where 
+
+      open import Agda.Builtin.List 
+      open import Lists
+      open import Relations.FinitelyBranching
+
+      applyRules : ∀ (rs : List (Fin k)) (t : Terms V)
+          → Σ[ us ∈ List (Terms V) ] (∀ u → u ∈List us ↔ List∃ (λ r → applyRule r t u) rs)
+      applyRules [] t = [] ,, λ _ → (λ { () }) , λ { () }
+      applyRules (r ∷ rs) t
+        with applyRules rs t 
+      ... | us ,, U+-
+        with matchDec (lhs (Rules r)) t in eq
+      ... | in1 (sub ,, refl)  = (subst (rhs (Rules r)) (lookup sub) ∷ us) 
+        ,, λ u → (λ { (in1 refl) → in1 refl
+                    ; (in2 down) → in2 (pr1 (U+- u) down) }) 
+               , λ { (in1 refl) → in1 refl
+                   ; (in2 down) → in2 (pr2 (U+- u) down) }
+      ... | in2 no  = us 
+        ,, λ u → (λ occ → in2 (pr1 (U+- u) occ))
+               , λ { (in2 prf) → pr2 (U+- u) prf }
+
+      Fin∈allFin : ∀ {m} (j : Fin m) → j ∈List toList (allFin m)
+      Fin∈allFin zero = in1 refl
+      Fin∈allFin {suc m} (suc j) = 
+        in2 (transp (λ x → suc j ∈List toList x) (~ (tabulate-allFin suc)) 
+                    (transp (λ x → suc j ∈List x) (~ (toList-map suc (allFin m)))
+                    (map∈ suc j (toList (allFin m)) (Fin∈allFin j)) ))
+
+      R₀isFBRel  : R₀ {V} isFBRel
+      R₀isFBRel s 
+        with applyRules (toList (allFin k)) s 
+      ... | (us ,, US) = us ,, λ b 
+        → (λ { (j ,, p) → pr2 (US b) (List∃intro _ (toList (allFin k)) j 
+                (Fin∈allFin j , p)) } ) 
+              , λ b∈us → Case (List∃elim _ (toList (allFin k)) (pr1 (US b) b∈us)) 
+                              λ p q →  p ,, pr2 q 
+      RisFBRel  : R isFBRel
+      RisFBRels : ∀ {n} (ts : Vec (Terms V) n) → ∀ j → FBRel R (lookup ts j)
+      RisFBRel  t = {!   !}
+      RisFBRels (t ∷ ts) zero = RisFBRel t
+      RisFBRels (t ∷ ts) (suc j) = RisFBRels ts j
+
+
 open Substitution
 open import Relation.Nullary
 
