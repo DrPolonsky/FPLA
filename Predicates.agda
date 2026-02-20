@@ -90,6 +90,9 @@ module ContainmentAndEquivalence {A : Set} where
   _⇔_ : ∀ {n : ℕ} → 𝓟^ n A → 𝓟^ n A → Set
   A ⇔ B = A ⊆ B × B ⊆ A
 
+  ↔𝓟⇔ : ∀ {P Q : 𝓟 A} → (∀ x → P x ↔ Q x) → P ⇔ Q
+  ↔𝓟⇔ P↔Q = (λ x → pr1 (P↔Q x)) , (λ x → pr2 (P↔Q x))
+
   infixr 15 _⇔_
   infix 16 _⊆_
 
