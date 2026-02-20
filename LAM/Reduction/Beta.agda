@@ -18,6 +18,8 @@ open import Relations.ClosureOperators
 data _⟶ₒ_ {X : Set} : Λ X → Λ X → Set where
   redex : ∀ {r s t}  →  (e : s [ t ]ₒ ≡ r)  →  app (abs s) t ⟶ₒ r
 
+
+
 -- One-step beta reduction is the contextual closure of ⟶ₒ
 data _⟶β_ {X : Set} : Λ X → Λ X → Set where
   red⟶β  : ∀ {s t}     →  s ⟶ₒ t       →  s ⟶β t

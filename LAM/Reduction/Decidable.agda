@@ -1,10 +1,11 @@
 module LAM.Reduction.Decidable where 
 
 open import Logic 
+open import Predicates
 open import Classical using (EM)
 open import Lifting 
 open import LAM.Lambda 
-open import LAM.Reduction.Reduction
+open import LAM.Reduction.Beta
 -- open import Predicates using (dec2)
 
 dec𝓡Λ : 𝓡Λ → Set₁ 
@@ -45,5 +46,14 @@ dec⟶β dX (app s1 s2) t
 ... | in2 no1 | in2 no2 | c | d = in2 λ { (red⟶β x) → noRoot x ; (appL⟶β rdx) → no1 rdx ; (appR⟶β rdx) → no2 rdx }
 ... | a | b | in2 no3 | in2 no4 = in2 (λ { (red⟶β x) → noRoot x ; (appL⟶β apl) → no4 refl ; (appR⟶β apr) → no3 refl }  ) 
 
+open import LAM.Reduction.FinitelyBranching 
+open import ARS.Properties
+open import ARS.Implications 
+open LocalProperties 
+
+open Hierarchy-Implications
+
+SN⊆WN⟶β : ∀ {X : Set} → dec≡ X → ∀ (t : Λ X) → t ∈ SN {R = _⟶β_ {X}} → t ∈ WN {R = _⟶β_ {X}}
+SN⊆WN⟶β dX t t∈SN = dec∧FB→SN⊆WN (dec⟶β dX _ _) ⟶βisFB t t∈SN 
 
 -- The end 

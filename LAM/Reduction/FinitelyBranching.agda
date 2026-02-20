@@ -3,7 +3,7 @@ open import Classical using (EM)
 open import Lifting 
 open import Predicates
 open import LAM.Lambda 
-open import LAM.Reduction.Reduction
+open import LAM.Reduction.Beta
 open import Relations.FinitelyBranching 
 
 open import Agda.Builtin.List
