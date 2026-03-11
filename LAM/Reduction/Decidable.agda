@@ -47,13 +47,23 @@ dec⟶β dX (app s1 s2) t
 ... | a | b | in2 no3 | in2 no4 = in2 (λ { (red⟶β x) → noRoot x ; (appL⟶β apl) → no4 refl ; (appR⟶β apr) → no3 refl }  ) 
 
 open import LAM.Reduction.FinitelyBranching 
-open import ARS.Properties
+open import ARS.Properties 
 open import ARS.Implications 
-open LocalProperties 
+open LocalProperties using (SN;WN)
 
 open Hierarchy-Implications
 
 SN⊆WN⟶β : ∀ {X : Set} → dec≡ X → ∀ (t : Λ X) → t ∈ SN {R = _⟶β_ {X}} → t ∈ WN {R = _⟶β_ {X}}
 SN⊆WN⟶β dX t t∈SN = dec∧FB→SN⊆WN (dec⟶β dX _ _) ⟶βisFB t t∈SN 
+
+open import Relations.Core
+open import Relations.Decidable 
+open import Relations.FinitelyBranching
+
+⟶βisMinDec : ∀ {X} → dec≡ X → (~R (_⟶β_ {X})) isMinDec
+⟶βisMinDec decX = dec∧FB→isMinDec (_⟶β_) (dec⟶β decX _ _) ⟶βisFB 
+
+decNFβ : ∀ {X} → dec≡ X → dec (NF {X}) 
+decNFβ {X} decX s = pr2 (MinDec⊆∁RMin⊆ΣR∩decNF (~R (_⟶β_ {X})) s (⟶βisMinDec decX s))
 
 -- The end 
