@@ -1,20 +1,33 @@
-module ARS.Properties {A : Set} where
+module ARS.Properties {ℓ₁} {A : Set ℓ₁} where
 
-open import Relations.Relations
-open import Predicates
-open import Logic
-open import Datatypes using (ℕ; zero)
-open import Relations.Seq
-open import Relations.WellFounded.WFDefinitions
+-- open import Relations.Relations
+-- open import Predicates
+-- open import Logic
+-- open import Datatypes using (ℕ; zero)
+-- open import Relations.Seq
+-- open import Relations.WellFounded.WFDefinitions
 
-_↘_↙_ : A → 𝓡 A → A → Set
-_↘_↙_ x R y = (R ∘~ R) x y
+open import Level using (Level; _⊔_)
+open import Relation.Binary.Core using (Rel)
+open import Relation.Binary.Definitions using (Trans; Sym)
+open import Relation.Binary.Construct.Composition renaming (_;_ to RelComp)
+open import Function.Base using (flip)
+private
+  variable
+    ℓ₂ : Level
+    ℓ₃ : Level
 
-_↙_↘_ : A → 𝓡 A → A → Set
-_↙_↘_ x R y = (R ~∘ R) x y
+-- A peak/span of two rewrite steps
+_↙_↘_ : A → Rel A ℓ₂ → A → Set (ℓ₁ ⊔ ℓ₂)
+_↙_↘_ x R y = RelComp (flip R) R x y
+
+-- A valley/cospan
+_↘_↙_ : A → Rel A ℓ₂ → A → Set (ℓ₁ ⊔ ℓ₂)
+_↘_↙_ x R y = RelComp R (flip R) x y
+
 
 {- Local and global properties for ARS -}
-
+{-
 module LocalProperties {R : 𝓡 A} where
 
     WCR : 𝓟 A
@@ -49,7 +62,7 @@ module LocalProperties {R : 𝓡 A} where
     WM x = Σ[ r ∈ A ] ((R ⋆) x r × MF r)
 
     -- Strongly minimal form
-    data SM : 𝓟 A where 
+    data SM : 𝓟 A where
       MF⊆SM : ∀ x → MF x → SM x
       SMind : ∀ x → (∀ y → R x y → SM y) → SM x
 
@@ -129,3 +142,4 @@ module MiscProperties (R : 𝓡 A) where
   WFmin→WN : (~R R) isWFmin → R isWN
   WFmin→WN ~RisWFmin x with ~RisWFmin ((R ⋆) x) x ε⋆
   ... | (n ,, R*xn , nmin) = n ,, R*xn , λ Rny → nmin _ (R*xn ⋆!⋆ (Rny ,⋆ ε⋆) )  Rny
+-}
