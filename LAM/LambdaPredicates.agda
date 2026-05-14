@@ -1,7 +1,11 @@
 open import Logic
 open import Lifting
-open import Lambda
+open import LAM.Lambda
 open import Predicates
+
+open import Relations.Core
+open import Relations.ClosureOperators
+
 
 {-
 The following is defined in Lambda.agda
@@ -11,13 +15,22 @@ The following is defined in Lambda.agda
 ΛRel = ∀ {X : Set} → Λ X → Λ X → Set
 
 -}
-module LambdaPredicates where
+module LAM.LambdaPredicates where
 
 Λ𝓟 : Set₁
 Λ𝓟 = ∀ {X} → 𝓟 (Λ X)
 
 Λ𝓡 : Set₁
-Λ𝓡 = ΛRel
+Λ𝓡 = ∀ {X} → Λ X → Λ X → Set
+
+~Λ𝓡 : Λ𝓡 → Λ𝓡 
+~Λ𝓡 R {X} = ~R (R {X}) 
+
+_Λ↓_ : Λ𝓟 → Λ𝓡 → Λ𝓟 
+_Λ↓_ P R {X} t = Σ[ s ∈ Λ X ] (s ∈ P × R s t)
+
+-- Λ𝓡 : Set₁
+-- Λ𝓡 = ΛRel
 
 Functorial : Λ𝓡 → Set₁
 Functorial R = ∀ {X Y : Set} (f : X → Y)
@@ -43,6 +56,7 @@ record ΛCongruence (R : Λ𝓡) : Set₁ where
     abs𝓡 (s [ lift f ]) (s [ lift g ])
           (CongSubst Rmap (lift f) (lift g) (io𝓟 _ (λ x → Rmap i (fRg x)) (var𝓡 o) ) s )
 
+{-
 module Lambda^ where
   var^ : ∀ {n : ℕ} {A : Set} → 𝓟^ n A → 𝓟^ n (Λ A)
   var^ {zero}   P         = P
@@ -65,3 +79,4 @@ module Lambda^ where
   Λ^ {succ n} {A} P (app t1 t2) = app^ (Λ^ P t1) (Λ^ P t2)
   Λ^ {succ n} {A} P (abs t0)    = abs^ (Λ^ (↑^ P) t0)
 open Lambda^ public
+-}

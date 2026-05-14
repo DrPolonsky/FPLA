@@ -148,7 +148,6 @@ isSubset {A} eq xs ys = check xs ys where
 isSubset' : ∀ {A} → (A → A → 𝔹) → List A → List A → 𝔹
 isSubset' f a1 a2 = all (λ x → elem f x a2 ) a1
 
-
 List- : ∀ {A} → (A → A → 𝔹) → List A → List A → List A
 List- f [] a2 = []
 List- f xs@(x ∷ a1) [] = xs
@@ -157,3 +156,7 @@ List- f (x ∷ a1) (y ∷ a2) = List- f (drop f y (x ∷ a1)) a2
 flatten : ∀ {A} → (List (List A)) → List A
 flatten [] = []
 flatten (al ∷ as) = al ++ (flatten as)
+
+List→length : ∀ {A B} (f : A → B) (xs : List A) → length xs ≡ length (List→ f xs) 
+List→length f [] = refl
+List→length f (x ∷ xs) = cong succ (List→length f xs)

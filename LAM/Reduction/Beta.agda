@@ -4,12 +4,10 @@ module LAM.Reduction.Beta where
 open import Logic
 open import Lifting
 open import LAM.Lambda
+open import LAM.LambdaPredicates
 open import Predicates
 open import Relations.Core
 open import Relations.ClosureOperators
-
-𝓡Λ : Set₁
-𝓡Λ = ∀ {X} → Λ X → Λ X → Set
 
 -- The axiom of beta reduction
 -- s ⟶ₒ t  if t results from s by contracting a beta redex
@@ -17,8 +15,6 @@ open import Relations.ClosureOperators
 -- ⟶ₒ is \-->\_o
 data _⟶ₒ_ {X : Set} : Λ X → Λ X → Set where
   redex : ∀ {r s t}  →  (e : s [ t ]ₒ ≡ r)  →  app (abs s) t ⟶ₒ r
-
-
 
 -- One-step beta reduction is the contextual closure of ⟶ₒ
 data _⟶β_ {X : Set} : Λ X → Λ X → Set where
@@ -145,9 +141,9 @@ reflCC R (abs t0) = absCC (reflCC R t0 )
 -- Examples
 
 -- The identity combinator
-IC : ∀ {X} → Λ X
-IC = abs (var o )
-
+-- IC : ∀ {X} → Λ X
+-- IC = abs (var o )
+--
 -- One-step beta reduction (contraction at the root)
 II→I : ∀ {X} → app (IC {X}) IC ⟶β IC
 II→I = ax𝓡Λ (red refl)
